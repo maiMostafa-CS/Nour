@@ -1,0 +1,56 @@
+name: islamic_app
+description: Offline Islamic app built with Clean Architecture and BLoC.
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.5.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # UI
+  cupertino_icons: ^1.0.9
+  hijri: ^3.0.1
+  # State Management
+  flutter_bloc: ^9.1.1
+  equatable: ^2.0.7
+  just_audio: ^0.10.6
+  flutter_local_notifications: ^22.3.0
+  timezone: ^0.11.1
+  flutter_timezone: ^5.1.0
+  flutter_foreground_task: ^11.0.1
+  # Dependency Injection
+  get_it: ^9.2.1
+  # Location
+  geocoding: ^5.0.0
+  geolocator: ^14.0.3
+  flutter_compass: ^0.8.1
+  permission_handler: ^13.0.2
+  alarm: ^5.12.0
+  # Date & Time
+  intl: ^0.20.3
+  android_alarm_manager_plus: ^5.1.1
+  # Prayer Times
+  adhan_dart: ^2.0.0
+  # Local Storage
+  shared_preferences: ^2.5.5
+  audioplayers: ^6.8.1
+  workmanager: ^0.10.10
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/quran/
+    - assets/adhkar/
+    - assets/images/
+    - assets/adhan-mp3/
+    - assets/prayer_time_soon/
+    - assets/countriesCapitals/
