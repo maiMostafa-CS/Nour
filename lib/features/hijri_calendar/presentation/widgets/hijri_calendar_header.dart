@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class HijriCalendarHeader extends StatelessWidget {
   final String monthName;
@@ -22,8 +23,9 @@ class HijriCalendarHeader extends StatelessWidget {
       children: [
         IconButton(
           onPressed: onNext,
-          icon: const Icon(
+          icon: Icon(
             Icons.chevron_left_rounded,
+            size: 28.sp,
           ),
         ),
 
@@ -31,16 +33,18 @@ class HijriCalendarHeader extends StatelessWidget {
           children: [
             Text(
               monthName,
-              style: const TextStyle(
-                fontSize: 21,
+              style: TextStyle(
+                fontSize: 21.sp,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 4),
+
+            SizedBox(height: 4.h),
+
             Text(
               '$year هـ',
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 14.sp,
                 color: Colors.grey.shade600,
               ),
             ),
@@ -49,8 +53,9 @@ class HijriCalendarHeader extends StatelessWidget {
 
         IconButton(
           onPressed: onPrevious,
-          icon: const Icon(
+          icon: Icon(
             Icons.chevron_right_rounded,
+            size: 28.sp,
           ),
         ),
       ],

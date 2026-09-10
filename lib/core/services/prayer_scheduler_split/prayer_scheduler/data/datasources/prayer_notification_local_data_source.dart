@@ -25,4 +25,9 @@ abstract class PrayerNotificationLocalDataSource {
   });
 
   Future<void> cancelAll();
+  Future<void> forceReschedule({
+    required double latitude,
+    required double longitude,
+    required int days,
+  });
 }

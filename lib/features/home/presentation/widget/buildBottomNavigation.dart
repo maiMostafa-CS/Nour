@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/router/app_router.dart';
 
@@ -93,7 +94,7 @@ class CustomBottomNavigation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 72,
+      height: 72.h,
       decoration: BoxDecoration(
         color: const Color(0xFFF8F6F0),
         border: Border(
@@ -117,22 +118,22 @@ class CustomBottomNavigation extends StatelessWidget {
                 index,
               ),
               child: SizedBox(
-                width: 55,
+                width: 55.w,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(
                       item.icon,
-                      size: 22,
+                      size: 22.sp,
                       color: selected
                           ? item.color
                           : const Color(0xFF777777),
                     ),
-                    const SizedBox(height: 4),
+                    SizedBox(height: 4.h),
                     Text(
                       item.label,
                       style: TextStyle(
-                        fontSize: 9,
+                        fontSize: 9.sp,
                         fontWeight: selected
                             ? FontWeight.bold
                             : FontWeight.normal,

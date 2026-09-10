@@ -4,15 +4,15 @@ import 'package:alarm/alarm.dart';
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../../../../../../features/prayer_times/data/datasources/prayer_local_data_source.dart';
 import '../../../../../../features/prayer_times/domain/entities/PrayerDayScheduleEntity.dart';
-import '../../../../adhan_scheduler_service.dart' as legacy;
+import '../../adhan_scheduler_service.dart';
 import '../../config/prayer_scheduler_config.dart';
 import '../../notifications/countdown_notification_service.dart';
 import '../../scheduler/adhan_scheduler.dart';
 import '../../scheduler/countdown_scheduler.dart';
 import '../../scheduler/iqama_scheduler.dart';
-import '../../scheduler/reminder_scheduler.dart';
 import '../../utils/prayer_scheduler_ids.dart';
 import 'prayer_notification_local_data_source.dart';
 
@@ -24,18 +24,15 @@ class PrayerNotificationLocalDataSourceImpl
 
   final PrayerLocalDataSource _prayerCalculator;
 
-  @override
-  Future<void> scheduleForDays({
+  // ============================================================
+  // BUILD SCHEDULE
+  // ============================================================
+
+  Future<List<DailyPrayerTimesEntity>> _buildSchedule({
     required double latitude,
     required double longitude,
     required int days,
   }) async {
-    prayerSchedulerLog('════════════════════════════════════');
-    prayerSchedulerLog('🚀 START scheduleForDays()');
-    prayerSchedulerLog('📍 latitude = $latitude');
-    prayerSchedulerLog('📍 longitude = $longitude');
-    prayerSchedulerLog('📅 days = $days');
-
     final now = DateTime.now();
 
     final today = DateTime(
@@ -71,8 +68,33 @@ class PrayerNotificationLocalDataSourceImpl
       );
     }
 
-    // Rolling scheduling: never cancel existing future alarms here.
-    // Alarm IDs are deterministic, so scheduling the same prayer updates it safely.
+    return schedule;
+  }
+
+  // ============================================================
+  // SCHEDULE FOR DAYS
+  // ============================================================
+
+  @override
+  Future<void> scheduleForDays({
+    required double latitude,
+    required double longitude,
+    required int days,
+  }) async {
+    prayerSchedulerLog('════════════════════════════════════');
+    prayerSchedulerLog('🚀 START scheduleForDays()');
+    prayerSchedulerLog('📍 latitude = $latitude');
+    prayerSchedulerLog('📍 longitude = $longitude');
+    prayerSchedulerLog('📅 days = $days');
+
+    final now = DateTime.now();
+
+    final schedule = await _buildSchedule(
+      latitude: latitude,
+      longitude: longitude,
+      days: days,
+    );
+
     final windowEntries = <Map<String, String>>[];
 
     var scheduledAdhans = 0;
@@ -84,23 +106,10 @@ class PrayerNotificationLocalDataSourceImpl
       final day = schedule[dayIndex];
 
       for (final moment in day.toMoments()) {
+        // ======================================================
+        // ADHAN
+        // ======================================================
 
-
-        final reminderTime =
-        moment.time.subtract(const Duration(minutes: 5));
-
-        // if (reminderTime.isAfter(now)) {
-        //   try {
-        //     await ReminderScheduler.schedule(
-        //       dayIndex: dayIndex,
-        //       moment: moment,
-        //     );
-        //     scheduledReminders++;
-        //   } catch (e, stackTrace) {
-        //     prayerSchedulerLog('❌ Reminder FAILED: $e');
-        //     prayerSchedulerLog('STACKTRACE: $stackTrace');
-        //   }
-        // }
         final adhanScheduled = await AdhanScheduler.schedule(
           dayIndex: dayIndex,
           moment: moment,
@@ -110,8 +119,13 @@ class PrayerNotificationLocalDataSourceImpl
           scheduledAdhans++;
         }
 
-        final iqamaTime =
-        moment.time.add(const Duration(minutes: 15));
+        // ======================================================
+        // IQAMA +15 MINUTES
+        // ======================================================
+
+        final iqamaTime = moment.time.add(
+          const Duration(minutes: 15),
+        );
 
         if (iqamaTime.isAfter(now)) {
           try {
@@ -119,6 +133,7 @@ class PrayerNotificationLocalDataSourceImpl
               dayIndex: dayIndex,
               moment: moment,
             );
+
             scheduledIqamas++;
           } catch (e, stackTrace) {
             prayerSchedulerLog('❌ Iqama FAILED: $e');
@@ -126,17 +141,31 @@ class PrayerNotificationLocalDataSourceImpl
           }
         }
 
+        // ======================================================
+        // COUNTDOWN UPDATE
+        // ======================================================
+
         if (moment.time.isAfter(now)) {
           try {
             await CountdownScheduler.schedule(
               moment: moment,
             );
+
             scheduledCountdowns++;
           } catch (e, stackTrace) {
-            prayerSchedulerLog('❌ Countdown update FAILED: $e');
-            prayerSchedulerLog('STACKTRACE: $stackTrace');
+            prayerSchedulerLog(
+              '❌ Countdown update FAILED: $e',
+            );
+
+            prayerSchedulerLog(
+              'STACKTRACE: $stackTrace',
+            );
           }
         }
+
+        // ======================================================
+        // SAVE WINDOW
+        // ======================================================
 
         windowEntries.add({
           'name': moment.name,
@@ -144,6 +173,10 @@ class PrayerNotificationLocalDataSourceImpl
         });
       }
     }
+
+    // ==========================================================
+    // SAVE SCHEDULING DATA
+    // ==========================================================
 
     final prefs = await SharedPreferences.getInstance();
 
@@ -154,150 +187,517 @@ class PrayerNotificationLocalDataSourceImpl
 
     await prefs.setString(
       prayerScheduledFromPrefsKey,
-      today.toIso8601String(),
+      DateTime(
+        now.year,
+        now.month,
+        now.day,
+      ).toIso8601String(),
     );
 
-    await prefs.setDouble(prayerLastLatitudePrefsKey, latitude);
-    await prefs.setDouble(prayerLastLongitudePrefsKey, longitude);
+    // الموقع الذي اتعملت عليه الجدولة
+    await prefs.setDouble(
+      prayerScheduledLatitudePrefsKey,
+      latitude,
+    );
+
+    await prefs.setDouble(
+      prayerScheduledLongitudePrefsKey,
+      longitude,
+    );
+
+    // آخر موقع معروف
+    await prefs.setDouble(
+      prayerLastLatitudePrefsKey,
+      latitude,
+    );
+
+    await prefs.setDouble(
+      prayerLastLongitudePrefsKey,
+      longitude,
+    );
+
     await prefs.setString(
       prayerNotificationWindowPrefsKey,
       jsonEncode(windowEntries),
     );
 
+    // ==========================================================
+    // INITIAL COUNTDOWN
+    // ==========================================================
+
     try {
       await CountdownNotificationService.showNextPrayerCountdown();
     } catch (e, stackTrace) {
-      prayerSchedulerLog('❌ Initial countdown FAILED: $e');
-      prayerSchedulerLog('STACKTRACE: $stackTrace');
+      prayerSchedulerLog(
+        '❌ Initial countdown FAILED: $e',
+      );
+
+      prayerSchedulerLog(
+        'STACKTRACE: $stackTrace',
+      );
     }
 
-    prayerSchedulerLog('🎉 SCHEDULING FINISHED SUCCESSFULLY');
+    prayerSchedulerLog(
+      '🎉 SCHEDULING FINISHED SUCCESSFULLY',
+    );
+
     prayerSchedulerLog('📅 Days = $days');
     prayerSchedulerLog('🕌 Adhans = $scheduledAdhans');
     prayerSchedulerLog('🔔 Reminders = $scheduledReminders');
     prayerSchedulerLog('🕋 Iqamas = $scheduledIqamas');
-    prayerSchedulerLog('⏱️ Countdown updates = $scheduledCountdowns');
-    prayerSchedulerLog('📦 Total entries = ${windowEntries.length}');
-    prayerSchedulerLog('════════════════════════════════════');
+    prayerSchedulerLog(
+      '⏱️ Countdown updates = $scheduledCountdowns',
+    );
+    prayerSchedulerLog(
+      '📦 Total entries = ${windowEntries.length}',
+    );
+
+    prayerSchedulerLog(
+      '════════════════════════════════════',
+    );
   }
 
-  /// يتأكد إن فيه [days] يوم قدام دايماً مجدولين (نافذة متجددة).
-  ///
-  /// بيقرأ آخر تاريخ اتجدولت منه النافذة (`prayerScheduledFromPrefsKey`)
-  /// وعدد الأيام اللي اتجدولوا (`prayerScheduledDaysPrefsKey`)، وبيحسب
-  /// كام يوم "متبقي" فعلياً من النافذة القديمة من النهاردة. لو المتبقي
-  /// أقل من [days] (يعني النافذة قربت تخلص أو فيه فجوة)، بينادي
-  /// [scheduleForDays] عشان يعيد بناء نافذة كاملة [days] يوم من النهاردة.
-  ///
-  /// لو النافذة لسه كافية، الدالة مبتعملش حاجة (تجنباً لعمل cancel +
-  /// reschedule كامل لكل الـ Alarms من غير داعي).
+  // ============================================================
+  // ENSURE ROLLING WINDOW
+  // ============================================================
+
   @override
   Future<void> ensureWindowScheduled({
     required double latitude,
     required double longitude,
-    int days = 30,
+    int days = kPrayerNotificationWindowDays,
   }) async {
     final prefs = await SharedPreferences.getInstance();
 
-    final scheduledFromIso = prefs.getString(prayerScheduledFromPrefsKey);
-    final scheduledDays = prefs.getInt(prayerScheduledDaysPrefsKey);
-
-    final today = DateTime(
-      DateTime.now().year,
-      DateTime.now().month,
-      DateTime.now().day,
+    final scheduledDays = prefs.getInt(
+      prayerScheduledDaysPrefsKey,
     );
 
-    var needsReschedule = true;
+    final scheduledFromIso = prefs.getString(
+      prayerScheduledFromPrefsKey,
+    );
 
-    if (scheduledFromIso != null && scheduledDays != null) {
-      final scheduledFrom = DateTime.parse(scheduledFromIso);
-      final lastCoveredDay =
-      scheduledFrom.add(Duration(days: scheduledDays - 1));
+    bool needsReschedule = false;
 
-      // كام يوم "كامل" فاضل من آخر يوم مغطى، ابتداءً من النهاردة؟
-      final daysRemaining = lastCoveredDay.difference(today).inDays;
+    // ==========================================================
+    // NO PREVIOUS SCHEDULE
+    // ==========================================================
 
-      // لو لسه فاضل نفس عدد الأيام المطلوب (أو أكتر)، النافذة كويسة.
-      // Renew in the background every couple of days worth of coverage,
-      // while keeping existing alarms untouched.
-      needsReschedule = daysRemaining < 2;
-
+    if (scheduledDays == null || scheduledFromIso == null) {
       prayerSchedulerLog(
-        '🔎 ensureWindowScheduled: daysRemaining=$daysRemaining, '
-            'needed=${days - 1}, needsReschedule=$needsReschedule',
+        '📅 No previous schedule found → RESCHEDULE',
       );
+
+      needsReschedule = true;
     } else {
-      prayerSchedulerLog(
-        '🔎 ensureWindowScheduled: no previous window found, scheduling fresh',
+      final scheduledFrom = DateTime.tryParse(
+        scheduledFromIso,
       );
+
+      if (scheduledFrom == null) {
+        prayerSchedulerLog(
+          '❌ Invalid scheduledFrom → RESCHEDULE',
+        );
+
+        needsReschedule = true;
+      } else {
+        final today = DateTime.now();
+
+        final startDate = DateTime(
+          scheduledFrom.year,
+          scheduledFrom.month,
+          scheduledFrom.day,
+        );
+
+        final currentDate = DateTime(
+          today.year,
+          today.month,
+          today.day,
+        );
+
+        final daysPassed = currentDate
+            .difference(startDate)
+            .inDays;
+
+        final daysRemaining =
+            scheduledDays - daysPassed;
+
+        prayerSchedulerLog(
+          '📅 Scheduled=$scheduledDays | '
+              'Passed=$daysPassed | '
+              'Remaining=$daysRemaining',
+        );
+
+        // ======================================================
+        // لو باقي يوم واحد أو أقل
+        // ======================================================
+
+        if (daysRemaining <= 1) {
+          prayerSchedulerLog(
+            '🔄 Schedule window almost finished → RESCHEDULE',
+          );
+
+          needsReschedule = true;
+        }
+      }
     }
 
-    if (needsReschedule) {
-      await scheduleForDays(
+    // ==========================================================
+    // CHECK LOCATION
+    // ==========================================================
+
+    if (!needsReschedule) {
+      final locationChanged =
+      await _hasScheduledLocationChanged(
+        latitude: latitude,
+        longitude: longitude,
+      );
+
+      if (locationChanged) {
+        prayerSchedulerLog(
+          '📍 Location changed → RESCHEDULE',
+        );
+
+        needsReschedule = true;
+      }
+    }
+
+    // ==========================================================
+    // CHECK FUTURE ADHANS
+    // ==========================================================
+
+    if (!needsReschedule) {
+      final alarmsExist =
+      await _areFutureAdhansScheduled(
         latitude: latitude,
         longitude: longitude,
         days: days,
       );
+
+      if (!alarmsExist) {
+        prayerSchedulerLog(
+          '❌ Future Adhan alarm missing → RESCHEDULE',
+        );
+
+        needsReschedule = true;
+      }
+    }
+
+    // ==========================================================
+    // RESCHEDULE
+    // ==========================================================
+
+    if (needsReschedule) {
+      await forceReschedule(
+        latitude: latitude,
+        longitude: longitude,
+        days: days,
+      );
+    } else {
+      prayerSchedulerLog(
+        '✅ Existing $days-day schedule is still valid',
+      );
     }
   }
 
-  /// بتتنادى من الـ Alarm.ringing listener بعد كل أذان/تنبيه/إقامة يرن.
-  /// دي هي نقطة الـ "auto-renew": مش بتعمل حاجة تقيلة كل مرة، بس بتتأكد
-  /// (عن طريق [ensureWindowScheduled]) إن النافذة لسه كافية، وتمدها لو لأ.
+  // ============================================================
+  // CHECK LOCATION
+  // ============================================================
+
+  Future<bool> _hasScheduledLocationChanged({
+    required double latitude,
+    required double longitude,
+  }) async {
+    final prefs = await SharedPreferences.getInstance();
+
+    final scheduledLatitude = prefs.getDouble(
+      prayerScheduledLatitudePrefsKey,
+    );
+
+    final scheduledLongitude = prefs.getDouble(
+      prayerScheduledLongitudePrefsKey,
+    );
+
+    if (scheduledLatitude == null ||
+        scheduledLongitude == null) {
+      prayerSchedulerLog(
+        '📍 No scheduled location found → RESCHEDULE',
+      );
+
+      return true;
+    }
+
+    const tolerance = 0.0001;
+
+    final latitudeChanged =
+        (scheduledLatitude - latitude).abs() >
+            tolerance;
+
+    final longitudeChanged =
+        (scheduledLongitude - longitude).abs() >
+            tolerance;
+
+    final changed =
+        latitudeChanged || longitudeChanged;
+
+    prayerSchedulerLog(
+      '📍 SCHEDULED LOCATION CHECK | '
+          'scheduled=($scheduledLatitude,$scheduledLongitude) | '
+          'current=($latitude,$longitude) | '
+          'changed=$changed',
+    );
+
+    return changed;
+  }
+
+  // ============================================================
+  // CHECK FUTURE ADHANS
+  // ============================================================
+
+  Future<bool> _areFutureAdhansScheduled({
+    required double latitude,
+    required double longitude,
+    required int days,
+  }) async {
+    final now = DateTime.now();
+
+    final schedule = await _buildSchedule(
+      latitude: latitude,
+      longitude: longitude,
+      days: days,
+    );
+
+    for (final day in schedule) {
+      for (final moment in day.toMoments()) {
+        // الصلاة انتهت
+        if (!moment.time.isAfter(now)) {
+          continue;
+        }
+
+        final id = PrayerSchedulerIds.adhan(
+          moment.time,
+          moment.index,
+        );
+
+        final alarm = await Alarm.getAlarm(id);
+
+        if (alarm == null) {
+          prayerSchedulerLog(
+            '❌ Missing future Adhan alarm | '
+                'id=$id | '
+                'prayer=${moment.name} | '
+                'time=${moment.time}',
+          );
+
+          return false;
+        }
+
+        if (!alarm.dateTime.isAfter(now)) {
+          prayerSchedulerLog(
+            '❌ Adhan alarm is not future | '
+                'id=$id | '
+                'alarmTime=${alarm.dateTime}',
+          );
+
+          return false;
+        }
+      }
+    }
+
+    prayerSchedulerLog(
+      '✅ All future Adhan alarms are scheduled',
+    );
+
+    return true;
+  }
+
+  // ============================================================
+  // ALARM FIRED
+  // ============================================================
+
   @override
   Future<void> onAlarmFired({
     required double latitude,
     required double longitude,
-    int days = 30,
-  }) {
-    return ensureWindowScheduled(
+    int days = kPrayerNotificationWindowDays,
+  }) async {
+    prayerSchedulerLog(
+      '🔔 onAlarmFired()',
+    );
+
+    prayerSchedulerLog(
+      '📍 location=$latitude,$longitude',
+    );
+
+    await ensureWindowScheduled(
       latitude: latitude,
       longitude: longitude,
       days: days,
     );
   }
 
+  // ============================================================
+  // FORCE RESCHEDULE
+  // ============================================================
+
+  @override
+  Future<void> forceReschedule({
+    required double latitude,
+    required double longitude,
+    required int days,
+  }) async {
+    prayerSchedulerLog(
+      '🚨 FORCE RESCHEDULE START',
+    );
+
+    prayerSchedulerLog(
+      '📍 NEW LOCATION = $latitude, $longitude',
+    );
+
+    prayerSchedulerLog(
+      '📅 DAYS = $days',
+    );
+
+    try {
+      // إلغاء الجدول القديم
+      await cancelAll();
+
+      prayerSchedulerLog(
+        '🛑 OLD SCHEDULE CANCELLED',
+      );
+
+      // إنشاء جدول جديد
+      await scheduleForDays(
+        latitude: latitude,
+        longitude: longitude,
+        days: days,
+      );
+
+      prayerSchedulerLog(
+        '✅ FORCE RESCHEDULE COMPLETED',
+      );
+    } catch (e, stackTrace) {
+      prayerSchedulerLog(
+        '❌ FORCE RESCHEDULE FAILED: $e',
+      );
+
+      prayerSchedulerLog(
+        'STACKTRACE: $stackTrace',
+      );
+
+      rethrow;
+    }
+  }
+
+  // ============================================================
+  // CANCEL ALL
+  // ============================================================
+
   @override
   Future<void> cancelAll() async {
-    prayerSchedulerLog('🛑 START cancelAll()');
+    prayerSchedulerLog(
+      '🛑 START cancelAll()',
+    );
 
     final prefs = await SharedPreferences.getInstance();
 
-    final previousDays = prefs.getInt(prayerScheduledDaysPrefsKey) ?? 30;
-    final scheduledFromIso = prefs.getString(prayerScheduledFromPrefsKey);
-    final scheduledFrom = scheduledFromIso != null
-        ? DateTime.tryParse(scheduledFromIso)
+    final previousDays =
+        prefs.getInt(
+          prayerScheduledDaysPrefsKey,
+        ) ??
+            kPrayerNotificationWindowDays;
+
+    final scheduledFromIso =
+    prefs.getString(
+      prayerScheduledFromPrefsKey,
+    );
+
+    final scheduledFrom =
+    scheduledFromIso != null
+        ? DateTime.tryParse(
+      scheduledFromIso,
+    )
         : null;
 
-    // Clear by real calendar dates so IDs never collide with a new rolling window.
-    final firstDay = scheduledFrom ?? DateTime.now();
-    final daysToClear = previousDays.clamp(1, 60);
+    final firstDay =
+        scheduledFrom ??
+            DateTime.now();
+
+    final daysToClear =
+    previousDays.clamp(1, 60);
 
     var cancelled = 0;
 
-    for (var d = 0; d < daysToClear; d++) {
-      final date = DateTime(firstDay.year, firstDay.month, firstDay.day + d);
+    for (var d = 0;
+    d < daysToClear;
+    d++) {
+      final date = DateTime(
+        firstDay.year,
+        firstDay.month,
+        firstDay.day + d,
+      );
+
       for (var p = 0; p < 5; p++) {
-        final adhanId = PrayerSchedulerIds.adhan(date, p);
-        final reminderId = PrayerSchedulerIds.reminder(date, p);
-        final iqamaId = PrayerSchedulerIds.iqama(date, p);
-        final countdownId = PrayerSchedulerIds.countdownUpdate(date, p);
+        final adhanId =
+        PrayerSchedulerIds.adhan(
+          date,
+          p,
+        );
+
+        final reminderId =
+        PrayerSchedulerIds.reminder(
+          date,
+          p,
+        );
+
+        final iqamaId =
+        PrayerSchedulerIds.iqama(
+          date,
+          p,
+        );
+
+        final countdownId =
+        PrayerSchedulerIds.countdownUpdate(
+          date,
+          p,
+        );
 
         try {
-          await Alarm.stop(adhanId);
-          await Alarm.stop(reminderId);
-          await Alarm.stop(iqamaId);
-          await AndroidAlarmManager.cancel(countdownId);
+          await Alarm.stop(
+            adhanId,
+          );
+
+          await Alarm.stop(
+            reminderId,
+          );
+
+          await Alarm.stop(
+            iqamaId,
+          );
+
+          await AndroidAlarmManager.cancel(
+            countdownId,
+          );
+
           cancelled++;
         } catch (e) {
-          prayerSchedulerLog('⚠️ Cancel error | date=$date | prayer=$p | error=$e');
+          prayerSchedulerLog(
+            '⚠️ Cancel error | '
+                'date=$date | '
+                'prayer=$p | '
+                'error=$e',
+          );
         }
       }
     }
 
+    // ==========================================================
+    // CANCEL COUNTDOWN NOTIFICATION
+    // ==========================================================
+
     try {
-      final notifications = FlutterLocalNotificationsPlugin();
+      final notifications =
+      FlutterLocalNotificationsPlugin();
 
       await notifications.cancel(
         id: countdownNotificationId,
@@ -306,16 +706,43 @@ class PrayerNotificationLocalDataSourceImpl
       prayerSchedulerLog(
         '⚠️ Failed to cancel countdown notification',
       );
-      prayerSchedulerLog('ERROR = $e');
-      prayerSchedulerLog('STACKTRACE = $stackTrace');
+
+      prayerSchedulerLog(
+        'ERROR = $e',
+      );
+
+      prayerSchedulerLog(
+        'STACKTRACE = $stackTrace',
+      );
     }
 
-    await prefs.remove(prayerScheduledDaysPrefsKey);
-    await prefs.remove(prayerScheduledFromPrefsKey);
-    await prefs.remove(prayerNotificationWindowPrefsKey);
+    // ==========================================================
+    // CLEAR PREFS
+    // ==========================================================
+
+    await prefs.remove(
+      prayerScheduledDaysPrefsKey,
+    );
+
+    await prefs.remove(
+      prayerScheduledFromPrefsKey,
+    );
+
+    await prefs.remove(
+      prayerNotificationWindowPrefsKey,
+    );
+
+    await prefs.remove(
+      prayerScheduledLatitudePrefsKey,
+    );
+
+    await prefs.remove(
+      prayerScheduledLongitudePrefsKey,
+    );
 
     prayerSchedulerLog(
-      '✅ cancelAll() completed | cancelled=$cancelled',
+      '✅ cancelAll() completed | '
+          'cancelled=$cancelled',
     );
   }
 }

@@ -1,11 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class SelectedCountryCard extends StatelessWidget {
   final String countryName;
   final VoidCallback onBack;
 
   const SelectedCountryCard({
+    super.key,
     required this.countryName,
     required this.onBack,
   });
@@ -13,46 +15,46 @@ class SelectedCountryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Theme.of(context)
-          .colorScheme
-          .primaryContainer,
-      borderRadius: BorderRadius.circular(18),
+      color: Theme.of(context).colorScheme.primaryContainer,
+      borderRadius: BorderRadius.circular(18.r),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(16.w),
         child: Row(
           children: [
             IconButton(
               onPressed: onBack,
-              icon: const Icon(
+              icon: Icon(
                 Icons.arrow_back,
+                size: 24.sp,
               ),
             ),
 
-            const SizedBox(width: 8),
+            SizedBox(width: 8.w),
 
-            const Icon(
+            Icon(
               Icons.public,
-              size: 28,
+              size: 28.sp,
             ),
 
-            const SizedBox(width: 12),
+            SizedBox(width: 12.w),
 
             Expanded(
               child: Column(
-                crossAxisAlignment:
-                CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Country',
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: 12.sp,
                     ),
                   ),
-                  const SizedBox(height: 3),
+
+                  SizedBox(height: 3.h),
+
                   Text(
                     countryName,
-                    style: const TextStyle(
-                      fontSize: 17,
+                    style: TextStyle(
+                      fontSize: 17.sp,
                       fontWeight: FontWeight.bold,
                     ),
                   ),

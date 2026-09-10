@@ -1,11 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class CoordinateRow extends StatelessWidget {
   final String label;
   final String value;
 
   const CoordinateRow({
+    super.key,
     required this.label,
     required this.value,
   });
@@ -13,8 +15,8 @@ class CoordinateRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(
-        vertical: 5,
+      padding: EdgeInsets.symmetric(
+        vertical: 5.h,
       ),
       child: Row(
         children: [
@@ -23,12 +25,14 @@ class CoordinateRow extends StatelessWidget {
               label,
               style: TextStyle(
                 color: Colors.grey.shade600,
+                fontSize: 14.sp,
               ),
             ),
           ),
           Text(
             value,
-            style: const TextStyle(
+            style: TextStyle(
+              fontSize: 14.sp,
               fontWeight: FontWeight.w600,
             ),
           ),

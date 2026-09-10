@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -12,17 +13,17 @@ import '../bloc/blocState.dart';
 import '../widgets/ErrorView.dart';
 import '../widgets/coordinateRow.dart';
 import 'countrySelectionScreen.dart';
+
 enum LocationSelectionType {
   current,
   manual,
 }
 
-
 class LocationPage extends StatefulWidget {
-const LocationPage({super.key});
+  const LocationPage({super.key});
 
-@override
-State<LocationPage> createState() => _LocationPageState();
+  @override
+  State<LocationPage> createState() => _LocationPageState();
 }
 
 class _LocationPageState extends State<LocationPage> {
@@ -47,16 +48,19 @@ class _LocationPageState extends State<LocationPage> {
     super.dispose();
   }
 
-// ============================================================
-// MAIN SCREEN
-// ============================================================
+  // ============================================================
+  // MAIN SCREEN
+  // ============================================================
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Select Location',
+          style: TextStyle(
+            fontSize: 18.sp,
+          ),
         ),
         centerTitle: true,
       ),
@@ -68,10 +72,14 @@ class _LocationPageState extends State<LocationPage> {
               SnackBar(
                 content: Text(
                   state.errorMessage!,
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                  ),
                 ),
               ),
             );
           }
+
           if (state.status == LocationStatus.success &&
               state.currentLocation != null) {
             final location = state.currentLocation!;
@@ -81,15 +89,19 @@ class _LocationPageState extends State<LocationPage> {
                   'lat=${location.latitude} | '
                   'lng=${location.longitude}',
             );
+
             Navigator.of(context).pop({
               'type': LocationSelectionType.current,
               'location': location,
             });
 
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
+              SnackBar(
                 content: Text(
                   'Current location detected successfully',
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                  ),
                 ),
               ),
             );
@@ -123,9 +135,12 @@ class _LocationPageState extends State<LocationPage> {
           }
 
           if (state.locations.isEmpty) {
-            return const Center(
+            return Center(
               child: Text(
                 'No locations found',
+                style: TextStyle(
+                  fontSize: 14.sp,
+                ),
               ),
             );
           }
@@ -139,56 +154,58 @@ class _LocationPageState extends State<LocationPage> {
     );
   }
 
-// ============================================================
-// SCREEN 1
-// LOCATION CHOICE
-// ============================================================
+  // ============================================================
+  // SCREEN 1
+  // LOCATION CHOICE
+  // ============================================================
 
-  Widget _buildLocationChoiceScreen(BuildContext context,
-      LocationState state,) {
+  Widget _buildLocationChoiceScreen(
+      BuildContext context,
+      LocationState state,
+      ) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16.w),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const SizedBox(height: 16),
+          SizedBox(height: 16.h),
 
-          const Text(
+          Text(
             'Choose your location',
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 24,
+              fontSize: 24.sp,
               fontWeight: FontWeight.bold,
             ),
           ),
 
-          const SizedBox(height: 8),
+          SizedBox(height: 8.h),
 
           Text(
             'Select how you want to set your prayer location',
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 14.sp,
               color: Colors.grey.shade600,
             ),
           ),
 
-          const SizedBox(height: 32),
+          SizedBox(height: 32.h),
 
-// ======================================================
-// CURRENT LOCATION CARD
-// ======================================================
+          // ======================================================
+          // CURRENT LOCATION CARD
+          // ======================================================
 
           _buildCurrentLocationCard(
             context,
             state,
           ),
 
-          const SizedBox(height: 16),
+          SizedBox(height: 16.h),
 
-// ======================================================
-// MANUAL LOCATION CARD
-// ======================================================
+          // ======================================================
+          // MANUAL LOCATION CARD
+          // ======================================================
 
           _buildManualLocationCard(
             context,
@@ -198,20 +215,19 @@ class _LocationPageState extends State<LocationPage> {
     );
   }
 
-// ============================================================
-// CURRENT LOCATION CARD
-// ============================================================
+  // ============================================================
+  // CURRENT LOCATION CARD
+  // ============================================================
 
-  Widget _buildCurrentLocationCard(BuildContext context,
-      LocationState state,) {
+  Widget _buildCurrentLocationCard(
+      BuildContext context,
+      LocationState state,
+      ) {
     final isLoading =
         state.status == LocationStatus.loading;
 
     final primaryColor =
-        Theme
-            .of(context)
-            .colorScheme
-            .primary;
+        Theme.of(context).colorScheme.primary;
 
     return Card(
       elevation: 2,
@@ -225,69 +241,70 @@ class _LocationPageState extends State<LocationPage> {
           );
         },
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: EdgeInsets.all(20.w),
           child: Row(
             children: [
-// ICON
+              // ICON
               Container(
-                width: 58,
-                height: 58,
+                width: 58.w,
+                height: 58.h,
                 decoration: BoxDecoration(
                   color: primaryColor.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   Icons.my_location,
-                  size: 28,
+                  size: 28.sp,
                   color: primaryColor,
                 ),
               ),
 
-              const SizedBox(width: 16),
+              SizedBox(width: 16.w),
 
-// TEXT
+              // TEXT
               Expanded(
                 child: Column(
                   crossAxisAlignment:
                   CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'Use Current Location',
                       style: TextStyle(
-                        fontSize: 17,
+                        fontSize: 17.sp,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
 
-                    const SizedBox(height: 6),
+                    SizedBox(height: 6.h),
 
                     Text(
                       'Automatically detect your location using GPS',
                       style: TextStyle(
-                        fontSize: 13,
+                        fontSize: 13.sp,
                         color: Colors.grey.shade600,
                       ),
                     ),
 
                     if (state.currentLocation != null) ...[
-                      const SizedBox(height: 6),
+                      SizedBox(height: 6.h),
+
                       Text(
                         '${state.currentLocation!.city}, '
                             '${state.currentLocation!.country}',
                         style: TextStyle(
-                          fontSize: 13,
+                          fontSize: 13.sp,
                           color: primaryColor,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
 
-                      const SizedBox(height: 3),
+                      SizedBox(height: 3.h),
 
                       Text(
                         '${state.currentLocation!.latitude.toStringAsFixed(4)}, '
                             '${state.currentLocation!.longitude.toStringAsFixed(4)}',
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: 12.sp,
                           color: Colors.grey.shade600,
                         ),
                       ),
@@ -296,20 +313,20 @@ class _LocationPageState extends State<LocationPage> {
                 ),
               ),
 
-              const SizedBox(width: 8),
+              SizedBox(width: 8.w),
 
               if (isLoading)
-                const SizedBox(
-                  width: 22,
-                  height: 22,
+                SizedBox(
+                  width: 22.w,
+                  height: 22.h,
                   child: CircularProgressIndicator(
-                    strokeWidth: 2,
+                    strokeWidth: 2.w,
                   ),
                 )
               else
-                const Icon(
+                Icon(
                   Icons.arrow_forward_ios,
-                  size: 17,
+                  size: 17.sp,
                 ),
             ],
           ),
@@ -318,16 +335,15 @@ class _LocationPageState extends State<LocationPage> {
     );
   }
 
-// ============================================================
-// MANUAL LOCATION CARD
-// ============================================================
+  // ============================================================
+  // MANUAL LOCATION CARD
+  // ============================================================
 
-  Widget _buildManualLocationCard(BuildContext context,) {
+  Widget _buildManualLocationCard(
+      BuildContext context,
+      ) {
     final primaryColor =
-        Theme
-            .of(context)
-            .colorScheme
-            .primary;
+        Theme.of(context).colorScheme.primary;
 
     return Card(
       elevation: 2,
@@ -343,8 +359,10 @@ class _LocationPageState extends State<LocationPage> {
                         .read<LocationBloc>()
                         .state
                         .locations,
-                    onCountrySelected: (countryCode,
-                        countryName,) {
+                    onCountrySelected: (
+                        countryCode,
+                        countryName,
+                        ) {
                       _selectedCountryCode = countryCode;
                       _selectedCountryName = countryName;
                     },
@@ -365,28 +383,28 @@ class _LocationPageState extends State<LocationPage> {
           );
         },
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: EdgeInsets.all(20.w),
           child: Row(
             children: [
-// ICON
+              // ICON
               Container(
-                width: 58,
-                height: 58,
+                width: 58.w,
+                height: 58.h,
                 decoration: BoxDecoration(
                   color: primaryColor.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   Icons.public,
-                  size: 28,
+                  size: 28.sp,
                   color: primaryColor,
                 ),
               ),
 
-              const SizedBox(width: 16),
+              SizedBox(width: 16.w),
 
-// TEXT
-              const Expanded(
+              // TEXT
+              Expanded(
                 child: Column(
                   crossAxisAlignment:
                   CrossAxisAlignment.start,
@@ -394,15 +412,17 @@ class _LocationPageState extends State<LocationPage> {
                     Text(
                       'Select Location Manually',
                       style: TextStyle(
-                        fontSize: 17,
+                        fontSize: 17.sp,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(height: 6),
+
+                    SizedBox(height: 6.h),
+
                     Text(
                       'Choose your country and city manually',
                       style: TextStyle(
-                        fontSize: 13,
+                        fontSize: 13.sp,
                         color: Colors.grey,
                       ),
                     ),
@@ -410,11 +430,11 @@ class _LocationPageState extends State<LocationPage> {
                 ),
               ),
 
-              const SizedBox(width: 8),
+              SizedBox(width: 8.w),
 
-              const Icon(
+              Icon(
                 Icons.arrow_forward_ios,
-                size: 17,
+                size: 17.sp,
               ),
             ],
           ),
@@ -423,65 +443,67 @@ class _LocationPageState extends State<LocationPage> {
     );
   }
 
-// ============================================================
-// LOCATION CONFIRMATION
-// ============================================================
+  // ============================================================
+  // LOCATION CONFIRMATION
+  // ============================================================
 
-  void _showLocationConfirmation(BuildContext context,
-      dynamic location,) {
+  void _showLocationConfirmation(
+      BuildContext context,
+      dynamic location,
+      ) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(
-          top: Radius.circular(24),
+          top: Radius.circular(24.r),
         ),
       ),
       builder: (_) {
         return SafeArea(
           child: Padding(
-            padding: const EdgeInsets.all(24),
+            padding: EdgeInsets.all(24.w),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
-                  width: 45,
-                  height: 5,
+                  width: 45.w,
+                  height: 5.h,
                   decoration: BoxDecoration(
                     color: Colors.grey.shade400,
                     borderRadius:
-                    BorderRadius.circular(10),
+                    BorderRadius.circular(10.r),
                   ),
                 ),
 
-                const SizedBox(height: 24),
+                SizedBox(height: 24.h),
 
-                const Icon(
+                Icon(
                   Icons.location_on,
-                  size: 50,
+                  size: 50.sp,
                 ),
 
-                const SizedBox(height: 16),
+                SizedBox(height: 16.h),
 
                 Text(
                   location.city,
-                  style: const TextStyle(
-                    fontSize: 24,
+                  style: TextStyle(
+                    fontSize: 24.sp,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
 
-                const SizedBox(height: 6),
+                SizedBox(height: 6.h),
 
                 Text(
                   location.country,
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 16.sp,
                     color: Colors.grey.shade600,
                   ),
                 ),
 
-                const SizedBox(height: 20),
+                SizedBox(height: 20.h),
 
                 CoordinateRow(
                   label: 'Latitude',
@@ -493,39 +515,44 @@ class _LocationPageState extends State<LocationPage> {
                   value: location.longitude.toString(),
                 ),
 
-                const SizedBox(height: 24),
+                SizedBox(height: 24.h),
 
                 SizedBox(
                   width: double.infinity,
-                  height: 52,
+                  height: 52.h,
                   child: ElevatedButton(
-                    onPressed: ()  async {
+                    onPressed: () async {
                       Navigator.pop(context);
 
-                      await _saveLocation(this.context, location);
-
+                      await _saveLocation(
+                        this.context,
+                        location,
+                      );
                     },
-                    child: const Text(
+                    child: Text(
                       'Use this location',
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 16.sp,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
                 ),
 
-                const SizedBox(height: 8),
+                SizedBox(height: 8.h),
 
                 SizedBox(
                   width: double.infinity,
-                  height: 52,
+                  height: 52.h,
                   child: TextButton(
                     onPressed: () {
                       Navigator.pop(context);
                     },
-                    child: const Text(
+                    child: Text(
                       'Cancel',
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                      ),
                     ),
                   ),
                 ),
@@ -537,9 +564,9 @@ class _LocationPageState extends State<LocationPage> {
     );
   }
 
-// ============================================================
-// SAVE LOCATION
-// ============================================================
+  // ============================================================
+  // SAVE LOCATION
+  // ============================================================
 
   Future<void> _saveLocation(
       BuildContext context,
@@ -597,6 +624,7 @@ class _LocationPageState extends State<LocationPage> {
           (route) => false,
     );
   }
+
   Future<void> showCurrentLocationDialog(
       BuildContext context,
       ) async {
@@ -607,20 +635,26 @@ class _LocationPageState extends State<LocationPage> {
         return AlertDialog(
           icon: Icon(
             Icons.location_on,
-            size: 42,
+            size: 42.sp,
             color: Theme.of(context).colorScheme.primary,
           ),
-          title: const Text(
+          title: Text(
             'Update Current Location',
             textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 20.sp,
+            ),
           ),
-          content: const Text(
+          content: Text(
             'Your current location will be updated.\n\n'
                 'Please make sure that Location/GPS is enabled '
                 'on your device.\n\n'
                 'If Location is disabled, please enable it '
                 'before continuing.',
             textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 14.sp,
+            ),
           ),
           actions: [
             TextButton(
@@ -630,8 +664,11 @@ class _LocationPageState extends State<LocationPage> {
                   false,
                 );
               },
-              child: const Text(
+              child: Text(
                 'Cancel',
+                style: TextStyle(
+                  fontSize: 14.sp,
+                ),
               ),
             ),
             ElevatedButton(
@@ -641,8 +678,11 @@ class _LocationPageState extends State<LocationPage> {
                   true,
                 );
               },
-              child: const Text(
+              child: Text(
                 'Update Location',
+                style: TextStyle(
+                  fontSize: 14.sp,
+                ),
               ),
             ),
           ],
@@ -658,6 +698,7 @@ class _LocationPageState extends State<LocationPage> {
       context,
     );
   }
+
   Future<void> _updateCurrentLocation(
       BuildContext context,
       ) async {
@@ -725,6 +766,7 @@ class _LocationPageState extends State<LocationPage> {
       const GetCurrentLocation(),
     );
   }
+
   Future<void> _showLocationServiceDialog(
       BuildContext context,
       ) async {
@@ -733,19 +775,25 @@ class _LocationPageState extends State<LocationPage> {
       barrierDismissible: false,
       builder: (dialogContext) {
         return AlertDialog(
-          icon: const Icon(
+          icon: Icon(
             Icons.location_off,
-            size: 42,
+            size: 42.sp,
           ),
-          title: const Text(
+          title: Text(
             'Location is disabled',
             textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 20.sp,
+            ),
           ),
-          content: const Text(
+          content: Text(
             'Your device location is currently disabled.\n\n'
                 'Please open Location Settings and enable '
                 'Location/GPS, then try again.',
             textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 14.sp,
+            ),
           ),
           actions: [
             TextButton(
@@ -755,8 +803,11 @@ class _LocationPageState extends State<LocationPage> {
                   false,
                 );
               },
-              child: const Text(
+              child: Text(
                 'Cancel',
+                style: TextStyle(
+                  fontSize: 14.sp,
+                ),
               ),
             ),
             ElevatedButton(
@@ -766,8 +817,11 @@ class _LocationPageState extends State<LocationPage> {
                   true,
                 );
               },
-              child: const Text(
+              child: Text(
                 'Open Settings',
+                style: TextStyle(
+                  fontSize: 14.sp,
+                ),
               ),
             ),
           ],
@@ -779,6 +833,7 @@ class _LocationPageState extends State<LocationPage> {
       await Geolocator.openLocationSettings();
     }
   }
+
   Future<void> _showPermissionSettingsDialog(
       BuildContext context,
       ) async {
@@ -787,19 +842,25 @@ class _LocationPageState extends State<LocationPage> {
       barrierDismissible: false,
       builder: (dialogContext) {
         return AlertDialog(
-          icon: const Icon(
+          icon: Icon(
             Icons.location_disabled,
-            size: 42,
+            size: 42.sp,
           ),
-          title: const Text(
+          title: Text(
             'Location Permission Required',
             textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 20.sp,
+            ),
           ),
-          content: const Text(
+          content: Text(
             'Location permission has been denied.\n\n'
                 'Please open the app settings and allow '
                 'location permission to continue.',
             textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 14.sp,
+            ),
           ),
           actions: [
             TextButton(
@@ -809,8 +870,11 @@ class _LocationPageState extends State<LocationPage> {
                   false,
                 );
               },
-              child: const Text(
+              child: Text(
                 'Cancel',
+                style: TextStyle(
+                  fontSize: 14.sp,
+                ),
               ),
             ),
             ElevatedButton(
@@ -820,8 +884,11 @@ class _LocationPageState extends State<LocationPage> {
                   true,
                 );
               },
-              child: const Text(
+              child: Text(
                 'Open Settings',
+                style: TextStyle(
+                  fontSize: 14.sp,
+                ),
               ),
             ),
           ],
@@ -833,15 +900,20 @@ class _LocationPageState extends State<LocationPage> {
       await Geolocator.openAppSettings();
     }
   }
+
   void _showMessage(
       BuildContext context,
       String message,
       ) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message),
+        content: Text(
+          message,
+          style: TextStyle(
+            fontSize: 14.sp,
+          ),
+        ),
       ),
     );
   }
 }
-

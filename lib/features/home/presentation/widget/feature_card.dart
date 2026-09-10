@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class FeatureCard extends StatelessWidget {
   final String title;
@@ -27,14 +28,14 @@ class FeatureCard extends StatelessWidget {
       return GestureDetector(
         onTap: onTap,
         child: Container(
-          height: 110,
+          height: 110.h,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(15),
+            borderRadius: BorderRadius.circular(15.r),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(.025),
-                blurRadius: 6,
-                offset: const Offset(0, 2),
+                blurRadius: 6.r,
+                offset: Offset(0, 2.h),
               ),
             ],
           ),
@@ -48,9 +49,9 @@ class FeatureCard extends StatelessWidget {
                 ),
               ),
               Positioned(
-                top: 12,
-                bottom: 12,
-                right: 12,
+                top: 12.h,
+                bottom: 12.h,
+                right: 12.w,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -59,20 +60,20 @@ class FeatureCard extends StatelessWidget {
                       title,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 13,
+                      style: TextStyle(
+                        fontSize: 13.sp,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF222222),
+                        color: const Color(0xFF222222),
                       ),
                     ),
                     if (subtitle.isNotEmpty) ...[
-                      const SizedBox(height: 5),
+                      SizedBox(height: 5.h),
                       Text(
                         subtitle,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 16.sp,
                           color: Colors.grey.shade600,
                         ),
                       ),
@@ -86,25 +87,23 @@ class FeatureCard extends StatelessWidget {
       );
     }
 
-    // ==========================================
-    // الكارت بالأيقونة
-    // ==========================================
+    // Icon-based card
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        height: 110,
-        padding: const EdgeInsets.all(12),
+        height: 110.h,
+        padding: EdgeInsets.all(12.w),
         decoration: BoxDecoration(
           color: const Color(0xFFF3F0E9),
-          borderRadius: BorderRadius.circular(15),
+          borderRadius: BorderRadius.circular(15.r),
           border: Border.all(
             color: const Color(0xFFEDEBE5),
           ),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(.025),
-              blurRadius: 6,
-              offset: const Offset(0, 2),
+              blurRadius: 6.r,
+              offset: Offset(0, 2.h),
             ),
           ],
         ),
@@ -119,20 +118,20 @@ class FeatureCard extends StatelessWidget {
                     title,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 13,
+                    style: TextStyle(
+                      fontSize: 13.sp,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF222222),
+                      color: const Color(0xFF222222),
                     ),
                   ),
                   if (subtitle.isNotEmpty) ...[
-                    const SizedBox(height: 5),
+                    SizedBox(height: 5.h),
                     Text(
                       subtitle,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        fontSize: 9,
+                        fontSize: 9.sp,
                         color: Colors.grey.shade600,
                       ),
                     ),
@@ -140,10 +139,10 @@ class FeatureCard extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(width: 10),
+            SizedBox(width: 10.w),
             Container(
-              width: 42,
-              height: 42,
+              width: 42.w,
+              height: 42.h,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: (iconColor ?? Colors.grey).withOpacity(.08),
@@ -151,7 +150,7 @@ class FeatureCard extends StatelessWidget {
               child: Icon(
                 icon,
                 color: iconColor ?? Colors.grey,
-                size: 25,
+                size: 25.sp,
               ),
             ),
           ],

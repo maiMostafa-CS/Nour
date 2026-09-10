@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../domain/entities/hijri_date_entity.dart';
 
@@ -18,8 +19,13 @@ class HijriCalendarGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (dates.isEmpty) {
-      return const Center(
-        child: Text('لا توجد بيانات'),
+      return Center(
+        child: Text(
+          'لا توجد بيانات',
+          style: TextStyle(
+            fontSize: 14.sp,
+          ),
+        ),
       );
     }
 
@@ -56,16 +62,16 @@ class HijriCalendarGrid extends StatelessWidget {
         return GestureDetector(
           onTap: () => onDateSelected(date),
           child: Container(
-            margin: const EdgeInsets.all(4),
+            margin: EdgeInsets.all(4.w),
             decoration: BoxDecoration(
               color: isSelected
                   ? const Color(0xFF176B5B)
                   : Colors.white,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(12.r),
               border: date.isToday
                   ? Border.all(
                 color: const Color(0xFF176B5B),
-                width: 1.5,
+                width: 1.5.w,
               )
                   : null,
             ),
@@ -73,9 +79,8 @@ class HijriCalendarGrid extends StatelessWidget {
               child: Text(
                 '${date.day}',
                 style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: date.isToday ||
-                      isSelected
+                  fontSize: 16.sp,
+                  fontWeight: date.isToday || isSelected
                       ? FontWeight.bold
                       : FontWeight.normal,
                   color: isSelected

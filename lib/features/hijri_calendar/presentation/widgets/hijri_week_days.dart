@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class HijriWeekDays extends StatelessWidget {
   const HijriWeekDays({super.key});
@@ -23,7 +24,7 @@ class HijriWeekDays extends StatelessWidget {
             child: Text(
               day,
               style: TextStyle(
-                fontSize: 12,
+                fontSize: 12.sp,
                 fontWeight: FontWeight.bold,
                 color: Colors.grey.shade600,
               ),

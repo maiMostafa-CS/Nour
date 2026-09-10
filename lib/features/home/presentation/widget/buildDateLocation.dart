@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../prayer_times/domain/entities/prayer_times_entity.dart';
 
@@ -82,7 +83,6 @@ class _NextPrayerCardState extends State<NextPrayerCard> {
       }
     }
 
-
     if (nextPrayerTime == null) {
       final fajr = widget.prayerTimes.fajr;
 
@@ -111,21 +111,21 @@ class _NextPrayerCardState extends State<NextPrayerCard> {
 
     return Container(
       width: double.infinity,
-      height: 160,
+      height: 160.h,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(17),
+        borderRadius: BorderRadius.circular(17.r),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(.08),
-            blurRadius: 12,
-            offset: const Offset(0, 5),
+            blurRadius: 12.r,
+            offset: Offset(0, 5.h),
           ),
         ],
       ),
       clipBehavior: Clip.antiAlias,
       child: Stack(
         children: [
-          // الصورة
+          // Background image
           Positioned.fill(
             child: Image.asset(
               'assets/images/islamic_night_city.png',
@@ -149,50 +149,50 @@ class _NextPrayerCardState extends State<NextPrayerCard> {
             ),
           ),
 
-          // المحتوى
+          // Content
           Positioned.fill(
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(16.w),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text(
+                  Text(
                     'الصلاة القادمة',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 16,
+                      fontSize: 16.sp,
                       fontWeight: FontWeight.w400,
                     ),
                   ),
 
-                  const SizedBox(height: 2),
+                  SizedBox(height: 2.h),
 
                   Text(
                     'صلاة $nextPrayerName',
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Colors.white,
-                      fontSize: 22,
+                      fontSize: 22.sp,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
 
-                  const SizedBox(height: 2),
+                  SizedBox(height: 2.h),
 
                   Text(
                     remainingTime,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Colors.white,
-                      fontSize: 25,
+                      fontSize: 25.sp,
                       fontWeight: FontWeight.bold,
-                      letterSpacing: 1,
+                      letterSpacing: 1.w,
                     ),
                   ),
 
-                  const Text(
+                  Text(
                     'المتبقي على الأذان',
                     style: TextStyle(
                       color: Colors.white70,
-                      fontSize: 16,
+                      fontSize: 16.sp,
                     ),
                   ),
                 ],

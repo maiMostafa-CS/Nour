@@ -29,6 +29,7 @@ dependencies:
   flutter_compass: ^0.8.1
   permission_handler: ^13.0.2
   alarm: ^5.12.0
+  flutter_screenutil: ^5.9.3
   # Date & Time
   intl: ^0.20.3
   android_alarm_manager_plus: ^5.1.1

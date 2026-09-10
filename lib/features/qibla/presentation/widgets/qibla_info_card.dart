@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class QiblaInfoCard extends StatelessWidget {
   final double qiblaDirection;
@@ -48,16 +49,14 @@ class QiblaInfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: EdgeInsets.all(18.w),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius:
-        BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(20.r),
         boxShadow: [
           BoxShadow(
-            color:
-            Colors.black.withOpacity(0.05),
-            blurRadius: 15,
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 15.r,
           ),
         ],
       ),
@@ -66,68 +65,63 @@ class QiblaInfoCard extends StatelessWidget {
           Row(
             children: [
               Container(
-                width: 45,
-                height: 45,
+                width: 45.w,
+                height: 45.h,
                 decoration: BoxDecoration(
-                  color:
-                  const Color(0xFF176B5B)
+                  color: const Color(0xFF176B5B)
                       .withOpacity(0.1),
-                  borderRadius:
-                  BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(12.r),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.explore_rounded,
-                  color:
-                  Color(0xFF176B5B),
+                  color: const Color(0xFF176B5B),
+                  size: 24.sp,
                 ),
               ),
 
-              const SizedBox(width: 12),
+              SizedBox(width: 12.w),
 
-              const Expanded(
+              Expanded(
                 child: Text(
                   'اتجاه القبلة',
                   style: TextStyle(
-                    fontSize: 16,
-                    fontWeight:
-                    FontWeight.bold,
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
 
               Text(
                 '${qiblaDirection.toStringAsFixed(0)}°',
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight:
-                  FontWeight.bold,
-                  color:
-                  Color(0xFF176B5B),
+                style: TextStyle(
+                  fontSize: 20.sp,
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFF176B5B),
                 ),
               ),
             ],
           ),
 
-          const SizedBox(height: 12),
+          SizedBox(height: 12.h),
 
           const Divider(),
 
-          const SizedBox(height: 8),
+          SizedBox(height: 8.h),
 
           Row(
             children: [
-              const Icon(
+              Icon(
                 Icons.navigation_rounded,
-                size: 20,
+                size: 20.sp,
                 color: Colors.grey,
               ),
 
-              const SizedBox(width: 8),
+              SizedBox(width: 8.w),
 
               Text(
                 directionText,
-                style: const TextStyle(
-                  fontSize: 14,
+                style: TextStyle(
+                  fontSize: 14.sp,
                   color: Colors.grey,
                 ),
               ),
@@ -137,8 +131,8 @@ class QiblaInfoCard extends StatelessWidget {
               Text(
                 '${latitude.toStringAsFixed(4)}, '
                     '${longitude.toStringAsFixed(4)}',
-                style: const TextStyle(
-                  fontSize: 12,
+                style: TextStyle(
+                  fontSize: 12.sp,
                   color: Colors.grey,
                 ),
               ),

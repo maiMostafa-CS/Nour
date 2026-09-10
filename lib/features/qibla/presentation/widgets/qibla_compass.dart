@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class QiblaCompass extends StatelessWidget {
   final double qiblaDirection;
@@ -15,10 +16,10 @@ class QiblaCompass extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (heading == null) {
-      return const SizedBox(
-        width: 300,
-        height: 300,
-        child: Center(
+      return SizedBox(
+        width: 300.w,
+        height: 300.h,
+        child: const Center(
           child: CircularProgressIndicator(
             color: Color(0xFF176B5B),
           ),
@@ -30,23 +31,22 @@ class QiblaCompass extends StatelessWidget {
         (qiblaDirection - heading!) * pi / 180;
 
     return SizedBox(
-      width: 300,
-      height: 300,
+      width: 300.w,
+      height: 300.h,
       child: Stack(
         alignment: Alignment.center,
         children: [
           Container(
-            width: 280,
-            height: 280,
+            width: 280.w,
+            height: 280.h,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: Colors.white,
               boxShadow: [
                 BoxShadow(
-                  color:
-                  Colors.black.withOpacity(0.08),
-                  blurRadius: 20,
-                  spreadRadius: 3,
+                  color: Colors.black.withOpacity(0.08),
+                  blurRadius: 20.r,
+                  spreadRadius: 3.r,
                 ),
               ],
             ),
@@ -61,25 +61,26 @@ class QiblaCompass extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
-                  width: 70,
-                  height: 70,
-                  decoration:
-                  const BoxDecoration(
+                  width: 70.w,
+                  height: 70.h,
+                  decoration: const BoxDecoration(
                     shape: BoxShape.circle,
                     color: Color(0xFF176B5B),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.mosque_rounded,
                     color: Colors.white,
-                    size: 35,
+                    size: 35.sp,
                   ),
                 ),
 
-                const SizedBox(height: 5),
+                SizedBox(height: 5.h),
 
                 CustomPaint(
-                  size:
-                  const Size(35, 100),
+                  size: Size(
+                    35.w,
+                    100.h,
+                  ),
                   painter: ArrowPainter(),
                 ),
               ],
@@ -87,10 +88,9 @@ class QiblaCompass extends StatelessWidget {
           ),
 
           Container(
-            width: 14,
-            height: 14,
-            decoration:
-            const BoxDecoration(
+            width: 14.w,
+            height: 14.h,
+            decoration: const BoxDecoration(
               shape: BoxShape.circle,
               color: Colors.black87,
             ),
@@ -101,8 +101,7 @@ class QiblaCompass extends StatelessWidget {
   }
 }
 
-class CompassPainter
-    extends CustomPainter {
+class CompassPainter extends CustomPainter {
   @override
   void paint(
       Canvas canvas,
@@ -117,12 +116,12 @@ class CompassPainter
 
     final paint = Paint()
       ..color = Colors.grey.shade300
-      ..strokeWidth = 1
+      ..strokeWidth = 1.w
       ..style = PaintingStyle.stroke;
 
     canvas.drawCircle(
       center,
-      radius - 5,
+      radius - 5.w,
       paint,
     );
 
@@ -138,24 +137,22 @@ class CompassPainter
     ];
 
     for (final direction in directions) {
-      final text =
-      direction[0] as String;
+      final text = direction[0] as String;
 
-      final angle =
-      direction[1] as double;
+      final angle = direction[1] as double;
 
       final x = center.dx +
           cos(angle - pi / 2) *
-              (radius - 30);
+              (radius - 30.w);
 
       final y = center.dy +
           sin(angle - pi / 2) *
-              (radius - 30);
+              (radius - 30.w);
 
       textPainter.text = TextSpan(
         text: text,
         style: TextStyle(
-          fontSize: 18,
+          fontSize: 18.sp,
           fontWeight: FontWeight.bold,
           color: text == 'N'
               ? const Color(0xFF176B5B)
@@ -183,8 +180,7 @@ class CompassPainter
   }
 }
 
-class ArrowPainter
-    extends CustomPainter {
+class ArrowPainter extends CustomPainter {
   @override
   void paint(
       Canvas canvas,
@@ -195,7 +191,10 @@ class ArrowPainter
       ..style = PaintingStyle.fill;
 
     final path = Path()
-      ..moveTo(size.width / 2, 0)
+      ..moveTo(
+        size.width / 2,
+        0,
+      )
       ..lineTo(
         size.width,
         size.height * 0.35,
@@ -210,7 +209,10 @@ class ArrowPainter
       )
       ..close();
 
-    canvas.drawPath(path, paint);
+    canvas.drawPath(
+      path,
+      paint,
+    );
   }
 
   @override

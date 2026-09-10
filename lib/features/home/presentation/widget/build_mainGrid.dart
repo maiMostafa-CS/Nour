@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hijri/hijri_calendar.dart';
 
 import '../../../../core/router/app_router.dart';
@@ -25,11 +26,10 @@ class _BuildMainGridState extends State<BuildMainGrid> {
                 image: 'assets/images/quran.png',
                 title: 'القرآن الكريم',
                 subtitle: 'آخر قراءة',
-
               ),
             ),
 
-            const SizedBox(width: 10),
+            SizedBox(width: 10.w),
 
             Expanded(
               child: FeatureCard(
@@ -40,7 +40,8 @@ class _BuildMainGridState extends State<BuildMainGrid> {
             ),
           ],
         ),
-        const SizedBox(height: 14),
+
+        SizedBox(height: 10.h),
 
         Row(
           children: [
@@ -53,13 +54,13 @@ class _BuildMainGridState extends State<BuildMainGrid> {
                   );
                 },
                 title: 'التقويم الهجري',
-                subtitle:getCurrentHijriDate(),
+                subtitle: getCurrentHijriDate(),
                 icon: Icons.calendar_month_outlined,
                 iconColor: const Color(0xFF333333),
               ),
             ),
 
-            const SizedBox(width: 10),
+            SizedBox(width: 10.w),
 
             Expanded(
               child: FeatureCard(
@@ -77,9 +78,7 @@ class _BuildMainGridState extends State<BuildMainGrid> {
             ),
           ],
         ),
-
       ],
     );
   }
-
 }

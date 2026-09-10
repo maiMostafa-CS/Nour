@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../bloc/hijri_calendar_bloc.dart';
 import '../bloc/hijri_calendar_event.dart';
@@ -8,8 +9,6 @@ import '../widgets/hijri_calendar_header.dart';
 import '../widgets/hijri_week_days.dart';
 import '../widgets/hijri_calendar_grid.dart';
 import '../widgets/prayer_times_card.dart';
-
-
 
 class HijriCalendarPage extends StatelessWidget {
   const HijriCalendarPage({
@@ -25,17 +24,16 @@ class HijriCalendarPage extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
-        title: const Text(
+        title: Text(
           'التقويم الهجري',
           style: TextStyle(
+            fontSize: 18.sp,
             fontWeight: FontWeight.bold,
           ),
         ),
       ),
 
-      body: BlocBuilder<
-          HijriCalendarBloc,
-          HijriCalendarState>(
+      body: BlocBuilder<HijriCalendarBloc, HijriCalendarState>(
         builder: (context, state) {
           if (state is HijriCalendarLoading) {
             return const Center(
@@ -46,10 +44,13 @@ class HijriCalendarPage extends StatelessWidget {
           if (state is HijriCalendarError) {
             return Center(
               child: Padding(
-                padding: const EdgeInsets.all(20),
+                padding: EdgeInsets.all(20.w),
                 child: Text(
                   state.message,
                   textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                  ),
                 ),
               ),
             );
@@ -64,20 +65,19 @@ class HijriCalendarPage extends StatelessWidget {
               : '';
 
           return SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(
-              16,
-              10,
-              16,
-              30,
+            padding: EdgeInsets.fromLTRB(
+              16.w,
+              10.h,
+              16.w,
+              30.h,
             ),
             child: Column(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(16),
+                  padding: EdgeInsets.all(16.w),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius:
-                    BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(20.r),
                   ),
                   child: Column(
                     children: [
@@ -86,36 +86,32 @@ class HijriCalendarPage extends StatelessWidget {
                         year: state.year,
                         onPrevious: () {
                           context
-                              .read<
-                              HijriCalendarBloc>()
+                              .read<HijriCalendarBloc>()
                               .add(
                             const PreviousHijriMonth(),
                           );
                         },
                         onNext: () {
                           context
-                              .read<
-                              HijriCalendarBloc>()
+                              .read<HijriCalendarBloc>()
                               .add(
                             const NextHijriMonth(),
                           );
                         },
                       ),
 
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20.h),
 
                       const HijriWeekDays(),
 
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10.h),
 
                       HijriCalendarGrid(
                         dates: state.dates,
-                        selectedDate:
-                        state.selectedDate,
+                        selectedDate: state.selectedDate,
                         onDateSelected: (date) {
                           context
-                              .read<
-                              HijriCalendarBloc>()
+                              .read<HijriCalendarBloc>()
                               .add(
                             SelectHijriDate(
                               date.gregorianDate,
@@ -127,29 +123,27 @@ class HijriCalendarPage extends StatelessWidget {
                   ),
                 ),
 
-                const SizedBox(height: 20),
+                SizedBox(height: 20.h),
 
                 if (state.selectedDate != null)
                   Align(
-                    alignment:
-                    Alignment.centerRight,
+                    alignment: Alignment.centerRight,
                     child: Text(
                       '${state.selectedDate!.day} '
                           '${state.selectedDate!.monthName} '
                           '${state.selectedDate!.year} هـ',
-                      style: const TextStyle(
-                        fontSize: 18,
+                      style: TextStyle(
+                        fontSize: 18.sp,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
 
-                const SizedBox(height: 12),
+                SizedBox(height: 12.h),
 
                 if (state.prayerTimes != null)
                   PrayerTimesCard(
-                    prayerTimes:
-                    state.prayerTimes!,
+                    prayerTimes: state.prayerTimes!,
                   ),
               ],
             ),

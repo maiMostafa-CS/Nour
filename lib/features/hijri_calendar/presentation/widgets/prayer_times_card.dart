@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../prayer_times/domain/entities/prayer_times_entity.dart';
 
@@ -17,8 +18,7 @@ class PrayerTimesCard extends StatelessWidget {
         ? time.hour - 12
         : time.hour;
 
-    final minute =
-    time.minute.toString().padLeft(2, '0');
+    final minute = time.minute.toString().padLeft(2, '0');
 
     final period = time.hour >= 12 ? 'م' : 'ص';
 
@@ -31,33 +31,33 @@ class PrayerTimesCard extends StatelessWidget {
       IconData icon,
       ) {
     return Padding(
-      padding: const EdgeInsets.symmetric(
-        vertical: 9,
+      padding: EdgeInsets.symmetric(
+        vertical: 9.h,
       ),
       child: Row(
         children: [
           Icon(
             icon,
-            size: 22,
+            size: 22.sp,
             color: const Color(0xFF176B5B),
           ),
 
-          const SizedBox(width: 12),
+          SizedBox(width: 12.w),
 
           Expanded(
             child: Text(
               name,
-              style: const TextStyle(
-                fontSize: 15,
+              style: TextStyle(
+                fontSize: 15.sp,
               ),
             ),
           ),
 
           Text(
             _formatTime(time),
-            style: const TextStyle(
+            style: TextStyle(
               fontWeight: FontWeight.bold,
-              fontSize: 15,
+              fontSize: 15.sp,
             ),
           ),
         ],
@@ -68,31 +68,30 @@ class PrayerTimesCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: EdgeInsets.all(18.w),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(20.r),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.04),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
+            blurRadius: 12.r,
+            offset: Offset(0, 4.h),
           ),
         ],
       ),
       child: Column(
-        crossAxisAlignment:
-        CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'مواقيت الصلاة',
             style: TextStyle(
-              fontSize: 19,
+              fontSize: 19.sp,
               fontWeight: FontWeight.bold,
             ),
           ),
 
-          const SizedBox(height: 10),
+          SizedBox(height: 10.h),
 
           _buildPrayer(
             'الفجر',

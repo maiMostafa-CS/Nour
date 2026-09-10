@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_compass/flutter_compass.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../injection_container.dart';
 import '../bloc/bloc.dart';
@@ -15,16 +16,13 @@ class QiblaPage extends StatefulWidget {
   const QiblaPage({super.key});
 
   @override
-  State<QiblaPage> createState() =>
-      _QiblaPageState();
+  State<QiblaPage> createState() => _QiblaPageState();
 }
 
-class _QiblaPageState
-    extends State<QiblaPage> {
+class _QiblaPageState extends State<QiblaPage> {
   double? _heading;
 
-  StreamSubscription<CompassEvent>?
-  _compassSubscription;
+  StreamSubscription<CompassEvent>? _compassSubscription;
 
   @override
   void initState() {
@@ -34,16 +32,15 @@ class _QiblaPageState
   }
 
   void _startCompass() {
-    _compassSubscription =
-        FlutterCompass.events?.listen(
-              (event) {
-            if (!mounted) return;
+    _compassSubscription = FlutterCompass.events?.listen(
+          (event) {
+        if (!mounted) return;
 
-            setState(() {
-              _heading = event.heading;
-            });
-          },
-        );
+        setState(() {
+          _heading = event.heading;
+        });
+      },
+    );
   }
 
   @override
@@ -58,42 +55,28 @@ class _QiblaPageState
     return BlocProvider(
       create: (_) => sl<QiblaBloc>()
         ..add(const QiblaStarted()),
-
       child: Scaffold(
-        backgroundColor:
-        const Color(0xFFF8F3EA),
-
+        backgroundColor: const Color(0xFFF8F3EA),
         appBar: AppBar(
-          backgroundColor:
-          const Color(0xFFF8F3EA),
-
+          backgroundColor: const Color(0xFFF8F3EA),
           elevation: 0,
-
           centerTitle: true,
-
-          title: const Text(
+          title: Text(
             'اتجاه القبلة',
             style: TextStyle(
-              color:
-              Color(0xFF176B5B),
-              fontWeight:
-              FontWeight.bold,
+              color: const Color(0xFF176B5B),
+              fontWeight: FontWeight.bold,
+              fontSize: 18.sp,
             ),
           ),
-
-          iconTheme:
-          const IconThemeData(
-            color:
-            Color(0xFF176B5B),
+          iconTheme: IconThemeData(
+            color: const Color(0xFF176B5B),
+            size: 24.sp,
           ),
         ),
-
         body: SafeArea(
-          child: BlocBuilder<
-              QiblaBloc,
-              QiblaState>(
-            builder:
-                (context, state) {
+          child: BlocBuilder<QiblaBloc, QiblaState>(
+            builder: (context, state) {
               return _buildBody(
                 context,
                 state,
@@ -113,10 +96,8 @@ class _QiblaPageState
       case QiblaStatus.initial:
       case QiblaStatus.loading:
         return const Center(
-          child:
-          CircularProgressIndicator(
-            color:
-            Color(0xFF176B5B),
+          child: CircularProgressIndicator(
+            color: Color(0xFF176B5B),
           ),
         );
 
@@ -139,69 +120,60 @@ class _QiblaPageState
     final qibla = state.qibla!;
 
     return SingleChildScrollView(
-      padding:
-      const EdgeInsets.all(20),
+      padding: EdgeInsets.all(20.w),
       child: Column(
         children: [
-          const SizedBox(height: 10),
+          SizedBox(height: 10.h),
 
-          const Text(
+          Text(
             'وجّه هاتفك نحو القبلة',
             style: TextStyle(
-              fontSize: 22,
-              fontWeight:
-              FontWeight.bold,
-              color:
-              Color(0xFF176B5B),
+              fontSize: 22.sp,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFF176B5B),
             ),
           ),
 
-          const SizedBox(height: 8),
+          SizedBox(height: 8.h),
 
-          const Text(
+          Text(
             'حرّك الهاتف حتى يشير السهم '
                 'إلى اتجاه الكعبة',
-            textAlign:
-            TextAlign.center,
+            textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 14.sp,
               color: Colors.grey,
             ),
           ),
 
-          const SizedBox(height: 30),
+          SizedBox(height: 30.h),
 
           QiblaCompass(
-            qiblaDirection:
-            qibla.qiblaDirection,
+            qiblaDirection: qibla.qiblaDirection,
             heading: _heading,
           ),
 
-          const SizedBox(height: 25),
+          SizedBox(height: 25.h),
 
           if (_heading != null)
             Text(
               'اتجاه الهاتف: '
                   '${_heading!.toStringAsFixed(0)}°',
-              style:
-              const TextStyle(
-                fontSize: 14,
+              style: TextStyle(
+                fontSize: 14.sp,
                 color: Colors.grey,
               ),
             ),
 
-          const SizedBox(height: 20),
+          SizedBox(height: 20.h),
 
           QiblaInfoCard(
-            qiblaDirection:
-            qibla.qiblaDirection,
-            latitude:
-            qibla.latitude,
-            longitude:
-            qibla.longitude,
+            qiblaDirection: qibla.qiblaDirection,
+            latitude: qibla.latitude,
+            longitude: qibla.longitude,
           ),
 
-          const SizedBox(height: 20),
+          SizedBox(height: 20.h),
 
           _buildHint(),
         ],
@@ -211,26 +183,21 @@ class _QiblaPageState
 
   Widget _buildHint() {
     return Container(
-      padding:
-      const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color:
-        const Color(0xFF176B5B)
-            .withOpacity(0.08),
-        borderRadius:
-        BorderRadius.circular(16),
+        color: const Color(0xFF176B5B).withOpacity(0.08),
+        borderRadius: BorderRadius.circular(16.r),
       ),
-      child: const Row(
-        crossAxisAlignment:
-        CrossAxisAlignment.start,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(
             Icons.info_outline_rounded,
-            color:
-            Color(0xFF176B5B),
+            color: const Color(0xFF176B5B),
+            size: 24.sp,
           ),
 
-          SizedBox(width: 10),
+          SizedBox(width: 10.w),
 
           Expanded(
             child: Text(
@@ -238,7 +205,7 @@ class _QiblaPageState
                   'الهاتف عن الأجهزة المعدنية '
                   'وحركه بشكل رقم 8 لمعايرة البوصلة.',
               style: TextStyle(
-                fontSize: 13,
+                fontSize: 13.sp,
                 height: 1.5,
               ),
             ),
@@ -254,65 +221,51 @@ class _QiblaPageState
       ) {
     return Center(
       child: Padding(
-        padding:
-        const EdgeInsets.all(25),
+        padding: EdgeInsets.all(25.w),
         child: Column(
-          mainAxisAlignment:
-          MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
+            Icon(
               Icons.location_off_rounded,
-              size: 70,
-              color:
-              Color(0xFF176B5B),
+              size: 70.sp,
+              color: const Color(0xFF176B5B),
             ),
 
-            const SizedBox(height: 20),
+            SizedBox(height: 20.h),
 
             Text(
-              state.errorMessage ??
-                  'حدث خطأ',
-              textAlign:
-              TextAlign.center,
-              style: const TextStyle(
-                fontSize: 16,
+              state.errorMessage ?? 'حدث خطأ',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 16.sp,
                 height: 1.5,
               ),
             ),
 
-            const SizedBox(height: 20),
+            SizedBox(height: 20.h),
 
             ElevatedButton(
               onPressed: () {
-                context
-                    .read<QiblaBloc>()
-                    .add(
+                context.read<QiblaBloc>().add(
                   const QiblaRetry(),
                 );
               },
-              style:
-              ElevatedButton.styleFrom(
-                backgroundColor:
-                const Color(
-                    0xFF176B5B),
-                foregroundColor:
-                Colors.white,
-                padding:
-                const EdgeInsets
-                    .symmetric(
-                  horizontal: 30,
-                  vertical: 14,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF176B5B),
+                foregroundColor: Colors.white,
+                padding: EdgeInsets.symmetric(
+                  horizontal: 30.w,
+                  vertical: 14.h,
                 ),
-                shape:
-                RoundedRectangleBorder(
-                  borderRadius:
-                  BorderRadius.circular(
-                      14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14.r),
                 ),
               ),
-              child:
-              const Text(
+              child: Text(
                 'إعادة المحاولة',
+                style: TextStyle(
+                  fontSize: 14.sp,
+                ),
               ),
             ),
           ],

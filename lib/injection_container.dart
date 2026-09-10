@@ -1,6 +1,7 @@
 import 'package:get_it/get_it.dart';
 
 import 'core/services/prayer_scheduler_split/prayer_scheduler/data/datasources/prayer_notification_local_data_source.dart';
+import 'core/services/prayer_scheduler_split/prayer_scheduler/data/datasources/prayer_notification_local_data_source_impl.dart';
 import 'features/hijri_calendar/data/datasources/hijri_calendar_local_data_source.dart';
 import 'features/hijri_calendar/data/repositories/hijri_calendar_repository_impl.dart';
 import 'features/hijri_calendar/domain/repositories/hijri_calendar_repository.dart';

@@ -47,6 +47,7 @@
         android:icon="@mipmap/ic_launcher"
         android:usesCleartextTraffic="true">
 
+        <!-- Main Flutter Activity -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -75,7 +76,10 @@
             android:name="flutterEmbedding"
             android:value="2"/>
 
-        <!-- flutter_local_notifications -->
+        <!-- ====================================================== -->
+        <!-- Flutter Local Notifications -->
+        <!-- ====================================================== -->
+
         <receiver
             android:exported="false"
             android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver"/>
@@ -93,39 +97,20 @@
 
         </receiver>
 
-        <!-- 🔥 Foreground Service for alarm playback 🔥 -->
+        <!-- ====================================================== -->
+        <!-- Flutter Foreground Task -->
+        <!-- Used for alarm/audio playback -->
+        <!-- ====================================================== -->
+
         <service
             android:name="com.pravera.flutter_foreground_task.service.ForegroundService"
             android:foregroundServiceType="mediaPlayback|specialUse"
             android:exported="false"/>
 
-        <!-- 🔥 Audio Service (required by alarm package) 🔥 -->
-        <service
-            android:name="com.ryanheise.audioservice.AudioService"
-            android:enabled="true"
-            android:exported="false"
-            android:foregroundServiceType="mediaPlayback"/>
+        <!-- ====================================================== -->
+        <!-- Android Alarm Manager Plus -->
+        <!-- ====================================================== -->
 
-        <!-- 🔥 Alarm receivers for boot and package replacement 🔥 -->
-        <receiver
-            android:name="com.ryanheise.audioservice.MediaButtonReceiver"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
-                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
-            </intent-filter>
-        </receiver>
-
-        <receiver
-            android:name="com.ryanheise.audioservice.AlarmReceiver"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
-                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
-            </intent-filter>
-        </receiver>
-
-        <!-- 🔥 Android Alarm Manager Plus 🔥 -->
         <service
             android:name="dev.fluttercommunity.plus.androidalarmmanager.AlarmService"
             android:permission="android.permission.BIND_JOB_SERVICE"
@@ -139,29 +124,41 @@
             android:name="dev.fluttercommunity.plus.androidalarmmanager.RebootBroadcastReceiver"
             android:enabled="false"
             android:exported="false">
+
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
+
         </receiver>
 
-        <!-- 🔥 WorkManager Initialization 🔥 -->
+        <!-- ====================================================== -->
+        <!-- WorkManager -->
+        <!-- ====================================================== -->
+
         <provider
             android:name="androidx.startup.InitializationProvider"
             android:authorities="${applicationId}.androidx-startup"
             android:exported="false">
+
             <meta-data
                 android:name="androidx.work.WorkManagerInitializer"
                 android:value="androidx.startup"/>
+
         </provider>
 
     </application>
 
-    <!-- Required for Android text processing -->
+    <!-- ======================================================== -->
+    <!-- Android Text Processing -->
+    <!-- ======================================================== -->
+
     <queries>
+
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>
         </intent>
+
     </queries>
 
 </manifest>

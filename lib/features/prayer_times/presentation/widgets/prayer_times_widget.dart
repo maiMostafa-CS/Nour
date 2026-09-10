@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 
 import '../../domain/entities/prayer_times_entity.dart';
@@ -102,14 +103,14 @@ class _PrayerTimesWidgetState
     }
 
     return SizedBox(
-      height: 86,
+      height: 86.h,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         reverse: true,
         physics: const BouncingScrollPhysics(),
         itemCount: prayers.length,
         separatorBuilder: (_, __) =>
-        const SizedBox(width: 7),
+            SizedBox(width: 7.w),
         itemBuilder: (context, index) {
           final prayer = prayers[index];
 
@@ -127,44 +128,48 @@ class _PrayerTimesWidgetState
         bool isActive = false,
       }) {
     return Container(
-      width: 49,
-      padding: const EdgeInsets.symmetric(
-        vertical: 8,
+      width: 52.w,
+      padding: EdgeInsets.symmetric(
+        vertical: 8.h,
       ),
       decoration: BoxDecoration(
         color: isActive
             ? const Color(0xFF176B5B)
             : const Color(0xFFF5F0E6),
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(14.r),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
             prayer['icon'] as IconData,
-            size: 22,
+            size: 22.sp,
             color: isActive
                 ? Colors.white
                 : const Color(0xFF176B5B),
           ),
-          const SizedBox(height: 5),
+
+          SizedBox(height: 5.h),
+
           Text(
             prayer['name'] as String,
             style: TextStyle(
-              fontSize: 13,
+              fontSize: 13.sp,
               fontWeight: FontWeight.w600,
               color: isActive
                   ? Colors.white
                   : const Color(0xFF222222),
             ),
           ),
-          const SizedBox(height: 3),
+
+          SizedBox(height: 3.h),
+
           Text(
             _formatPrayerTime(
               prayer['time'] as DateTime,
             ),
             style: TextStyle(
-              fontSize: 12,
+              fontSize: 12.sp,
               fontWeight: FontWeight.bold,
               color: isActive
                   ? Colors.white
@@ -178,7 +183,7 @@ class _PrayerTimesWidgetState
 
   String _formatPrayerTime(DateTime time) {
     return DateFormat(
-     " hh:mm",
+      " hh:mm",
     ).format(time);
   }
 }

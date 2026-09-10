@@ -58,6 +58,8 @@
 //   }
 // }
 import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class AdhkarPage extends StatelessWidget {
   const AdhkarPage({super.key});
@@ -97,79 +99,56 @@ class AdhkarPage extends StatelessWidget {
         title: 'حصن المسلم',
         icon: '📖',
       ),
-
-      // 9
       const AdhkarCategory(
         title: 'أذكار دخول المنزل',
         icon: '🚪',
       ),
-
-      // 10
       const AdhkarCategory(
         title: 'أذكار الخروج من المنزل',
         icon: '🚶',
       ),
-
-      // 11
       const AdhkarCategory(
         title: 'أذكار دخول الخلاء',
         icon: '🚻',
       ),
-
-      // 12
       const AdhkarCategory(
         title: 'أذكار الخروج من الخلاء',
         icon: '🛁',
       ),
-
-      // 13
       const AdhkarCategory(
         title: 'أذكار اللباس',
         icon: '👕',
       ),
-
-      // 14
       const AdhkarCategory(
         title: 'أذكار السفر',
         icon: '🚗',
       ),
-
-      // 15
       const AdhkarCategory(
         title: 'أذكار المطر',
         icon: '🌧️',
       ),
-
-      // 16
       const AdhkarCategory(
         title: 'أذكار الرياح والرعد',
         icon: '🌩️',
       ),
-
-      // 17
       const AdhkarCategory(
         title: 'أذكار متنوعة',
         icon: '🤲',
       ),
-
-      // 18
       const AdhkarCategory(
         title: 'أدعية من القرآن',
         icon: '📖',
       ),
-
-      // 19
       const AdhkarCategory(
         title: 'أدعية الأنبياء',
         icon: '❤️',
       ),
-
-      // 20
       const AdhkarCategory(
         title: 'الرقية الشرعية',
         icon: '🤍',
       ),
     ];
+
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
@@ -184,29 +163,29 @@ class AdhkarPage extends StatelessWidget {
             onPressed: () {
               Navigator.pop(context);
             },
-            icon: const Icon(
+            icon: Icon(
               Icons.arrow_back_ios_new_rounded,
-              size: 20,
-              color: Color(0xFF222222),
+              size: 20.sp,
+              color: const Color(0xFF222222),
             ),
           ),
 
-          title: const Text(
+          title: Text(
             'الأذكار',
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 18.sp,
               fontWeight: FontWeight.w700,
-              color: Color(0xFF222222),
+              color: const Color(0xFF222222),
             ),
           ),
 
           actions: [
             IconButton(
               onPressed: () {},
-              icon: const Icon(
+              icon: Icon(
                 Icons.settings_outlined,
-                size: 22,
-                color: Color(0xFF222222),
+                size: 22.sp,
+                color: const Color(0xFF222222),
               ),
             ),
           ],
@@ -217,28 +196,27 @@ class AdhkarPage extends StatelessWidget {
             children: [
               Expanded(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 18,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 18.w,
                   ),
                   child: Column(
                     children: [
-                      const SizedBox(height: 4),
+                      SizedBox(height: 4.h),
 
-                      // Search
                       _buildSearch(),
 
-                      const SizedBox(height: 14),
+                      SizedBox(height: 14.h),
 
-                      // Categories
                       GridView.builder(
                         shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
+                        physics:
+                        const NeverScrollableScrollPhysics(),
                         itemCount: categories.length,
                         gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
+                        SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 3,
-                          crossAxisSpacing: 9,
-                          mainAxisSpacing: 9,
+                          crossAxisSpacing: 9.w,
+                          mainAxisSpacing: 9.h,
                           childAspectRatio: 0.90,
                         ),
                         itemBuilder: (context, index) {
@@ -251,13 +229,12 @@ class AdhkarPage extends StatelessWidget {
                         },
                       ),
 
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20.h),
                     ],
                   ),
                 ),
               ),
 
-              // Bottom Navigation
               _buildBottomNavigation(),
             ],
           ),
@@ -268,28 +245,28 @@ class AdhkarPage extends StatelessWidget {
 
   Widget _buildSearch() {
     return Container(
-      height: 44,
+      height: 44.h,
       decoration: BoxDecoration(
         color: const Color(0xFFF3F1EB),
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(14.r),
       ),
       child: TextField(
         textDirection: TextDirection.rtl,
         decoration: InputDecoration(
           hintText: 'ابحث في الأذكار',
-          hintStyle: const TextStyle(
-            fontSize: 13,
-            color: Color(0xFF999999),
+          hintStyle: TextStyle(
+            fontSize: 13.sp,
+            color: const Color(0xFF999999),
           ),
-          prefixIcon: const Icon(
+          prefixIcon: Icon(
             Icons.search_rounded,
-            size: 20,
-            color: Color(0xFF999999),
+            size: 20.sp,
+            color: const Color(0xFF999999),
           ),
           border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 12,
-            vertical: 11,
+          contentPadding: EdgeInsets.symmetric(
+            horizontal: 12.w,
+            vertical: 11.h,
           ),
         ),
       ),
@@ -301,23 +278,23 @@ class AdhkarPage extends StatelessWidget {
       AdhkarCategory category,
       ) {
     return InkWell(
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(14.r),
       onTap: () {
         _openCategory(context, category);
       },
       child: Container(
         decoration: BoxDecoration(
           color: const Color(0xFFFEFDF9),
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(14.r),
           border: Border.all(
             color: const Color(0xFFECE9E1),
-            width: 1,
+            width: 1.w,
           ),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.025),
-              blurRadius: 5,
-              offset: const Offset(0, 2),
+              blurRadius: 5.r,
+              offset: Offset(0, 2.h),
             ),
           ],
         ),
@@ -325,32 +302,35 @@ class AdhkarPage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: const Color(0xFFF5F1E8),
+              width: 48.w,
+              height: 48.h,
+              decoration: const BoxDecoration(
+                color: Color(0xFFF5F1E8),
                 shape: BoxShape.circle,
               ),
               alignment: Alignment.center,
               child: Text(
                 category.icon,
-                style: const TextStyle(
-                  fontSize: 27,
+                style: TextStyle(
+                  fontSize: 27.sp,
                 ),
               ),
             ),
 
-            const SizedBox(height: 8),
+            SizedBox(height: 8.h),
 
-            Text(
-              category.title,
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF333333),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 3.w),
+              child: Text(
+                category.title,
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 11.sp,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFF333333),
+                ),
               ),
             ),
           ],
@@ -365,95 +345,76 @@ class AdhkarPage extends StatelessWidget {
       ) {
     switch (category.title) {
       case 'أذكار الصباح':
-      // Navigator.pushNamed(context, AppRouter.morningAdhkar);
         break;
 
       case 'أذكار المساء':
-      // Navigator.pushNamed(context, AppRouter.eveningAdhkar);
         break;
 
       case 'أذكار بعد الصلاة':
-      // Navigator.pushNamed(context, AppRouter.afterPrayerAdhkar);
         break;
 
       case 'أذكار النوم':
-      // Navigator.pushNamed(context, AppRouter.sleepAdhkar);
         break;
 
       case 'أذكار الاستيقاظ':
-      // Navigator.pushNamed(context, AppRouter.wakingAdhkar);
         break;
 
       case 'أذكار المسجد':
-      // Navigator.pushNamed(context, AppRouter.mosqueAdhkar);
         break;
 
       case 'أذكار الطعام':
-      // Navigator.pushNamed(context, AppRouter.foodAdhkar);
         break;
 
       case 'حصن المسلم':
-      // Navigator.pushNamed(context, AppRouter.hisnMuslim);
         break;
 
       case 'أذكار دخول المنزل':
-      // Navigator.pushNamed(context, AppRouter.enterHomeAdhkar);
         break;
 
       case 'أذكار الخروج من المنزل':
-      // Navigator.pushNamed(context, AppRouter.leaveHomeAdhkar);
         break;
 
       case 'أذكار دخول الخلاء':
-      // Navigator.pushNamed(context, AppRouter.enterBathroomAdhkar);
         break;
 
       case 'أذكار الخروج من الخلاء':
-      // Navigator.pushNamed(context, AppRouter.leaveBathroomAdhkar);
         break;
 
       case 'أذكار اللباس':
-      // Navigator.pushNamed(context, AppRouter.clothingAdhkar);
         break;
 
       case 'أذكار السفر':
-      // Navigator.pushNamed(context, AppRouter.travelAdhkar);
         break;
 
       case 'أذكار المطر':
-      // Navigator.pushNamed(context, AppRouter.rainAdhkar);
         break;
 
       case 'أذكار الرياح والرعد':
-      // Navigator.pushNamed(context, AppRouter.windThunderAdhkar);
         break;
 
       case 'أذكار متنوعة':
-      // Navigator.pushNamed(context, AppRouter.miscAdhkar);
         break;
 
       case 'أدعية من القرآن':
-      // Navigator.pushNamed(context, AppRouter.quranDuas);
         break;
 
       case 'أدعية الأنبياء':
-      // Navigator.pushNamed(context, AppRouter.prophetsDuas);
         break;
 
       case 'الرقية الشرعية':
-      // Navigator.pushNamed(context, AppRouter.ruqyah);
         break;
     }
   }
 
   Widget _buildBottomNavigation() {
     return Container(
-      height: 68,
+      height: 68.h,
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border(
           top: BorderSide(
             color: Colors.grey.shade200,
+            width: 1.w,
           ),
         ),
       ),
@@ -503,14 +464,16 @@ class AdhkarPage extends StatelessWidget {
       children: [
         Icon(
           icon,
-          size: 21,
+          size: 21.sp,
           color: active ? activeColor : inactiveColor,
         ),
-        const SizedBox(height: 4),
+
+        SizedBox(height: 4.h),
+
         Text(
           label,
           style: TextStyle(
-            fontSize: 10,
+            fontSize: 10.sp,
             fontWeight:
             active ? FontWeight.w700 : FontWeight.w500,
             color: active ? activeColor : inactiveColor,

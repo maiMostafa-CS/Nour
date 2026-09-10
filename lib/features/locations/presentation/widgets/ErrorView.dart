@@ -1,11 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ErrorView extends StatelessWidget {
   final String message;
   final VoidCallback onRetry;
 
   const ErrorView({
+    super.key,
     required this.message,
     required this.onRetry,
   });
@@ -14,33 +16,39 @@ class ErrorView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(24.w),
         child: Column(
-          mainAxisAlignment:
-          MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
+            Icon(
               Icons.location_off,
-              size: 60,
+              size: 60.sp,
             ),
 
-            const SizedBox(height: 16),
+            SizedBox(height: 16.h),
 
             Text(
               message,
               textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 14.sp,
+              ),
             ),
 
-            const SizedBox(height: 20),
+            SizedBox(height: 20.h),
 
             ElevatedButton(
               onPressed: onRetry,
-              child: const Text('Retry'),
+              child: Text(
+                'Retry',
+                style: TextStyle(
+                  fontSize: 14.sp,
+                ),
+              ),
             ),
           ],
         ),
       ),
-
     );
   }
 }
