@@ -6,12 +6,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../core/router/app_router.dart';
 import '../../../../core/services/prayer_scheduler_split/prayer_scheduler/config/prayer_scheduler_config.dart';
+import '../../domain/entity/current_location_entity.dart';
 import '../../domain/entity/location_entity.dart';
 import '../bloc/bloc.dart';
 import '../bloc/blocEvent.dart';
 import '../bloc/blocState.dart';
 import '../widgets/ErrorView.dart';
 import '../widgets/coordinateRow.dart';
+import '../widgets/current_location_dialog.dart';
 import 'countrySelectionScreen.dart';
 
 enum LocationSelectionType {
@@ -65,7 +67,8 @@ class _LocationPageState extends State<LocationPage> {
         centerTitle: true,
       ),
       body: BlocConsumer<LocationBloc, LocationState>(
-        listener: (context, state) {
+        listener:
+            (context, state) async {
           if (state.status == LocationStatus.failure &&
               state.errorMessage != null) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -90,26 +93,9 @@ class _LocationPageState extends State<LocationPage> {
                   'lng=${location.longitude}',
             );
 
-            Navigator.of(context).pop({
-              'type': LocationSelectionType.current,
-              'location': location,
-            });
-
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  'Current location detected successfully',
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                  ),
-                ),
-              ),
-            );
-
-            Navigator.pushNamedAndRemoveUntil(
+            await _saveCurrentLocation(
               context,
-              '/',
-                  (route) => false,
+              location,
             );
           }
         },
@@ -235,9 +221,22 @@ class _LocationPageState extends State<LocationPage> {
       child: InkWell(
         onTap: isLoading
             ? null
-            : () {
-          showCurrentLocationDialog(
-            context,
+            : () async {
+          final shouldUpdate =
+          await showCurrentLocationDialog(context);
+
+          if (!shouldUpdate) return;
+
+          final ready =
+          await CurrentLocationHelper
+              .checkAndRequestPermission(context);
+
+          if (!ready) return;
+
+          if (!context.mounted) return;
+
+          context.read<LocationBloc>().add(
+            const GetCurrentLocation(),
           );
         },
         child: Padding(
@@ -571,7 +570,8 @@ class _LocationPageState extends State<LocationPage> {
   Future<void> _saveLocation(
       BuildContext context,
       LocationEntity location,
-      ) async {
+      )
+  async {
     final prefs = await SharedPreferences.getInstance();
 
     await prefs.setString(
@@ -624,296 +624,370 @@ class _LocationPageState extends State<LocationPage> {
           (route) => false,
     );
   }
-
-  Future<void> showCurrentLocationDialog(
+  Future<void> _saveCurrentLocation(
       BuildContext context,
+      CurrentLocationEntity location,
       ) async {
-    final result = await showDialog<bool>(
-      context: context,
-      barrierDismissible: false,
-      builder: (dialogContext) {
-        return AlertDialog(
-          icon: Icon(
-            Icons.location_on,
-            size: 42.sp,
-            color: Theme.of(context).colorScheme.primary,
-          ),
-          title: Text(
-            'Update Current Location',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 20.sp,
-            ),
-          ),
-          content: Text(
-            'Your current location will be updated.\n\n'
-                'Please make sure that Location/GPS is enabled '
-                'on your device.\n\n'
-                'If Location is disabled, please enable it '
-                'before continuing.',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 14.sp,
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(
-                  dialogContext,
-                  false,
-                );
-              },
-              child: Text(
-                'Cancel',
-                style: TextStyle(
-                  fontSize: 14.sp,
-                ),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(
-                  dialogContext,
-                  true,
-                );
-              },
-              child: Text(
-                'Update Location',
-                style: TextStyle(
-                  fontSize: 14.sp,
-                ),
-              ),
-            ),
-          ],
-        );
-      },
+    final prefs = await SharedPreferences.getInstance();
+
+    await prefs.setString('prayer_location_mode', 'auto');
+
+    await prefs.setDouble(
+      'prayer_current_latitude',
+      location.latitude,
     );
 
-    if (result != true) {
-      return;
-    }
-
-    await _updateCurrentLocation(
-      context,
+    await prefs.setDouble(
+      'prayer_current_longitude',
+      location.longitude,
     );
-  }
 
-  Future<void> _updateCurrentLocation(
-      BuildContext context,
-      ) async {
-    final serviceEnabled =
-    await Geolocator.isLocationServiceEnabled();
+    await prefs.setString(
+      'prayer_city_name',
+      location.city,
+    );
 
-    if (!serviceEnabled) {
-      if (!context.mounted) return;
+    await prefs.setString(
+      'prayer_country_name',
+      location.country,
+    );
 
-      await _showLocationServiceDialog(
-        context,
-      );
+    await prefs.setDouble(
+      prayerLastLatitudePrefsKey,
+      location.latitude,
+    );
 
-      return;
-    }
+    await prefs.setDouble(
+      prayerLastLongitudePrefsKey,
+      location.longitude,
+    );
 
-    final permission =
-    await Geolocator.checkPermission();
-
-    if (permission == LocationPermission.denied) {
-      final newPermission =
-      await Geolocator.requestPermission();
-
-      if (newPermission == LocationPermission.denied) {
-        if (!context.mounted) return;
-
-        _showMessage(
-          context,
-          'Location permission is required.',
-        );
-
-        return;
-      }
-
-      if (newPermission ==
-          LocationPermission.deniedForever) {
-        if (!context.mounted) return;
-
-        await _showPermissionSettingsDialog(
-          context,
-        );
-
-        return;
-      }
-    }
-
-    if (permission ==
-        LocationPermission.deniedForever) {
-      if (!context.mounted) return;
-
-      await _showPermissionSettingsDialog(
-        context,
-      );
-
-      return;
-    }
-
-    // ============================================================
-    // EVERYTHING IS OK
-    // ============================================================
+    debugPrint(
+      '📍 CURRENT LOCATION SAVED | '
+          'city=${location.city} | '
+          'country=${location.country} | '
+          'lat=${location.latitude} | '
+          'lng=${location.longitude}',
+    );
 
     if (!context.mounted) return;
 
-    context.read<LocationBloc>().add(
-      const GetCurrentLocation(),
+    Navigator.of(context).pushNamedAndRemoveUntil(
+      '/',
+          (route) => false,
     );
   }
-
-  Future<void> _showLocationServiceDialog(
-      BuildContext context,
-      ) async {
-    final openSettings = await showDialog<bool>(
-      context: context,
-      barrierDismissible: false,
-      builder: (dialogContext) {
-        return AlertDialog(
-          icon: Icon(
-            Icons.location_off,
-            size: 42.sp,
-          ),
-          title: Text(
-            'Location is disabled',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 20.sp,
-            ),
-          ),
-          content: Text(
-            'Your device location is currently disabled.\n\n'
-                'Please open Location Settings and enable '
-                'Location/GPS, then try again.',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 14.sp,
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(
-                  dialogContext,
-                  false,
-                );
-              },
-              child: Text(
-                'Cancel',
-                style: TextStyle(
-                  fontSize: 14.sp,
-                ),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(
-                  dialogContext,
-                  true,
-                );
-              },
-              child: Text(
-                'Open Settings',
-                style: TextStyle(
-                  fontSize: 14.sp,
-                ),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-
-    if (openSettings == true) {
-      await Geolocator.openLocationSettings();
-    }
-  }
-
-  Future<void> _showPermissionSettingsDialog(
-      BuildContext context,
-      ) async {
-    final openSettings = await showDialog<bool>(
-      context: context,
-      barrierDismissible: false,
-      builder: (dialogContext) {
-        return AlertDialog(
-          icon: Icon(
-            Icons.location_disabled,
-            size: 42.sp,
-          ),
-          title: Text(
-            'Location Permission Required',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 20.sp,
-            ),
-          ),
-          content: Text(
-            'Location permission has been denied.\n\n'
-                'Please open the app settings and allow '
-                'location permission to continue.',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 14.sp,
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(
-                  dialogContext,
-                  false,
-                );
-              },
-              child: Text(
-                'Cancel',
-                style: TextStyle(
-                  fontSize: 14.sp,
-                ),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(
-                  dialogContext,
-                  true,
-                );
-              },
-              child: Text(
-                'Open Settings',
-                style: TextStyle(
-                  fontSize: 14.sp,
-                ),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-
-    if (openSettings == true) {
-      await Geolocator.openAppSettings();
-    }
-  }
-
-  void _showMessage(
-      BuildContext context,
-      String message,
-      ) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          message,
-          style: TextStyle(
-            fontSize: 14.sp,
-          ),
-        ),
-      ),
-    );
-  }
+  // Future<void> showCurrentLocationDialog(
+  //     BuildContext context,
+  //     )
+  // async {
+  //   final result = await showDialog<bool>(
+  //     context: context,
+  //     barrierDismissible: false,
+  //     builder: (dialogContext) {
+  //       return AlertDialog(
+  //         icon: Icon(
+  //           Icons.location_on,
+  //           size: 42.sp,
+  //           color: Theme.of(context).colorScheme.primary,
+  //         ),
+  //         title: Text(
+  //           'Update Current Location',
+  //           textAlign: TextAlign.center,
+  //           style: TextStyle(
+  //             fontSize: 20.sp,
+  //           ),
+  //         ),
+  //         content: Text(
+  //           'Your current location will be updated.\n\n'
+  //               'Please make sure that Location/GPS is enabled '
+  //               'on your device.\n\n'
+  //               'If Location is disabled, please enable it '
+  //               'before continuing.',
+  //           textAlign: TextAlign.center,
+  //           style: TextStyle(
+  //             fontSize: 14.sp,
+  //           ),
+  //         ),
+  //         actions: [
+  //           TextButton(
+  //             onPressed: () {
+  //               Navigator.pop(
+  //                 dialogContext,
+  //                 false,
+  //               );
+  //             },
+  //             child: Text(
+  //               'Cancel',
+  //               style: TextStyle(
+  //                 fontSize: 14.sp,
+  //               ),
+  //             ),
+  //           ),
+  //           ElevatedButton(
+  //             onPressed: () {
+  //               Navigator.pop(
+  //                 dialogContext,
+  //                 true,
+  //               );
+  //             },
+  //             child: Text(
+  //               'Update Location',
+  //               style: TextStyle(
+  //                 fontSize: 14.sp,
+  //               ),
+  //             ),
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   );
+  //
+  //   if (result != true) {
+  //     return;
+  //   }
+  //
+  //   await _updateCurrentLocation(
+  //     context,
+  //   );
+  // }
+  // Future<void> _updateCurrentLocation(
+  //     BuildContext context,
+  //     )
+  // async {
+  //   try {
+  //     final serviceEnabled =
+  //     await Geolocator.isLocationServiceEnabled();
+  //
+  //     debugPrint(
+  //       '📍 GPS SERVICE ENABLED = $serviceEnabled',
+  //     );
+  //
+  //     if (!serviceEnabled) {
+  //       if (!context.mounted) return;
+  //
+  //       await _showLocationServiceDialog(context);
+  //       return;
+  //     }
+  //
+  //     LocationPermission permission =
+  //     await Geolocator.checkPermission();
+  //
+  //     debugPrint(
+  //       '📍 LOCATION PERMISSION BEFORE = $permission',
+  //     );
+  //
+  //     if (permission == LocationPermission.denied) {
+  //       permission =
+  //       await Geolocator.requestPermission();
+  //
+  //       debugPrint(
+  //         '📍 LOCATION PERMISSION AFTER = $permission',
+  //       );
+  //     }
+  //
+  //     if (permission == LocationPermission.denied) {
+  //       if (!context.mounted) return;
+  //
+  //       _showMessage(
+  //         context,
+  //         'Location permission is required.',
+  //       );
+  //
+  //       return;
+  //     }
+  //
+  //     if (permission ==
+  //         LocationPermission.deniedForever) {
+  //       if (!context.mounted) return;
+  //
+  //       await _showPermissionSettingsDialog(context);
+  //       return;
+  //     }
+  //
+  //     // ============================================================
+  //     // EVERYTHING IS OK
+  //     // ============================================================
+  //
+  //     debugPrint(
+  //       '📍 LOCATION READY → REQUESTING BLOC',
+  //     );
+  //
+  //     if (!context.mounted) return;
+  //
+  //     context.read<LocationBloc>().add(
+  //       const GetCurrentLocation(),
+  //     );
+  //   } catch (e, stackTrace) {
+  //     debugPrint(
+  //       '❌ CURRENT LOCATION REQUEST FAILED',
+  //     );
+  //
+  //     debugPrint(
+  //       '❌ ERROR = $e',
+  //     );
+  //
+  //     debugPrint(
+  //       '❌ STACK = $stackTrace',
+  //     );
+  //
+  //     if (!context.mounted) return;
+  //
+  //     _showMessage(
+  //       context,
+  //       'Unable to get your current location.',
+  //     );
+  //   }
+  // }
+  // Future<void> _showLocationServiceDialog(
+  //     BuildContext context,
+  //     )
+  // async {
+  //   final openSettings = await showDialog<bool>(
+  //     context: context,
+  //     barrierDismissible: false,
+  //     builder: (dialogContext) {
+  //       return AlertDialog(
+  //         icon: Icon(
+  //           Icons.location_off,
+  //           size: 42.sp,
+  //         ),
+  //         title: Text(
+  //           'Location is disabled',
+  //           textAlign: TextAlign.center,
+  //           style: TextStyle(
+  //             fontSize: 20.sp,
+  //           ),
+  //         ),
+  //         content: Text(
+  //           'Your device location is currently disabled.\n\n'
+  //               'Please open Location Settings and enable '
+  //               'Location/GPS, then try again.',
+  //           textAlign: TextAlign.center,
+  //           style: TextStyle(
+  //             fontSize: 14.sp,
+  //           ),
+  //         ),
+  //         actions: [
+  //           TextButton(
+  //             onPressed: () {
+  //               Navigator.pop(
+  //                 dialogContext,
+  //                 false,
+  //               );
+  //             },
+  //             child: Text(
+  //               'Cancel',
+  //               style: TextStyle(
+  //                 fontSize: 14.sp,
+  //               ),
+  //             ),
+  //           ),
+  //           ElevatedButton(
+  //             onPressed: () {
+  //               Navigator.pop(
+  //                 dialogContext,
+  //                 true,
+  //               );
+  //             },
+  //             child: Text(
+  //               'Open Settings',
+  //               style: TextStyle(
+  //                 fontSize: 14.sp,
+  //               ),
+  //             ),
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   );
+  //
+  //   if (openSettings == true) {
+  //     await Geolocator.openLocationSettings();
+  //   }
+  // }
+  //
+  // Future<void> _showPermissionSettingsDialog(
+  //     BuildContext context,
+  //     )
+  // async {
+  //   final openSettings = await showDialog<bool>(
+  //     context: context,
+  //     barrierDismissible: false,
+  //     builder: (dialogContext) {
+  //       return AlertDialog(
+  //         icon: Icon(
+  //           Icons.location_disabled,
+  //           size: 42.sp,
+  //         ),
+  //         title: Text(
+  //           'Location Permission Required',
+  //           textAlign: TextAlign.center,
+  //           style: TextStyle(
+  //             fontSize: 20.sp,
+  //           ),
+  //         ),
+  //         content: Text(
+  //           'Location permission has been denied.\n\n'
+  //               'Please open the app settings and allow '
+  //               'location permission to continue.',
+  //           textAlign: TextAlign.center,
+  //           style: TextStyle(
+  //             fontSize: 14.sp,
+  //           ),
+  //         ),
+  //         actions: [
+  //           TextButton(
+  //             onPressed: () {
+  //               Navigator.pop(
+  //                 dialogContext,
+  //                 false,
+  //               );
+  //             },
+  //             child: Text(
+  //               'Cancel',
+  //               style: TextStyle(
+  //                 fontSize: 14.sp,
+  //               ),
+  //             ),
+  //           ),
+  //           ElevatedButton(
+  //             onPressed: () {
+  //               Navigator.pop(
+  //                 dialogContext,
+  //                 true,
+  //               );
+  //             },
+  //             child: Text(
+  //               'Open Settings',
+  //               style: TextStyle(
+  //                 fontSize: 14.sp,
+  //               ),
+  //             ),
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   );
+  //
+  //   if (openSettings == true) {
+  //     await Geolocator.openAppSettings();
+  //   }
+  // }
+  //
+  // void _showMessage(
+  //     BuildContext context,
+  //     String message,
+  //     ) {
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     SnackBar(
+  //       content: Text(
+  //         message,
+  //         style: TextStyle(
+  //           fontSize: 14.sp,
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 }

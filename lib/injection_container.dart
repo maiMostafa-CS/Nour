@@ -9,6 +9,7 @@ import 'features/hijri_calendar/domain/usecases/get_hijri_date.dart';
 import 'features/hijri_calendar/domain/usecases/get_hijri_month.dart';
 import 'features/hijri_calendar/presentation/bloc/hijri_calendar_bloc.dart';
 
+import 'features/home/presentation/bloc/bloc.dart';
 import 'features/locations/data/datasources/current_location_data_source.dart';
 import 'features/locations/data/datasources/location_local_data_source.dart';
 import 'features/locations/data/repositories/current_location_repository_impl.dart';
@@ -55,6 +56,9 @@ final sl = GetIt.instance;
 
 Future<void> configureDependencies() async {
 
+  // sl.registerFactory<HomeBloc>(
+  //       () => HomeBloc(),
+  // );
   // ============================================================
   // Prayer Times
   // ============================================================

@@ -74,7 +74,10 @@ static const locationPage = '/locationPage';
       case home:
       default:
         return MaterialPageRoute(
-          builder: (_) => HomePage(),
+          builder: (_) => BlocProvider(
+            create: (_) => getIt<LocationBloc>(),
+            child: const HomePage(),
+          ),
         );
     }
   }

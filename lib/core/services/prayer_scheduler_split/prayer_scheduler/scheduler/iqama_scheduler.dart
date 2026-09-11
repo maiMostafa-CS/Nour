@@ -35,6 +35,7 @@ class IqamaScheduler {
       loopAudio: false,
       vibrate: false,
       androidFullScreenIntent: false,
+      allowAlarmOverlap: true,
       androidStopAlarmOnTermination: false,
       volumeSettings: VolumeSettings.fade(
         volume: 1.0,

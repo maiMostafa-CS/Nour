@@ -14,15 +14,22 @@ class PrayerInitial extends PrayerState {
 class PrayerLoading extends PrayerState {
   const PrayerLoading();
 }
-
 class PrayerLoaded extends PrayerState {
   final PrayerTimesEntity prayerTimes;
+  final double latitude;
+  final double longitude;
 
-  const PrayerLoaded(this.prayerTimes);
+  const PrayerLoaded({
+    required this.prayerTimes,
+    required this.latitude,
+    required this.longitude,
+  });
 
   @override
   List<Object?> get props => [
     prayerTimes,
+    latitude,
+    longitude,
   ];
 }
 

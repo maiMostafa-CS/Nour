@@ -33,7 +33,11 @@ class PrayerBloc extends Bloc<PrayerEvent, PrayerState> {
       );
 
       emit(
-        PrayerLoaded(result),
+        PrayerLoaded(
+          prayerTimes: result,
+          latitude: event.latitude,
+          longitude: event.longitude,
+        ),
       );
     } catch (e) {
       emit(

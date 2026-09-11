@@ -46,6 +46,13 @@ class CountdownNotificationService {
       }
 
       final now = DateTime.now();
+      final sortedEntries = List<Map<String, dynamic>>.from(
+        entries.map((e) => Map<String, dynamic>.from(e as Map)),
+      )..sort((a, b) {
+        final timeA = DateTime.tryParse(a['time'] as String) ?? DateTime(0);
+        final timeB = DateTime.tryParse(b['time'] as String) ?? DateTime(0);
+        return timeA.compareTo(timeB);
+      });
       Map<String, dynamic>? next;
 
       for (var i = 0; i < entries.length; i++) {

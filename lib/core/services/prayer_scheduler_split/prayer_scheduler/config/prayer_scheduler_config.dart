@@ -32,7 +32,3 @@ const String adhanAsset =
 const String iqamaAsset =
 
      'assets/adhan-mp3/Iqama.mp3';
-
-const String reminderAsset =
-
-    'assets/prayer_time_soon/fajr.mp3';

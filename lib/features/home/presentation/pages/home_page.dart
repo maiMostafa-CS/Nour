@@ -12,14 +12,17 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/services/adhan_scheduler_service.dart';
 import '../../../../core/services/prayer_scheduler_split/prayer_scheduler/adhan_scheduler_service.dart';
-import '../../../../core/services/prayer_scheduler_split/prayer_scheduler/background/prayer_background_callbacks.dart';
 import '../../../../core/services/prayer_scheduler_split/prayer_scheduler/config/prayer_scheduler_config.dart';
 import '../../../../injection_container.dart';
 import '../../../hijri_calendar/domain/usecases/get_hijri_date.dart';
 import '../../../hijri_calendar/presentation/bloc/hijri_calendar_bloc.dart';
 import '../../../locations/domain/entity/current_location_entity.dart';
 import '../../../locations/domain/entity/location_entity.dart';
+import '../../../locations/presentation/bloc/bloc.dart';
+import '../../../locations/presentation/bloc/blocEvent.dart';
+import '../../../locations/presentation/bloc/blocState.dart';
 import '../../../locations/presentation/pages/locationPage.dart';
+import '../../../locations/presentation/widgets/current_location_dialog.dart';
 import '../../../prayer_times/presentation/bloc/prayer_bloc.dart';
 import '../../../prayer_times/presentation/widgets/prayer_times_widget.dart';
 import '../widget/buildBottomNavigation.dart';
@@ -35,6 +38,25 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomePage> with RouteAware {
+  Future<void> _handleCurrentLocationUpdate() async {
+    final shouldUpdate =
+    await showCurrentLocationDialog(context);
+
+    if (!shouldUpdate) return;
+
+    final ready =
+    await CurrentLocationHelper.checkAndRequestPermission(
+      context,
+    );
+
+    if (!ready) return;
+
+    if (!mounted) return;
+
+    context.read<LocationBloc>().add(
+      const GetCurrentLocation(),
+    );
+  }
   Timer? _timer;
 
   String? cityName;
@@ -85,52 +107,71 @@ class _HomeScreenState extends State<HomePage> with RouteAware {
     _getHijriDate = sl<GetHijriDate>();
   }
 
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider.value(
       value: _prayerBloc,
-      child: BlocListener<PrayerBloc, PrayerState>(
-        listener: (context, state) async {
-          if (state is! PrayerLoaded) {
-            return;
-          }
+      child: MultiBlocListener(
+        listeners: [
+          // =========================
+          // Location Listener
+          // =========================
+          BlocListener<LocationBloc, LocationState>(
+            listener: _onLocationStateChanged,
+          ),
 
-          debugPrint(
-            '🕌 PRAYER LOADED | '
-                'lat=$_latitude | '
-                'lng=$_longitude',
-          );
+          // =========================
+          // Prayer Listener
+          // =========================
+          BlocListener<PrayerBloc, PrayerState>(
+            listener: (context, state) async {
+              if (state is! PrayerLoaded) {
+                return;
+              }
 
-          final service = AdhanSchedulerService();
+              debugPrint(
+                '🕌 PRAYER LOADED | '
+                    'lat=$_latitude | '
+                    'lng=$_longitude',
+              );
 
-          try {
-            debugPrint('🔔 SCHEDULING ADHAN...');
+              final service = AdhanSchedulerService();
 
-            await service.showNextPrayerCountdown(
-              state.prayerTimes,
-            );
+              try {
+                debugPrint('🔔 SCHEDULING ADHAN...');
 
-            await service.schedulePrayerAdhan(
-              state.prayerTimes,
-              latitude: _latitude,
-              longitude: _longitude,
-            );
+                await service.showNextPrayerCountdown(
+                  state.prayerTimes,
+                );
 
-            _adhanScheduled = true;
+                await service.schedulePrayerAdhan(
+                  state.prayerTimes,
+                  latitude:state.latitude,
+                  longitude:  state.longitude,
+                );
 
-            debugPrint(
-              '✅ ADHAN SCHEDULED SUCCESSFULLY',
-            );
-          } catch (e, stackTrace) {
-            _adhanScheduled = false;
+                _adhanScheduled = true;
 
-            debugPrint(
-              '❌ ADHAN SCHEDULING FAILED: $e',
-            );
+                debugPrint(
+                  '✅ ADHAN SCHEDULED SUCCESSFULLY',
+                );
+              } catch (e, stackTrace) {
+                _adhanScheduled = false;
 
-            debugPrint('$stackTrace');
-          }
-        },
+                debugPrint(
+                  '❌ ADHAN SCHEDULING FAILED: $e',
+                );
+
+                debugPrint('$stackTrace');
+              }
+            },
+          ),
+        ],
+
+        // =========================
+        // Home UI
+        // =========================
         child: Directionality(
           textDirection: widgets.TextDirection.rtl,
           child: Scaffold(
@@ -139,10 +180,14 @@ class _HomeScreenState extends State<HomePage> with RouteAware {
               centerTitle: true,
               backgroundColor: const Color(0xFFE8E8CE),
               elevation: 0,
-              title:
-                Text(getCurrentHijriDate(),style: TextStyle( fontSize: 16.sp,
+              title: Text(
+                getCurrentHijriDate(),
+                style: TextStyle(
+                  fontSize: 16.sp,
                   fontWeight: FontWeight.bold,
-                  color: const Color(0xFF222222),) )
+                  color: const Color(0xFF222222),
+                ),
+              ),
             ),
 
             backgroundColor: const Color(0xFFE8E8CE),
@@ -189,8 +234,14 @@ class _HomeScreenState extends State<HomePage> with RouteAware {
                               crossAxisAlignment:
                               CrossAxisAlignment.start,
                               children: [
-
                                 _buildTopBar(),
+
+                                ElevatedButton(
+                                  onPressed: () {
+                                    AutoRenewTest.run();
+                                  },
+                                  child: const Text('data'),
+                                ),
 
                                 SizedBox(height: 5.h),
 
@@ -235,14 +286,16 @@ class _HomeScreenState extends State<HomePage> with RouteAware {
               ),
             ),
 
-            bottomNavigationBar:
-            CustomBottomNavigation(
-              selectedIndex: selectedNavIndex,
-              onSelected: (index) {
-                setState(() {
-                  selectedNavIndex = index;
-                });
-              },
+            bottomNavigationBar: SafeArea(
+              top: false,
+              child: CustomBottomNavigation(
+                selectedIndex: selectedNavIndex,
+                onSelected: (index) {
+                  setState(() {
+                    selectedNavIndex = index;
+                  });
+                },
+              ),
             ),
           ),
         ),
@@ -252,6 +305,7 @@ class _HomeScreenState extends State<HomePage> with RouteAware {
 
   Widget _buildTopBar() {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Flexible(
           child: InkWell(
@@ -288,8 +342,10 @@ class _HomeScreenState extends State<HomePage> with RouteAware {
                 ],
               ),
             ),
-          ),
-        ),
+          ),),
+        IconButton(onPressed:_handleCurrentLocationUpdate,
+           icon: Icon(Icons.location_on_outlined)),
+
       ],
     );
   }
@@ -796,4 +852,111 @@ class _HomeScreenState extends State<HomePage> with RouteAware {
     }
   }
 
+  Future<void> _onLocationStateChanged(
+      BuildContext context,
+      LocationState state,
+      ) async {
+    if (state.status == LocationStatus.loading) {
+      debugPrint('📍 Location loading...');
+      return;
+    }
+
+    if (state.status == LocationStatus.failure) {
+      debugPrint(
+        '❌ LOCATION ERROR = ${state.errorMessage}',
+      );
+      return;
+    }
+
+    if (state.status != LocationStatus.success ||
+        state.currentLocation == null) {
+      return;
+    }
+
+    final location = state.currentLocation!;
+
+    final newLat = location.latitude;
+    final newLng = location.longitude;
+
+    debugPrint(
+      '📍 CURRENT LOCATION SUCCESS | '
+          'lat=$newLat | '
+          'lng=$newLng',
+    );
+
+    // Get city
+    String newCity = location.city.trim();
+
+    if (newCity.isEmpty) {
+      newCity = await _getCityNameFromCoordinates(
+        newLat,
+        newLng,
+      );
+    }
+
+    // Save AUTO location
+    final prefs = await SharedPreferences.getInstance();
+
+    await prefs.setString(
+      _locationModeKey,
+      _locationModeAuto,
+    );
+
+    await prefs.setString(
+      'prayer_city_name',
+      newCity,
+    );
+
+    await prefs.setDouble(
+      prayerLastLatitudePrefsKey,
+      newLat,
+    );
+
+    await prefs.setDouble(
+      prayerLastLongitudePrefsKey,
+      newLng,
+    );
+
+    debugPrint(
+      '💾 LOCATION SAVED | '
+          'mode=auto | '
+          'lat=$newLat | '
+          'lng=$newLng | '
+          'city=$newCity',
+    );
+
+    if (!mounted) return;
+
+    setState(() {
+      _latitude = newLat;
+      _longitude = newLng;
+      _cityName = newCity;
+      _locationReady = true;
+      _adhanScheduled = false;
+    });
+
+    debugPrint(
+      '🏠 HOME LOCATION UPDATED | '
+          'lat=$_latitude | '
+          'lng=$_longitude',
+    );
+
+    // IMPORTANT:
+    // Don't cancel alarms here.
+    // Scheduler owns cancel/reschedule.
+
+    _prayerBloc.add(
+      LoadPrayerTimes(
+        latitude: newLat,
+        longitude: newLng,
+        date: DateTime.now(),
+      ),
+    );
+
+    debugPrint(
+      '🔄 PRAYER TIMES RELOAD REQUESTED | '
+          'lat=$newLat | '
+          'lng=$newLng',
+    );
+  }
 }
