@@ -1,7 +1,16 @@
 import 'package:get_it/get_it.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import 'core/router/app_router.dart';
 import 'core/services/prayer_scheduler_split/prayer_scheduler/data/datasources/prayer_notification_local_data_source.dart';
 import 'core/services/prayer_scheduler_split/prayer_scheduler/data/datasources/prayer_notification_local_data_source_impl.dart';
+import 'features/adhan/data/datasources/adhan_local_data_source.dart';
+import 'features/adhan/data/repositories/adhan_repository_impl.dart';
+import 'features/adhan/domain/usecases/get_adhans.dart';
+import 'features/adhan/domain/usecases/get_selected_adhan.dart';
+import 'features/adhan/domain/usecases/save_selected_adhan.dart';
+import 'features/adhan/domain/repositories/adhan_repository.dart';
+import 'features/adhan/presentation/bloc/adhan_bloc.dart';
 import 'features/hijri_calendar/data/datasources/hijri_calendar_local_data_source.dart';
 import 'features/hijri_calendar/data/repositories/hijri_calendar_repository_impl.dart';
 import 'features/hijri_calendar/domain/repositories/hijri_calendar_repository.dart';
@@ -279,6 +288,7 @@ Future<void> configureDependencies() async {
 // ===============================
 // BLoC
 // ===============================
+  final prefs = await SharedPreferences.getInstance();
 
   sl.registerFactory<LocationBloc>(
         () => LocationBloc(
@@ -288,4 +298,56 @@ Future<void> configureDependencies() async {
       getCurrentLocation: sl<GetCurrentLocationUseCase>(),
     ),
   );
+// ============================================================
+// SharedPreferences
+// ============================================================
+
+
+  sl.registerLazySingleton<SharedPreferences>(
+        () => prefs,
+  );
+
+
+// ============================================================
+// Adhan
+// ============================================================
+
+  sl.registerLazySingleton<AdhanLocalDataSource>(
+        () => AdhanLocalDataSourceImpl(
+      prefs: prefs,
+    ),
+  );
+
+  sl.registerLazySingleton<AdhanRepository>(
+        () => AdhanRepositoryImpl(
+      localDataSource: sl<AdhanLocalDataSource>(),
+    ),
+  );
+
+  sl.registerLazySingleton<GetAdhans>(
+        () => GetAdhans(
+      sl<AdhanRepository>(),
+    ),
+  );
+
+  sl.registerLazySingleton<GetSelectedAdhan>(
+        () => GetSelectedAdhan(
+      sl<AdhanRepository>(),
+    ),
+  );
+
+  sl.registerLazySingleton<SaveSelectedAdhan>(
+        () => SaveSelectedAdhan(
+      sl<AdhanRepository>(),
+    ),
+  );
+
+  sl.registerFactory<AdhanBloc>(
+        () => AdhanBloc(
+      getAdhans: sl<GetAdhans>(),
+      getSelectedAdhan: sl<GetSelectedAdhan>(),
+      saveSelectedAdhan: sl<SaveSelectedAdhan>(),
+    ),
+  );
+
   }

@@ -5,6 +5,9 @@ import 'package:islamic_app/features/locations/presentation/bloc/blocEvent.dart'
 
 import 'package:islamic_app/splashscreen.dart';
 
+import '../../features/adhan/presentation/bloc/adhan_bloc.dart';
+import '../../features/adhan/presentation/bloc/adhan_event.dart';
+import '../../features/adhan/presentation/pages/adhan_reciter_page.dart';
 import '../../features/hijri_calendar/presentation/bloc/hijri_calendar_bloc.dart';
 import '../../features/hijri_calendar/presentation/bloc/hijri_calendar_event.dart';
 import '../../features/hijri_calendar/presentation/pages/hijri_calendar_page.dart';
@@ -15,6 +18,7 @@ import '../../features/locations/presentation/pages/locationPage.dart';
 import '../../features/qibla/presentation/pages/qibla_page.dart';
 import '../../features/quran/presentation/pages/quran_page.dart';
 import '../../features/adhkar/presentation/pages/adhkar_page.dart';
+import '../../injection_container.dart';
 
 final getIt = GetIt.instance;
 
@@ -26,6 +30,7 @@ class AppRouter {
   static const qibla = '/qibla';
   static const hijriCalendar = '/hijriCalendar';
 static const locationPage = '/locationPage';
+static const adhan= "/adhan";
   static Route<dynamic> onGenerateRoute(
       RouteSettings settings,
       ) {
@@ -69,6 +74,14 @@ static const locationPage = '/locationPage';
                 const LoadLocations() ,
               ),
             child: const LocationPage(),
+          ),
+        );
+      case adhan:
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider<AdhanBloc>(
+            create: (_) => sl<AdhanBloc>()
+              ..add(const LoadAdhanReciters()),
+            child: const AdhanReciterPage(),
           ),
         );
       case home:

@@ -23,6 +23,12 @@ class _BuildMainGridState extends State<BuildMainGrid> {
           children: [
             Expanded(
               child: FeatureCard(
+                onTap: () async {
+                  await Navigator.pushNamed(
+                    context,
+                    AppRouter.adhan,
+                  );
+                },
                 image: 'assets/images/quran.png',
                 title: 'القرآن الكريم',
                 subtitle: 'آخر قراءة',

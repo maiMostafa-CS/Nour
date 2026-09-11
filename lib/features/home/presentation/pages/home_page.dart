@@ -236,12 +236,12 @@ class _HomeScreenState extends State<HomePage> with RouteAware {
                               children: [
                                 _buildTopBar(),
 
-                                ElevatedButton(
-                                  onPressed: () {
-                                    AutoRenewTest.run();
-                                  },
-                                  child: const Text('data'),
-                                ),
+                                // ElevatedButton(
+                                //   onPressed: () {
+                                //     AutoRenewTest.run();
+                                //   },
+                                //   child: const Text('data'),
+                                // ),
 
                                 SizedBox(height: 5.h),
 
