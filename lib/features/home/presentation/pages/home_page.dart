@@ -8,6 +8,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
 
 import '../../../../core/router/app_router.dart';
 import '../../../../core/services/adhan_scheduler_service.dart';
@@ -75,6 +76,9 @@ class _HomeScreenState extends State<HomePage> with RouteAware {
   static const String _locationModeManual = 'manual';
 
   String _cityName = 'Select location';
+  String _locationTimezone = 'Africa/Cairo';
+
+  static const String _locationTimezoneKey = 'prayer_location_timezone';
 
   late final HijriCalendarBloc _hijriCalendarBloc;
   late final GetHijriDate _getHijriDate;
@@ -247,6 +251,7 @@ class _HomeScreenState extends State<HomePage> with RouteAware {
 
                                 NextPrayerCard(
                                   prayerTimes: prayerTimes,
+                                  timezoneName: _locationTimezone,
                                 ),
 
                                 SizedBox(height: 18.h),
@@ -259,6 +264,7 @@ class _HomeScreenState extends State<HomePage> with RouteAware {
 
                                 PrayerTimesWidget(
                                   prayerTimes: prayerTimes,
+                                  timezoneName: _locationTimezone,
                                 ),
 
                                 SizedBox(height: 18.h),
@@ -343,9 +349,24 @@ class _HomeScreenState extends State<HomePage> with RouteAware {
               ),
             ),
           ),),
-        IconButton(onPressed:_handleCurrentLocationUpdate,
-           icon: Icon(Icons.location_on_outlined)),
+        Row(children: [
+          IconButton(
+            onPressed: () {
+              Navigator.pushNamed(
+                context,
+                AppRouter.prayerSettingsPage,
+              );
+            },
+            icon: Icon(
+              Icons.settings,
+              size: 25.sp,
+              color: const Color(0xFF222222),
+            ),
+          ),
 
+          IconButton(onPressed:_handleCurrentLocationUpdate,
+              icon: Icon(Icons.location_on_outlined)),
+        ],)
       ],
     );
   }
@@ -383,6 +404,7 @@ class _HomeScreenState extends State<HomePage> with RouteAware {
 
     double lat;
     double lng;
+    String timezoneName;
 
     // ============================================================
     // CURRENT GPS LOCATION
@@ -392,6 +414,7 @@ class _HomeScreenState extends State<HomePage> with RouteAware {
       lat = location.latitude;
       lng = location.longitude;
       cityName = location.city;
+      timezoneName = location.timezone;
 
       debugPrint(
         '📍 CURRENT GPS | '
@@ -413,6 +436,7 @@ class _HomeScreenState extends State<HomePage> with RouteAware {
     else if (location is LocationEntity) {
       lat = location.latitude;
       lng = location.longitude;
+      timezoneName = location.timezone;
 
       cityName = location.city;
 
@@ -447,6 +471,13 @@ class _HomeScreenState extends State<HomePage> with RouteAware {
       'prayer_city_name',
       cityName ?? '',
     );
+
+    if (timezoneName.isNotEmpty) {
+      await prefs.setString(
+        _locationTimezoneKey,
+        timezoneName,
+      );
+    }
 
     if (type == LocationSelectionType.current) {
       await prefs.setString(
@@ -504,6 +535,9 @@ class _HomeScreenState extends State<HomePage> with RouteAware {
       _latitude = lat;
       _longitude = lng;
       _cityName = cityName ?? '';
+      if (timezoneName.isNotEmpty) {
+        _locationTimezone = timezoneName;
+      }
       _locationReady = true;
       _adhanScheduled = false;
     });
@@ -557,6 +591,13 @@ class _HomeScreenState extends State<HomePage> with RouteAware {
 
     final savedCity =
     prefs.getString('prayer_city_name');
+
+    final savedTimezone =
+    prefs.getString(_locationTimezoneKey);
+
+    if (savedTimezone != null && savedTimezone.isNotEmpty) {
+      _locationTimezone = savedTimezone;
+    }
 
     if (savedCity != null && mounted) {
       setState(() {
@@ -647,6 +688,13 @@ class _HomeScreenState extends State<HomePage> with RouteAware {
       _latitude = position.latitude;
       _longitude = position.longitude;
 
+      try {
+        final timezoneInfo = await FlutterTimezone.getLocalTimezone();
+        _locationTimezone = timezoneInfo.identifier;
+      } catch (e) {
+        debugPrint('❌ AUTO TIMEZONE LOOKUP ERROR | $e');
+      }
+
       // ============================================================
       // GET CITY NAME FROM GPS COORDINATES
       // ============================================================
@@ -677,6 +725,11 @@ class _HomeScreenState extends State<HomePage> with RouteAware {
       await prefs.setString(
         'prayer_city_name',
         _cityName,
+      );
+
+      await prefs.setString(
+        _locationTimezoneKey,
+        _locationTimezone,
       );
 
       await prefs.setDouble(
@@ -907,6 +960,13 @@ class _HomeScreenState extends State<HomePage> with RouteAware {
       newCity,
     );
 
+    if (location.timezone.isNotEmpty) {
+      await prefs.setString(
+        _locationTimezoneKey,
+        location.timezone,
+      );
+    }
+
     await prefs.setDouble(
       prayerLastLatitudePrefsKey,
       newLat,
@@ -931,6 +991,9 @@ class _HomeScreenState extends State<HomePage> with RouteAware {
       _latitude = newLat;
       _longitude = newLng;
       _cityName = newCity;
+      if (location.timezone.isNotEmpty) {
+        _locationTimezone = location.timezone;
+      }
       _locationReady = true;
       _adhanScheduled = false;
     });

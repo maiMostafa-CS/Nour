@@ -1,39 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:timezone/timezone.dart' as tz;
 
 import '../../../prayer_times/domain/entities/prayer_times_entity.dart';
 
 class PrayerTimesCard extends StatelessWidget {
   final PrayerTimesEntity prayerTimes;
+  final String timezoneName;
 
   const PrayerTimesCard({
     super.key,
     required this.prayerTimes,
+    required this.timezoneName,
   });
 
   String _formatTime(DateTime time) {
-    final hour = time.hour == 0
+    final location = tz.getLocation(timezoneName);
+    final localTime = tz.TZDateTime.from(time, location);
+
+    final hour = localTime.hour == 0
         ? 12
-        : time.hour > 12
-        ? time.hour - 12
-        : time.hour;
+        : localTime.hour > 12
+            ? localTime.hour - 12
+            : localTime.hour;
 
-    final minute = time.minute.toString().padLeft(2, '0');
-
-    final period = time.hour >= 12 ? 'م' : 'ص';
+    final minute = localTime.minute.toString().padLeft(2, '0');
+    final period = localTime.hour >= 12 ? 'م' : 'ص';
 
     return '$hour:$minute $period';
   }
 
   Widget _buildPrayer(
-      String name,
-      DateTime time,
-      IconData icon,
-      ) {
+    String name,
+    DateTime time,
+    IconData icon,
+  ) {
     return Padding(
-      padding: EdgeInsets.symmetric(
-        vertical: 9.h,
-      ),
+      padding: EdgeInsets.symmetric(vertical: 9.h),
       child: Row(
         children: [
           Icon(
@@ -41,18 +44,13 @@ class PrayerTimesCard extends StatelessWidget {
             size: 22.sp,
             color: const Color(0xFF176B5B),
           ),
-
           SizedBox(width: 12.w),
-
           Expanded(
             child: Text(
               name,
-              style: TextStyle(
-                fontSize: 15.sp,
-              ),
+              style: TextStyle(fontSize: 15.sp),
             ),
           ),
-
           Text(
             _formatTime(time),
             style: TextStyle(
@@ -90,44 +88,13 @@ class PrayerTimesCard extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
-
           SizedBox(height: 10.h),
-
-          _buildPrayer(
-            'الفجر',
-            prayerTimes.fajr,
-            Icons.wb_twilight,
-          ),
-
-          _buildPrayer(
-            'الشروق',
-            prayerTimes.sunrise,
-            Icons.wb_sunny_outlined,
-          ),
-
-          _buildPrayer(
-            'الظهر',
-            prayerTimes.dhuhr,
-            Icons.wb_sunny,
-          ),
-
-          _buildPrayer(
-            'العصر',
-            prayerTimes.asr,
-            Icons.sunny_snowing,
-          ),
-
-          _buildPrayer(
-            'المغرب',
-            prayerTimes.maghrib,
-            Icons.wb_twilight,
-          ),
-
-          _buildPrayer(
-            'العشاء',
-            prayerTimes.isha,
-            Icons.nightlight_round,
-          ),
+          _buildPrayer('الفجر', prayerTimes.fajr, Icons.wb_twilight),
+          _buildPrayer('الشروق', prayerTimes.sunrise, Icons.wb_sunny_outlined),
+          _buildPrayer('الظهر', prayerTimes.dhuhr, Icons.wb_sunny),
+          _buildPrayer('العصر', prayerTimes.asr, Icons.sunny_snowing),
+          _buildPrayer('المغرب', prayerTimes.maghrib, Icons.wb_twilight),
+          _buildPrayer('العشاء', prayerTimes.isha, Icons.nightlight_round),
         ],
       ),
     );

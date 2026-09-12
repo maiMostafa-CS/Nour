@@ -599,6 +599,13 @@ class _LocationPageState extends State<LocationPage> {
       location.country,
     );
 
+    if (location.timezone.isNotEmpty) {
+      await prefs.setString(
+        'prayer_location_timezone',
+        location.timezone,
+      );
+    }
+
     await prefs.setDouble(
       prayerLastLatitudePrefsKey,
       location.latitude,
@@ -651,6 +658,13 @@ class _LocationPageState extends State<LocationPage> {
       'prayer_country_name',
       location.country,
     );
+
+    if (location.timezone.isNotEmpty) {
+      await prefs.setString(
+        'prayer_location_timezone',
+        location.timezone,
+      );
+    }
 
     await prefs.setDouble(
       prayerLastLatitudePrefsKey,

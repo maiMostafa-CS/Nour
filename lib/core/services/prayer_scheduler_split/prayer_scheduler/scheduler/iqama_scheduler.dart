@@ -10,23 +10,49 @@ class IqamaScheduler {
   static Future<void> schedule({
     required int dayIndex,
     required dynamic moment,
+    required int iqamaMinutes,
   }) async {
     final id = PrayerSchedulerIds.iqama(
       moment.time,
       moment.index,
     );
 
-    final iqamaTime =
-        moment.time.add(const Duration(minutes: 15));
+    // ==========================================================
+    // IQAMA TIME
+    // ==========================================================
 
-    prayerSchedulerLog(
-      '🕋 IQAMA START | id=$id | prayer=${moment.name} | time=$iqamaTime',
+    final iqamaTime = moment.time.add(
+      Duration(
+        minutes: iqamaMinutes,
+      ),
     );
 
+    prayerSchedulerLog(
+      '🕋 IQAMA START | '
+          'id=$id | '
+          'prayer=${moment.name} | '
+          'delay=${iqamaMinutes}min | '
+          'prayerTime=${moment.time} | '
+          'iqamaTime=$iqamaTime',
+    );
+
+    // ==========================================================
+    // CHECK FUTURE
+    // ==========================================================
+
     if (!iqamaTime.isAfter(DateTime.now())) {
-      prayerSchedulerLog('⏭️ IQAMA SKIPPED');
+      prayerSchedulerLog(
+        '⏭️ IQAMA SKIPPED | '
+            'prayer=${moment.name} | '
+            'iqamaTime=$iqamaTime',
+      );
+
       return;
     }
+
+    // ==========================================================
+    // ALARM SETTINGS
+    // ==========================================================
 
     final alarmSettings = AlarmSettings(
       id: id,
@@ -52,10 +78,20 @@ class IqamaScheduler {
       payload: 'iqama',
     );
 
-    await Alarm.set(alarmSettings: alarmSettings);
+    // ==========================================================
+    // SET ALARM
+    // ==========================================================
+
+    await Alarm.set(
+      alarmSettings: alarmSettings,
+    );
 
     prayerSchedulerLog(
-      '✅ IQAMA Alarm.set SUCCESS | id=$id',
+      '✅ IQAMA Alarm.set SUCCESS | '
+          'id=$id | '
+          'prayer=${moment.name} | '
+          'delay=${iqamaMinutes}min | '
+          'time=$iqamaTime',
     );
   }
 }

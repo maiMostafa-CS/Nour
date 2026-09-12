@@ -11,6 +11,12 @@ import 'features/adhan/domain/usecases/get_selected_adhan.dart';
 import 'features/adhan/domain/usecases/save_selected_adhan.dart';
 import 'features/adhan/domain/repositories/adhan_repository.dart';
 import 'features/adhan/presentation/bloc/adhan_bloc.dart';
+import 'features/adhan_settings/data/ datasources/adhan_settings_local_data_source.dart';
+import 'features/adhan_settings/data/repositories/adhan_settings_repository_impl.dart';
+import 'features/adhan_settings/domain/repositories/ adhan_settings_repository.dart';
+import 'features/adhan_settings/domain/usecases/get_adhan_settings.dart';
+import 'features/adhan_settings/domain/usecases/update_adhan_setting.dart';
+import 'features/adhan_settings/presentation/bloc/adhan_settings_bloc.dart';
 import 'features/hijri_calendar/data/datasources/hijri_calendar_local_data_source.dart';
 import 'features/hijri_calendar/data/repositories/hijri_calendar_repository_impl.dart';
 import 'features/hijri_calendar/domain/repositories/hijri_calendar_repository.dart';
@@ -19,6 +25,12 @@ import 'features/hijri_calendar/domain/usecases/get_hijri_month.dart';
 import 'features/hijri_calendar/presentation/bloc/hijri_calendar_bloc.dart';
 
 import 'features/home/presentation/bloc/bloc.dart';
+import 'features/iqama_setting/data/datasources/iqama_settings_local_data_source.dart';
+import 'features/iqama_setting/data/repositories/iqama_settings_repository_impl.dart';
+import 'features/iqama_setting/domain/repositories/iqama_settings_repository.dart';
+import 'features/iqama_setting/domain/usecases/get_iqama_settings.dart';
+import 'features/iqama_setting/domain/usecases/update_iqama_setting.dart';
+import 'features/iqama_setting/presentation/bloc/iqama_settings_bloc.dart';
 import 'features/locations/data/datasources/current_location_data_source.dart';
 import 'features/locations/data/datasources/location_local_data_source.dart';
 import 'features/locations/data/repositories/current_location_repository_impl.dart';
@@ -194,6 +206,9 @@ Future<void> configureDependencies() async {
   sl.registerLazySingleton<PrayerNotificationLocalDataSource>(
         () => PrayerNotificationLocalDataSourceImpl(
       prayerCalculator: sl<PrayerLocalDataSource>(),
+      adhanSettingsRepository: sl<AdhanSettingsRepository>(),
+      iqamaSettingsRepository: sl<IqamaSettingsRepository>(),
+      adhanLocalDataSource: sl<AdhanLocalDataSource>(),
     ),
   );
 
@@ -347,6 +362,75 @@ Future<void> configureDependencies() async {
       getAdhans: sl<GetAdhans>(),
       getSelectedAdhan: sl<GetSelectedAdhan>(),
       saveSelectedAdhan: sl<SaveSelectedAdhan>(),
+    ),
+  );
+// Data Source
+  sl.registerLazySingleton<AdhanSettingsLocalDataSource>(
+        () => AdhanSettingsLocalDataSourceImpl(
+      prefs: sl<SharedPreferences>(),
+    ),
+  );
+
+// Repository
+  sl.registerLazySingleton<AdhanSettingsRepository>(
+        () => AdhanSettingsRepositoryImpl(
+      localDataSource: sl<AdhanSettingsLocalDataSource>(),
+    ),
+  );
+
+// UseCases
+  sl.registerLazySingleton<GetAdhanSettings>(
+        () => GetAdhanSettings(
+      repository: sl<AdhanSettingsRepository>(),
+    ),
+  );
+
+  sl.registerLazySingleton<UpdateAdhanSetting>(
+        () => UpdateAdhanSetting(
+      repository: sl<AdhanSettingsRepository>(),
+    ),
+  );
+
+// Bloc
+  sl.registerFactory<AdhanSettingsBloc>(
+        () => AdhanSettingsBloc(
+      getAdhanSettings: sl<GetAdhanSettings>(),
+      updateAdhanSetting: sl<UpdateAdhanSetting>(),
+    ),
+  );
+  sl.registerLazySingleton<IqamaSettingsLocalDataSource>(
+        () => IqamaSettingsLocalDataSourceImpl(
+      prefs: sl<SharedPreferences>(),
+    ),
+  );
+
+  sl.registerLazySingleton<IqamaSettingsRepository>(
+        () => IqamaSettingsRepositoryImpl(
+      localDataSource:
+      sl<IqamaSettingsLocalDataSource>(),
+    ),
+  );
+
+  sl.registerLazySingleton<GetIqamaSettings>(
+        () => GetIqamaSettings(
+      repository:
+      sl<IqamaSettingsRepository>(),
+    ),
+  );
+
+  sl.registerLazySingleton<UpdateIqamaSetting>(
+        () => UpdateIqamaSetting(
+      repository:
+      sl<IqamaSettingsRepository>(),
+    ),
+  );
+
+  sl.registerFactory<IqamaSettingsBloc>(
+        () => IqamaSettingsBloc(
+      getIqamaSettings:
+      sl<GetIqamaSettings>(),
+      updateIqamaSetting:
+      sl<UpdateIqamaSetting>(),
     ),
   );
 

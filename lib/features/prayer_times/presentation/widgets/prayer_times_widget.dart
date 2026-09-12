@@ -2,47 +2,33 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:intl/intl.dart';
+import 'package:timezone/timezone.dart' as tz;
 
 import '../../domain/entities/prayer_times_entity.dart';
 
 class PrayerTimesWidget extends StatefulWidget {
   final PrayerTimesEntity prayerTimes;
+  final String timezoneName;
 
   const PrayerTimesWidget({
     super.key,
     required this.prayerTimes,
+    required this.timezoneName,
   });
 
   @override
-  State<PrayerTimesWidget> createState() =>
-      _PrayerTimesWidgetState();
+  State<PrayerTimesWidget> createState() => _PrayerTimesWidgetState();
 }
 
-class _PrayerTimesWidgetState
-    extends State<PrayerTimesWidget> {
-  DateTime _now = DateTime.now();
-
+class _PrayerTimesWidgetState extends State<PrayerTimesWidget> {
   Timer? _timer;
 
   @override
   void initState() {
     super.initState();
-
-    _startTimer();
-  }
-
-  void _startTimer() {
-    _timer = Timer.periodic(
-      const Duration(seconds: 1),
-          (_) {
-        if (!mounted) return;
-
-        setState(() {
-          _now = DateTime.now();
-        });
-      },
-    );
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (mounted) setState(() {});
+    });
   }
 
   @override
@@ -51,8 +37,36 @@ class _PrayerTimesWidgetState
     super.dispose();
   }
 
+  tz.Location get _location {
+    try {
+      return tz.getLocation(widget.timezoneName);
+    } catch (_) {
+      return tz.getLocation('Africa/Cairo');
+    }
+  }
+
+  DateTime _localTime(DateTime time) {
+    return tz.TZDateTime.from(time, _location);
+  }
+
+  String _formatPrayerTime(DateTime time) {
+    final localTime = _localTime(time);
+
+    final hour = localTime.hour == 0
+        ? 12
+        : localTime.hour > 12
+        ? localTime.hour - 12
+        : localTime.hour;
+
+    final minute = localTime.minute.toString().padLeft(2, '0');
+
+    return '$hour:$minute';
+  }
+
   @override
   Widget build(BuildContext context) {
+    final now = tz.TZDateTime.now(_location);
+
     final prayers = [
       {
         'name': 'الفجر',
@@ -89,18 +103,15 @@ class _PrayerTimesWidgetState
     int activeIndex = -1;
 
     for (int i = 0; i < prayers.length; i++) {
-      final prayerTime =
-      prayers[i]['time'] as DateTime;
+      final prayerTime = prayers[i]['time'] as DateTime;
 
-      if (prayerTime.isAfter(_now)) {
+      if (prayerTime.isAfter(now)) {
         activeIndex = i;
         break;
       }
     }
 
-    if (activeIndex == -1) {
-      activeIndex = 0;
-    }
+    if (activeIndex == -1) activeIndex = 0;
 
     return SizedBox(
       height: 86.h,
@@ -109,8 +120,7 @@ class _PrayerTimesWidgetState
         reverse: true,
         physics: const BouncingScrollPhysics(),
         itemCount: prayers.length,
-        separatorBuilder: (_, __) =>
-            SizedBox(width: 7.w),
+        separatorBuilder: (_, __) => SizedBox(width: 7.w),
         itemBuilder: (context, index) {
           final prayer = prayers[index];
 
@@ -124,14 +134,12 @@ class _PrayerTimesWidgetState
   }
 
   Widget _buildPrayerItem(
-      Map<String, dynamic> prayer, {
-        bool isActive = false,
-      }) {
+    Map<String, dynamic> prayer, {
+    bool isActive = false,
+  }) {
     return Container(
       width: 52.w,
-      padding: EdgeInsets.symmetric(
-        vertical: 8.h,
-      ),
+      padding: EdgeInsets.symmetric(vertical: 6.h),
       decoration: BoxDecoration(
         color: isActive
             ? const Color(0xFF176B5B)
@@ -140,6 +148,7 @@ class _PrayerTimesWidgetState
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
             prayer['icon'] as IconData,
@@ -148,9 +157,7 @@ class _PrayerTimesWidgetState
                 ? Colors.white
                 : const Color(0xFF176B5B),
           ),
-
-          SizedBox(height: 5.h),
-
+          SizedBox(height: 4.h),
           Text(
             prayer['name'] as String,
             style: TextStyle(
@@ -161,13 +168,9 @@ class _PrayerTimesWidgetState
                   : const Color(0xFF222222),
             ),
           ),
-
-          SizedBox(height: 3.h),
-
+          SizedBox(height: 2.h),
           Text(
-            _formatPrayerTime(
-              prayer['time'] as DateTime,
-            ),
+            _formatPrayerTime(prayer['time'] as DateTime),
             style: TextStyle(
               fontSize: 12.sp,
               fontWeight: FontWeight.bold,
@@ -179,11 +182,5 @@ class _PrayerTimesWidgetState
         ],
       ),
     );
-  }
-
-  String _formatPrayerTime(DateTime time) {
-    return DateFormat(
-      " hh:mm",
-    ).format(time);
   }
 }

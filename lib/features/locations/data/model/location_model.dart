@@ -8,6 +8,7 @@ class LocationModel extends LocationEntity {
     required super.latitude,
     required super.longitude,
     required super.coordinateType,
+    required super.timezone,
   });
 
   factory LocationModel.fromJson(Map<String, dynamic> json) {
@@ -18,6 +19,7 @@ class LocationModel extends LocationEntity {
       latitude: (json['latitude'] as num?)?.toDouble() ?? 0.0,
       longitude: (json['longitude'] as num?)?.toDouble() ?? 0.0,
       coordinateType: json['coordinateType'] as String? ?? '',
+      timezone: (json['timezone'] as String?) ?? '',
     );
   }
 
@@ -29,6 +31,7 @@ class LocationModel extends LocationEntity {
       'latitude': latitude,
       'longitude': longitude,
       'coordinateType': coordinateType,
+      'timezone': timezone,
     };
   }
 }

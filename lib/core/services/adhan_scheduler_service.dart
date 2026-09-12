@@ -9,6 +9,11 @@ import 'package:islamic_app/core/services/prayer_scheduler_split/prayer_schedule
 import 'package:islamic_app/core/services/prayer_scheduler_split/prayer_scheduler/notifications/countdown_notification_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../features/adhan/data/datasources/adhan_local_data_source.dart';
+import '../../features/adhan_settings/data/ datasources/adhan_settings_local_data_source.dart';
+import '../../features/adhan_settings/data/repositories/adhan_settings_repository_impl.dart';
+import '../../features/iqama_setting/data/datasources/iqama_settings_local_data_source.dart';
+import '../../features/iqama_setting/data/repositories/iqama_settings_repository_impl.dart';
 import '../../features/prayer_times/data/datasources/prayer_local_data_source.dart';
 const int kPrayerMaintenanceTestAlarmId = 999999;
 class AutoRenewTest {
@@ -425,9 +430,25 @@ Future<void> prayerScheduleMaintenanceCallback() async {
       return;
     }
 
-    final dataSource =
-    PrayerNotificationLocalDataSourceImpl(
+
+    final dataSource = PrayerNotificationLocalDataSourceImpl(
       prayerCalculator: PrayerLocalDataSourceImpl(),
+
+      adhanSettingsRepository: AdhanSettingsRepositoryImpl(
+        localDataSource: AdhanSettingsLocalDataSourceImpl(
+          prefs: prefs,
+        ),
+      ),
+
+      iqamaSettingsRepository: IqamaSettingsRepositoryImpl(
+        localDataSource: IqamaSettingsLocalDataSourceImpl(
+          prefs: prefs,
+        ),
+      ),
+
+      adhanLocalDataSource: AdhanLocalDataSourceImpl(
+        prefs: prefs,
+      ),
     );
 
     prayerSchedulerLog(

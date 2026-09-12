@@ -1,5 +1,10 @@
 import 'package:flutter/widgets.dart';
 
+import '../../../../../features/adhan/data/datasources/adhan_local_data_source.dart';
+import '../../../../../features/adhan_settings/data/ datasources/adhan_settings_local_data_source.dart';
+import '../../../../../features/adhan_settings/data/repositories/adhan_settings_repository_impl.dart';
+import '../../../../../features/iqama_setting/data/datasources/iqama_settings_local_data_source.dart';
+import '../../../../../features/iqama_setting/data/repositories/iqama_settings_repository_impl.dart';
 import '../notifications/countdown_notification_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../../../../features/prayer_times/data/datasources/prayer_local_data_source.dart';
@@ -42,6 +47,22 @@ Future<void> prayerScheduleMaintenanceCallback() async {
 
     final dataSource = PrayerNotificationLocalDataSourceImpl(
       prayerCalculator: PrayerLocalDataSourceImpl(),
+
+      adhanSettingsRepository: AdhanSettingsRepositoryImpl(
+        localDataSource: AdhanSettingsLocalDataSourceImpl(
+          prefs: prefs,
+        ),
+      ),
+
+      iqamaSettingsRepository: IqamaSettingsRepositoryImpl(
+        localDataSource: IqamaSettingsLocalDataSourceImpl(
+          prefs: prefs,
+        ),
+      ),
+
+      adhanLocalDataSource: AdhanLocalDataSourceImpl(
+        prefs: prefs,
+      ),
     );
     await dataSource.ensureWindowScheduled(
       latitude: latitude,

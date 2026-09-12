@@ -5,7 +5,8 @@
     "city": "Kabul",
     "latitude": 34.526011,
     "longitude": 69.177684,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Asia/Kabul"
   },
   {
     "country": "Albania",
@@ -13,7 +14,8 @@
     "city": "Tirana",
     "latitude": 41.326873,
     "longitude": 19.818791,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Europe/Tirane"
   },
   {
     "country": "Algeria",
@@ -21,7 +23,8 @@
     "city": "Algiers",
     "latitude": 36.775361,
     "longitude": 3.060188,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Africa/Algiers"
   },
   {
     "country": "American Samoa",
@@ -29,7 +32,8 @@
     "city": "Pago Pago",
     "latitude": -14.275479,
     "longitude": -170.70483,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Pacific/Pago_Pago"
   },
   {
     "country": "Angola",
@@ -37,7 +41,8 @@
     "city": "Luanda",
     "latitude": -8.82727,
     "longitude": 13.243951,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Africa/Luanda"
   },
   {
     "country": "Anguilla",
@@ -45,7 +50,8 @@
     "city": "The Valley",
     "latitude": 41.559572,
     "longitude": -98.980548,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "America/Anguilla"
   },
   {
     "country": "Antigua and Barbuda",
@@ -53,7 +59,8 @@
     "city": "Saint John's",
     "latitude": 47.561701,
     "longitude": -52.715149,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "America/Antigua"
   },
   {
     "country": "Argentina",
@@ -61,7 +68,8 @@
     "city": "Buenos Aires",
     "latitude": -34.607568,
     "longitude": -58.437089,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "America/Argentina/Buenos_Aires"
   },
   {
     "country": "Armenia",
@@ -69,7 +77,8 @@
     "city": "Yerevan",
     "latitude": 40.177612,
     "longitude": 44.512585,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Asia/Yerevan"
   },
   {
     "country": "Aruba",
@@ -77,7 +86,8 @@
     "city": "Oranjestad",
     "latitude": 12.526874,
     "longitude": -70.035684,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "America/Aruba"
   },
   {
     "country": "Australia",
@@ -85,7 +95,8 @@
     "city": "Canberra",
     "latitude": -35.297591,
     "longitude": 149.101268,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Australia/Sydney"
   },
   {
     "country": "Austria",
@@ -93,7 +104,8 @@
     "city": "Vienna",
     "latitude": 48.208354,
     "longitude": 16.372504,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Europe/Vienna"
   },
   {
     "country": "Azerbaijan",
@@ -101,7 +113,8 @@
     "city": "Baku",
     "latitude": 40.375443,
     "longitude": 49.832675,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Asia/Baku"
   },
   {
     "country": "Bahrain",
@@ -109,7 +122,8 @@
     "city": "Manama",
     "latitude": 26.223504,
     "longitude": 50.582244,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Asia/Bahrain"
   },
   {
     "country": "Bangladesh",
@@ -117,7 +131,8 @@
     "city": "Dhaka",
     "latitude": 23.759357,
     "longitude": 90.378814,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Asia/Dhaka"
   },
   {
     "country": "Barbados",
@@ -125,7 +140,8 @@
     "city": "Bridgetown",
     "latitude": 13.097783,
     "longitude": -59.618418,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "America/Barbados"
   },
   {
     "country": "Belarus",
@@ -133,7 +149,8 @@
     "city": "Minsk",
     "latitude": 53.902334,
     "longitude": 27.561879,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Europe/Minsk"
   },
   {
     "country": "Belgium",
@@ -141,7 +158,8 @@
     "city": "Brussels",
     "latitude": 50.846557,
     "longitude": 4.351697,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Europe/Brussels"
   },
   {
     "country": "Belize",
@@ -149,7 +167,8 @@
     "city": "Belmopan",
     "latitude": 17.250199,
     "longitude": -88.770018,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "America/Belize"
   },
   {
     "country": "Benin",
@@ -157,7 +176,8 @@
     "city": "Porto-Novo",
     "latitude": 6.499072,
     "longitude": 2.625336,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Africa/Porto-Novo"
   },
   {
     "country": "Bermuda",
@@ -165,7 +185,8 @@
     "city": "Hamilton",
     "latitude": 43.25608,
     "longitude": -79.872858,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Atlantic/Bermuda"
   },
   {
     "country": "Bhutan",
@@ -173,7 +194,8 @@
     "city": "Thimphu",
     "latitude": 27.472762,
     "longitude": 89.629548,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Asia/Thimphu"
   },
   {
     "country": "Bolivia",
@@ -181,7 +203,8 @@
     "city": "Sucre",
     "latitude": -19.047725,
     "longitude": -65.259431,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "America/La_Paz"
   },
   {
     "country": "Bosnia and Herzegovina",
@@ -189,7 +212,8 @@
     "city": "Sarajevo",
     "latitude": 43.851977,
     "longitude": 18.386687,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Europe/Sarajevo"
   },
   {
     "country": "Botswana",
@@ -197,7 +221,8 @@
     "city": "Gaborone",
     "latitude": -24.658136,
     "longitude": 25.908847,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Africa/Gaborone"
   },
   {
     "country": "Brazil",
@@ -205,7 +230,8 @@
     "city": "Brasília",
     "latitude": -10.333333,
     "longitude": -53.2,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "America/Sao_Paulo"
   },
   {
     "country": "British Indian Ocean Territory",
@@ -213,7 +239,8 @@
     "city": "Diego Garcia",
     "latitude": -7.338358,
     "longitude": 72.471815,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Indian/Chagos"
   },
   {
     "country": "Brunei",
@@ -221,7 +248,8 @@
     "city": "Bandar Seri Begawan",
     "latitude": 4.889545,
     "longitude": 114.941757,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Asia/Brunei"
   },
   {
     "country": "Bulgaria",
@@ -229,7 +257,8 @@
     "city": "Sofia",
     "latitude": -15.25384,
     "longitude": 48.256216,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Europe/Sofia"
   },
   {
     "country": "Burkina Faso",
@@ -237,7 +266,8 @@
     "city": "Ouagadougou",
     "latitude": 12.368187,
     "longitude": -1.527094,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Africa/Ouagadougou"
   },
   {
     "country": "Burundi",
@@ -245,7 +275,8 @@
     "city": "Bujumbura",
     "latitude": -3.363812,
     "longitude": 29.367503,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Africa/Bujumbura"
   },
   {
     "country": "Cambodia",
@@ -253,7 +284,8 @@
     "city": "Phnom Penh",
     "latitude": 11.568271,
     "longitude": 104.922443,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Asia/Phnom_Penh"
   },
   {
     "country": "Cameroon",
@@ -261,7 +293,8 @@
     "city": "Yaoundé",
     "latitude": 3.868987,
     "longitude": 11.521334,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Africa/Douala"
   },
   {
     "country": "Canada",
@@ -269,7 +302,8 @@
     "city": "Ottawa",
     "latitude": 45.421106,
     "longitude": -75.690308,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "America/Toronto"
   },
   {
     "country": "Cape Verde",
@@ -277,7 +311,8 @@
     "city": "Praia",
     "latitude": 14.916017,
     "longitude": -23.509613,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Atlantic/Cape_Verde"
   },
   {
     "country": "Cayman Islands",
@@ -285,7 +320,8 @@
     "city": "George Town",
     "latitude": 5.414568,
     "longitude": 100.329804,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "America/Cayman"
   },
   {
     "country": "Central African Republic",
@@ -293,7 +329,8 @@
     "city": "Bangui",
     "latitude": 4.390715,
     "longitude": 18.550913,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Africa/Bangui"
   },
   {
     "country": "Chad",
@@ -301,7 +338,8 @@
     "city": "N'Djamena",
     "latitude": 12.119154,
     "longitude": 15.050276,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Africa/Ndjamena"
   },
   {
     "country": "Chile",
@@ -309,7 +347,8 @@
     "city": "Santiago",
     "latitude": 9.869479,
     "longitude": -83.798075,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "America/Santiago"
   },
   {
     "country": "China",
@@ -317,7 +356,8 @@
     "city": "Beijing",
     "latitude": 39.906217,
     "longitude": 116.391276,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Asia/Shanghai"
   },
   {
     "country": "Christmas Island",
@@ -325,7 +365,8 @@
     "city": "Flying Fish Cove",
     "latitude": -10.426665,
     "longitude": 105.668672,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Indian/Christmas"
   },
   {
     "country": "Cocos (Keeling) Islands",
@@ -333,7 +374,8 @@
     "city": "West Island",
     "latitude": -12.189848,
     "longitude": 96.830449,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Indian/Cocos"
   },
   {
     "country": "Colombia",
@@ -341,7 +383,8 @@
     "city": "Bogotá",
     "latitude": 4.59808,
     "longitude": -74.076044,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "America/Bogota"
   },
   {
     "country": "Comoros",
@@ -349,7 +392,8 @@
     "city": "Moroni",
     "latitude": -11.693126,
     "longitude": 43.254304,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Indian/Comoro"
   },
   {
     "country": "Cook Islands",
@@ -357,7 +401,8 @@
     "city": "Avarua",
     "latitude": -21.207474,
     "longitude": -159.770814,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Pacific/Rarotonga"
   },
   {
     "country": "Costa Rica",
@@ -365,7 +410,8 @@
     "city": "San José",
     "latitude": 9.932543,
     "longitude": -84.079578,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "America/Costa_Rica"
   },
   {
     "country": "Croatia",
@@ -373,7 +419,8 @@
     "city": "Zagreb",
     "latitude": 45.813177,
     "longitude": 15.977048,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Europe/Zagreb"
   },
   {
     "country": "Cuba",
@@ -381,7 +428,8 @@
     "city": "Havana",
     "latitude": 23.135305,
     "longitude": -82.358963,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "America/Havana"
   },
   {
     "country": "Cyprus",
@@ -389,7 +437,8 @@
     "city": "Nicosia",
     "latitude": 35.17393,
     "longitude": 33.364726,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Asia/Nicosia"
   },
   {
     "country": "Czech Republic",
@@ -397,7 +446,8 @@
     "city": "Prague",
     "latitude": 50.087465,
     "longitude": 14.421254,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Europe/Prague"
   },
   {
     "country": "Democratic Republic of the Congo",
@@ -405,7 +455,8 @@
     "city": "Kinshasa",
     "latitude": -4.321706,
     "longitude": 15.312597,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Africa/Kinshasa"
   },
   {
     "country": "Denmark",
@@ -413,7 +464,8 @@
     "city": "Copenhagen",
     "latitude": 55.686724,
     "longitude": 12.570072,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Europe/Copenhagen"
   },
   {
     "country": "Djibouti",
@@ -421,7 +473,8 @@
     "city": "Djibouti",
     "latitude": 11.814597,
     "longitude": 42.845306,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Africa/Djibouti"
   },
   {
     "country": "Dominica",
@@ -429,7 +482,8 @@
     "city": "Roseau",
     "latitude": 48.771037,
     "longitude": -95.769788,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "America/Dominica"
   },
   {
     "country": "Dominican Republic",
@@ -437,7 +491,8 @@
     "city": "Santo Domingo",
     "latitude": 18.480197,
     "longitude": -69.942111,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "America/Santo_Domingo"
   },
   {
     "country": "East Timor",
@@ -445,7 +500,8 @@
     "city": "Dili",
     "latitude": 28.651718,
     "longitude": 77.221939,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Asia/Dili"
   },
   {
     "country": "Ecuador",
@@ -453,7 +509,8 @@
     "city": "Quito",
     "latitude": -0.220164,
     "longitude": -78.512327,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "America/Guayaquil"
   },
   {
     "country": "Egypt",
@@ -461,7 +518,8 @@
     "city": "Cairo",
     "latitude": 30.048819,
     "longitude": 31.243666,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Africa/Cairo"
   },
   {
     "country": "El Salvador",
@@ -469,7 +527,8 @@
     "city": "San Salvador",
     "latitude": 13.698994,
     "longitude": -89.191425,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "America/El_Salvador"
   },
   {
     "country": "Equatorial Guinea",
@@ -477,7 +536,8 @@
     "city": "Malabo",
     "latitude": 3.752828,
     "longitude": 8.780061,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Africa/Malabo"
   },
   {
     "country": "Eritrea",
@@ -485,7 +545,8 @@
     "city": "Asmara",
     "latitude": 15.338967,
     "longitude": 38.932676,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Africa/Asmara"
   },
   {
     "country": "Estonia",
@@ -493,7 +554,8 @@
     "city": "Tallinn",
     "latitude": 59.437216,
     "longitude": 24.745369,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Europe/Tallinn"
   },
   {
     "country": "Ethiopia",
@@ -501,7 +563,8 @@
     "city": "Addis Ababa",
     "latitude": 9.010793,
     "longitude": 38.761252,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Africa/Addis_Ababa"
   },
   {
     "country": "Falkland Islands",
@@ -509,7 +572,8 @@
     "city": "Stanley",
     "latitude": -51.695058,
     "longitude": -57.849169,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Atlantic/Stanley"
   },
   {
     "country": "Faroe Islands",
@@ -517,7 +581,8 @@
     "city": "Tórshavn",
     "latitude": 62.012,
     "longitude": -6.768,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Atlantic/Faroe"
   },
   {
     "country": "Federated States of Micronesia",
@@ -525,7 +590,8 @@
     "city": "Palikir",
     "latitude": 6.920744,
     "longitude": 158.162714,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Pacific/Pohnpei"
   },
   {
     "country": "Fiji",
@@ -533,7 +599,8 @@
     "city": "Suva",
     "latitude": -18.141588,
     "longitude": 178.442166,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Pacific/Fiji"
   },
   {
     "country": "Finland",
@@ -541,7 +608,8 @@
     "city": "Helsinki",
     "latitude": 60.16741,
     "longitude": 24.942577,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Europe/Helsinki"
   },
   {
     "country": "France",
@@ -549,7 +617,8 @@
     "city": "Paris",
     "latitude": 48.856697,
     "longitude": 2.351462,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Europe/Paris"
   },
   {
     "country": "French Guiana",
@@ -557,7 +626,8 @@
     "city": "Cayenne",
     "latitude": 4.937114,
     "longitude": -52.325831,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "America/Cayenne"
   },
   {
     "country": "French Polynesia",
@@ -565,7 +635,8 @@
     "city": "Papeetē",
     "latitude": -17.537384,
     "longitude": -149.565996,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Pacific/Tahiti"
   },
   {
     "country": "French Southern and Antarctic Lands",
@@ -573,7 +644,8 @@
     "city": "Port-aux-Français",
     "latitude": -49.353677,
     "longitude": 70.243567,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Indian/Kerguelen"
   },
   {
     "country": "Gabon",
@@ -581,7 +653,8 @@
     "city": "Libreville",
     "latitude": 0.390002,
     "longitude": 9.454001,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Africa/Libreville"
   },
   {
     "country": "Georgia",
@@ -589,7 +662,8 @@
     "city": "Tbilisi",
     "latitude": 41.693459,
     "longitude": 44.80145,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Asia/Tbilisi"
   },
   {
     "country": "Germany",
@@ -597,7 +671,8 @@
     "city": "Berlin",
     "latitude": 52.517036,
     "longitude": 13.38886,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Europe/Berlin"
   },
   {
     "country": "Ghana",
@@ -605,7 +680,8 @@
     "city": "Accra",
     "latitude": 5.560014,
     "longitude": -0.205744,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Africa/Accra"
   },
   {
     "country": "Gibraltar",
@@ -613,7 +689,8 @@
     "city": "Gibraltar",
     "latitude": 36.140807,
     "longitude": -5.35413,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Europe/Gibraltar"
   },
   {
     "country": "Greece",
@@ -621,7 +698,8 @@
     "city": "Athens",
     "latitude": 37.983941,
     "longitude": 23.728305,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Europe/Athens"
   },
   {
     "country": "Greenland",
@@ -629,7 +707,8 @@
     "city": "Nuuk",
     "latitude": 64.175029,
     "longitude": -51.735539,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "America/Nuuk"
   },
   {
     "country": "Grenada",
@@ -637,7 +716,8 @@
     "city": "St. George's",
     "latitude": 48.658138,
     "longitude": 6.928099,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "America/Grenada"
   },
   {
     "country": "Guadeloupe",
@@ -645,7 +725,8 @@
     "city": "Basse-Terre",
     "latitude": 16.000078,
     "longitude": -61.733337,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "America/Guadeloupe"
   },
   {
     "country": "Guam",
@@ -653,7 +734,8 @@
     "city": "Hagåtña",
     "latitude": 13.472745,
     "longitude": 144.752018,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Pacific/Guam"
   },
   {
     "country": "Guatemala",
@@ -661,7 +743,8 @@
     "city": "Guatemala City",
     "latitude": 14.622233,
     "longitude": -90.518519,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "America/Guatemala"
   },
   {
     "country": "Guernsey",
@@ -669,7 +752,8 @@
     "city": "St. Peter Port",
     "latitude": 49.456814,
     "longitude": -2.538998,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Europe/Guernsey"
   },
   {
     "country": "Guinea",
@@ -677,7 +761,8 @@
     "city": "Conakry",
     "latitude": 9.51706,
     "longitude": -13.699843,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Africa/Conakry"
   },
   {
     "country": "Guinea-Bissau",
@@ -685,7 +770,8 @@
     "city": "Bissau",
     "latitude": 11.861324,
     "longitude": -15.583055,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Africa/Bissau"
   },
   {
     "country": "Guyana",
@@ -693,7 +779,8 @@
     "city": "Georgetown",
     "latitude": 6.802577,
     "longitude": -58.162861,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "America/Guyana"
   },
   {
     "country": "Haiti",
@@ -701,7 +788,8 @@
     "city": "Port-au-Prince",
     "latitude": 18.547327,
     "longitude": -72.339593,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "America/Port-au-Prince"
   },
   {
     "country": "Honduras",
@@ -709,7 +797,8 @@
     "city": "Tegucigalpa",
     "latitude": 14.105686,
     "longitude": -87.204676,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "America/Tegucigalpa"
   },
   {
     "country": "Hong Kong",
@@ -717,7 +806,8 @@
     "city": "City of Victoria",
     "latitude": -36.59861,
     "longitude": 144.678005,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Asia/Hong_Kong"
   },
   {
     "country": "Hungary",
@@ -725,7 +815,8 @@
     "city": "Budapest",
     "latitude": 47.498382,
     "longitude": 19.040471,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Europe/Budapest"
   },
   {
     "country": "Iceland",
@@ -733,7 +824,8 @@
     "city": "Reykjavik",
     "latitude": 64.145981,
     "longitude": -21.942237,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Atlantic/Reykjavik"
   },
   {
     "country": "India",
@@ -741,7 +833,8 @@
     "city": "New Delhi",
     "latitude": 28.614179,
     "longitude": 77.202266,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Asia/Kolkata"
   },
   {
     "country": "Indonesia",
@@ -749,7 +842,8 @@
     "city": "Jakarta",
     "latitude": -6.175394,
     "longitude": 106.827183,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Asia/Jakarta"
   },
   {
     "country": "Iran",
@@ -757,7 +851,8 @@
     "city": "Tehran",
     "latitude": 35.700618,
     "longitude": 51.401378,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Asia/Tehran"
   },
   {
     "country": "Iraq",
@@ -765,7 +860,8 @@
     "city": "Baghdad",
     "latitude": 33.302431,
     "longitude": 44.378799,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Asia/Baghdad"
   },
   {
     "country": "Ireland",
@@ -773,7 +869,8 @@
     "city": "Dublin",
     "latitude": 53.349764,
     "longitude": -6.260273,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Europe/Dublin"
   },
   {
     "country": "Isle of Man",
@@ -781,7 +878,8 @@
     "city": "Douglas",
     "latitude": 39.762842,
     "longitude": -88.217052,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Europe/Isle_of_Man"
   },
   {
     "country": "Israel",
@@ -789,7 +887,8 @@
     "city": "Jerusalem",
     "latitude": 31.778345,
     "longitude": 35.225079,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Asia/Jerusalem"
   },
   {
     "country": "Italy",
@@ -797,7 +896,8 @@
     "city": "Rome",
     "latitude": 41.89332,
     "longitude": 12.482932,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Europe/Rome"
   },
   {
     "country": "Ivory Coast",
@@ -805,7 +905,8 @@
     "city": "Yamoussoukro",
     "latitude": 6.809107,
     "longitude": -5.273263,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Africa/Abidjan"
   },
   {
     "country": "Jamaica",
@@ -813,7 +914,8 @@
     "city": "Kingston",
     "latitude": 17.971215,
     "longitude": -76.792813,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "America/Jamaica"
   },
   {
     "country": "Japan",
@@ -821,7 +923,8 @@
     "city": "Tokyo",
     "latitude": 35.682839,
     "longitude": 139.759455,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Asia/Tokyo"
   },
   {
     "country": "Jersey",
@@ -829,7 +932,8 @@
     "city": "Saint Helier",
     "latitude": 47.384387,
     "longitude": 4.683325,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Europe/Jersey"
   },
   {
     "country": "Jordan",
@@ -837,7 +941,8 @@
     "city": "Amman",
     "latitude": 31.951569,
     "longitude": 35.923962,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Asia/Amman"
   },
   {
     "country": "Kazakhstan",
@@ -845,7 +950,8 @@
     "city": "Astana",
     "latitude": 51.12822,
     "longitude": 71.430668,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Asia/Almaty"
   },
   {
     "country": "Kenya",
@@ -853,7 +959,8 @@
     "city": "Nairobi",
     "latitude": -1.283253,
     "longitude": 36.817245,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Africa/Nairobi"
   },
   {
     "country": "Kiribati",
@@ -861,7 +968,8 @@
     "city": "South Tarawa",
     "latitude": 1.349078,
     "longitude": 173.038651,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Pacific/Tarawa"
   },
   {
     "country": "Kuwait",
@@ -869,7 +977,8 @@
     "city": "Kuwait City",
     "latitude": 29.379709,
     "longitude": 47.973563,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Asia/Kuwait"
   },
   {
     "country": "Kyrgyzstan",
@@ -877,7 +986,8 @@
     "city": "Bishkek",
     "latitude": 42.876562,
     "longitude": 74.607008,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Asia/Bishkek"
   },
   {
     "country": "Laos",
@@ -885,7 +995,8 @@
     "city": "Vientiane",
     "latitude": 17.964099,
     "longitude": 102.613371,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Asia/Vientiane"
   },
   {
     "country": "Latvia",
@@ -893,7 +1004,8 @@
     "city": "Riga",
     "latitude": 56.949398,
     "longitude": 24.105185,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Europe/Riga"
   },
   {
     "country": "Lebanon",
@@ -901,7 +1013,8 @@
     "city": "Beirut",
     "latitude": 33.89592,
     "longitude": 35.47843,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Asia/Beirut"
   },
   {
     "country": "Lesotho",
@@ -909,7 +1022,8 @@
     "city": "Maseru",
     "latitude": -29.310054,
     "longitude": 27.478222,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Africa/Maseru"
   },
   {
     "country": "Liberia",
@@ -917,7 +1031,8 @@
     "city": "Monrovia",
     "latitude": 6.328034,
     "longitude": -10.797788,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Africa/Monrovia"
   },
   {
     "country": "Libya",
@@ -925,7 +1040,8 @@
     "city": "Tripoli",
     "latitude": 32.896672,
     "longitude": 13.177792,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Africa/Tripoli"
   },
   {
     "country": "Liechtenstein",
@@ -933,7 +1049,8 @@
     "city": "Vaduz",
     "latitude": 47.139286,
     "longitude": 9.522796,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Europe/Vaduz"
   },
   {
     "country": "Lithuania",
@@ -941,7 +1058,8 @@
     "city": "Vilnius",
     "latitude": 54.687046,
     "longitude": 25.282911,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Europe/Vilnius"
   },
   {
     "country": "Luxembourg",
@@ -949,7 +1067,8 @@
     "city": "Luxembourg",
     "latitude": 49.815868,
     "longitude": 6.129675,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Europe/Luxembourg"
   },
   {
     "country": "Madagascar",
@@ -957,7 +1076,8 @@
     "city": "Antananarivo",
     "latitude": -18.910012,
     "longitude": 47.525581,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Indian/Antananarivo"
   },
   {
     "country": "Malawi",
@@ -965,7 +1085,8 @@
     "city": "Lilongwe",
     "latitude": -13.987511,
     "longitude": 33.768144,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Africa/Blantyre"
   },
   {
     "country": "Malaysia",
@@ -973,7 +1094,8 @@
     "city": "Kuala Lumpur",
     "latitude": 3.151696,
     "longitude": 101.694237,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Asia/Kuala_Lumpur"
   },
   {
     "country": "Maldives",
@@ -981,7 +1103,8 @@
     "city": "Malé",
     "latitude": 16.370036,
     "longitude": -2.290024,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Indian/Maldives"
   },
   {
     "country": "Mali",
@@ -989,7 +1112,8 @@
     "city": "Bamako",
     "latitude": 12.605033,
     "longitude": -7.986514,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Africa/Bamako"
   },
   {
     "country": "Malta",
@@ -997,7 +1121,8 @@
     "city": "Valletta",
     "latitude": 35.898982,
     "longitude": 14.513676,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Europe/Malta"
   },
   {
     "country": "Marshall Islands",
@@ -1005,7 +1130,8 @@
     "city": "Majuro",
     "latitude": 7.090992,
     "longitude": 171.381635,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Pacific/Majuro"
   },
   {
     "country": "Martinique",
@@ -1013,7 +1139,8 @@
     "city": "Fort-de-France",
     "latitude": 14.602796,
     "longitude": -61.067672,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "America/Martinique"
   },
   {
     "country": "Mauritania",
@@ -1021,7 +1148,8 @@
     "city": "Nouakchott",
     "latitude": 18.079238,
     "longitude": -15.978007,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Africa/Nouakchott"
   },
   {
     "country": "Mauritius",
@@ -1029,7 +1157,8 @@
     "city": "Port Louis",
     "latitude": -20.163728,
     "longitude": 57.504533,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Indian/Mauritius"
   },
   {
     "country": "Mayotte",
@@ -1037,7 +1166,8 @@
     "city": "Mamoudzou",
     "latitude": -12.780586,
     "longitude": 45.227991,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Indian/Mayotte"
   },
   {
     "country": "Mexico",
@@ -1045,7 +1175,8 @@
     "city": "Mexico City",
     "latitude": 19.43263,
     "longitude": -99.133178,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "America/Mexico_City"
   },
   {
     "country": "Moldova",
@@ -1053,7 +1184,8 @@
     "city": "Chișinău",
     "latitude": 47.024471,
     "longitude": 28.832253,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Europe/Chisinau"
   },
   {
     "country": "Monaco",
@@ -1061,7 +1193,8 @@
     "city": "Monaco",
     "latitude": 43.732349,
     "longitude": 7.427683,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Europe/Monaco"
   },
   {
     "country": "Mongolia",
@@ -1069,7 +1202,8 @@
     "city": "Ulan Bator",
     "latitude": 47.918468,
     "longitude": 106.917702,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Asia/Ulaanbaatar"
   },
   {
     "country": "Montserrat",
@@ -1077,7 +1211,8 @@
     "city": "Plymouth",
     "latitude": 50.371266,
     "longitude": -4.142566,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "America/Montserrat"
   },
   {
     "country": "Morocco",
@@ -1085,7 +1220,8 @@
     "city": "Rabat",
     "latitude": 34.022405,
     "longitude": -6.834543,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Africa/Casablanca"
   },
   {
     "country": "Mozambique",
@@ -1093,7 +1229,8 @@
     "city": "Maputo",
     "latitude": -25.966213,
     "longitude": 32.56745,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Africa/Maputo"
   },
   {
     "country": "Namibia",
@@ -1101,7 +1238,8 @@
     "city": "Windhoek",
     "latitude": -22.574392,
     "longitude": 17.079069,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Africa/Windhoek"
   },
   {
     "country": "Nauru",
@@ -1109,7 +1247,8 @@
     "city": "Yaren",
     "latitude": -0.547101,
     "longitude": 166.9164,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Pacific/Nauru"
   },
   {
     "country": "Nepal",
@@ -1117,7 +1256,8 @@
     "city": "Kathmandu",
     "latitude": 27.708317,
     "longitude": 85.320582,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Asia/Kathmandu"
   },
   {
     "country": "Netherlands",
@@ -1125,7 +1265,8 @@
     "city": "Amsterdam",
     "latitude": 52.37276,
     "longitude": 4.893604,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Europe/Amsterdam"
   },
   {
     "country": "New Caledonia",
@@ -1133,7 +1274,8 @@
     "city": "Nouméa",
     "latitude": -22.274526,
     "longitude": 166.442419,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Pacific/Noumea"
   },
   {
     "country": "New Zealand",
@@ -1141,7 +1283,8 @@
     "city": "Wellington",
     "latitude": -41.288795,
     "longitude": 174.777211,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Pacific/Auckland"
   },
   {
     "country": "Nicaragua",
@@ -1149,7 +1292,8 @@
     "city": "Managua",
     "latitude": 12.145991,
     "longitude": -86.274666,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "America/Managua"
   },
   {
     "country": "Niger",
@@ -1157,7 +1301,8 @@
     "city": "Niamey",
     "latitude": 13.524834,
     "longitude": 2.109823,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Africa/Niamey"
   },
   {
     "country": "Nigeria",
@@ -1165,7 +1310,8 @@
     "city": "Abuja",
     "latitude": 9.06433,
     "longitude": 7.489297,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Africa/Lagos"
   },
   {
     "country": "Niue",
@@ -1173,7 +1319,8 @@
     "city": "Alofi",
     "latitude": -19.053416,
     "longitude": -169.919199,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Pacific/Niue"
   },
   {
     "country": "Norfolk Island",
@@ -1181,7 +1328,8 @@
     "city": "Kingston",
     "latitude": 17.971215,
     "longitude": -76.792813,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Pacific/Norfolk"
   },
   {
     "country": "North Korea",
@@ -1189,7 +1337,8 @@
     "city": "Pyongyang",
     "latitude": 39.019474,
     "longitude": 125.753388,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Asia/Pyongyang"
   },
   {
     "country": "Northern Mariana Islands",
@@ -1197,7 +1346,8 @@
     "city": "Saipan",
     "latitude": 15.190983,
     "longitude": 145.746853,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Pacific/Saipan"
   },
   {
     "country": "Norway",
@@ -1205,7 +1355,8 @@
     "city": "Oslo",
     "latitude": 59.91333,
     "longitude": 10.73897,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Europe/Oslo"
   },
   {
     "country": "Oman",
@@ -1213,7 +1364,8 @@
     "city": "Muscat",
     "latitude": 23.599786,
     "longitude": 58.54513,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Asia/Muscat"
   },
   {
     "country": "Pakistan",
@@ -1221,7 +1373,8 @@
     "city": "Islamabad",
     "latitude": 33.693812,
     "longitude": 73.065151,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Asia/Karachi"
   },
   {
     "country": "Palau",
@@ -1229,7 +1382,8 @@
     "city": "Ngerulmud",
     "latitude": 7.500619,
     "longitude": 134.624301,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Pacific/Palau"
   },
   {
     "country": "Panama",
@@ -1237,7 +1391,8 @@
     "city": "Panama City",
     "latitude": 8.971449,
     "longitude": -79.53418,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "America/Panama"
   },
   {
     "country": "Papua New Guinea",
@@ -1245,7 +1400,8 @@
     "city": "Port Moresby",
     "latitude": -9.47433,
     "longitude": 147.15995,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Pacific/Port_Moresby"
   },
   {
     "country": "Paraguay",
@@ -1253,7 +1409,8 @@
     "city": "Asunción",
     "latitude": -25.280046,
     "longitude": -57.634381,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "America/Asuncion"
   },
   {
     "country": "Peru",
@@ -1261,7 +1418,8 @@
     "city": "Lima",
     "latitude": -12.062106,
     "longitude": -77.036526,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "America/Lima"
   },
   {
     "country": "Philippines",
@@ -1269,7 +1427,8 @@
     "city": "Manila",
     "latitude": 14.590622,
     "longitude": 120.97997,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Asia/Manila"
   },
   {
     "country": "Pitcairn Islands",
@@ -1277,7 +1436,8 @@
     "city": "Adamstown",
     "latitude": -25.066667,
     "longitude": -130.100205,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Pacific/Pitcairn"
   },
   {
     "country": "Poland",
@@ -1285,7 +1445,8 @@
     "city": "Warsaw",
     "latitude": 52.233717,
     "longitude": 21.071411,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Europe/Warsaw"
   },
   {
     "country": "Portugal",
@@ -1293,7 +1454,8 @@
     "city": "Lisbon",
     "latitude": 38.707751,
     "longitude": -9.136592,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Europe/Lisbon"
   },
   {
     "country": "Puerto Rico",
@@ -1301,7 +1463,8 @@
     "city": "San Juan",
     "latitude": 18.465299,
     "longitude": -66.116666,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "America/Puerto_Rico"
   },
   {
     "country": "Qatar",
@@ -1309,7 +1472,8 @@
     "city": "Doha",
     "latitude": 25.285633,
     "longitude": 51.526416,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Asia/Qatar"
   },
   {
     "country": "Republic of Macedonia",
@@ -1317,7 +1481,8 @@
     "city": "Skopje",
     "latitude": 41.996092,
     "longitude": 21.43165,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Europe/Skopje"
   },
   {
     "country": "Republic of the Congo",
@@ -1325,7 +1490,8 @@
     "city": "Brazzaville",
     "latitude": -4.269441,
     "longitude": 15.271226,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Africa/Brazzaville"
   },
   {
     "country": "Romania",
@@ -1333,7 +1499,8 @@
     "city": "Bucharest",
     "latitude": 44.436141,
     "longitude": 26.10272,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Europe/Bucharest"
   },
   {
     "country": "Russia",
@@ -1341,7 +1508,8 @@
     "city": "Moscow",
     "latitude": 55.750446,
     "longitude": 37.617494,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Europe/Moscow"
   },
   {
     "country": "Rwanda",
@@ -1349,7 +1517,8 @@
     "city": "Kigali",
     "latitude": -1.88596,
     "longitude": 30.129675,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Africa/Kigali"
   },
   {
     "country": "Réunion",
@@ -1357,7 +1526,8 @@
     "city": "Saint-Denis",
     "latitude": 48.935773,
     "longitude": 2.358023,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Indian/Reunion"
   },
   {
     "country": "Saint Helena",
@@ -1365,7 +1535,8 @@
     "city": "Jamestown",
     "latitude": 37.210443,
     "longitude": -76.773893,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Atlantic/St_Helena"
   },
   {
     "country": "Saint Kitts and Nevis",
@@ -1373,7 +1544,8 @@
     "city": "Basseterre",
     "latitude": 17.296092,
     "longitude": -62.722301,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "America/St_Kitts"
   },
   {
     "country": "Saint Lucia",
@@ -1381,7 +1553,8 @@
     "city": "Castries",
     "latitude": 13.952589,
     "longitude": -60.987824,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "America/St_Lucia"
   },
   {
     "country": "Saint Pierre and Miquelon",
@@ -1389,7 +1562,8 @@
     "city": "Saint-Pierre",
     "latitude": 48.383272,
     "longitude": 7.471873,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "America/Miquelon"
   },
   {
     "country": "Saint Vincent and the Grenadines",
@@ -1397,7 +1571,8 @@
     "city": "Kingstown",
     "latitude": 13.156186,
     "longitude": -61.227962,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "America/St_Vincent"
   },
   {
     "country": "Samoa",
@@ -1405,7 +1580,8 @@
     "city": "Apia",
     "latitude": -13.834369,
     "longitude": -171.769279,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Pacific/Apia"
   },
   {
     "country": "San Marino",
@@ -1413,7 +1589,8 @@
     "city": "City of San Marino",
     "latitude": 43.9364,
     "longitude": 12.446699,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Europe/San_Marino"
   },
   {
     "country": "Saudi Arabia",
@@ -1421,7 +1598,8 @@
     "city": "Riyadh",
     "latitude": 24.631969,
     "longitude": 46.715065,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Asia/Riyadh"
   },
   {
     "country": "Senegal",
@@ -1429,7 +1607,8 @@
     "city": "Dakar",
     "latitude": 14.693425,
     "longitude": -17.447938,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Africa/Dakar"
   },
   {
     "country": "Serbia",
@@ -1437,7 +1616,8 @@
     "city": "Belgrade",
     "latitude": 44.817813,
     "longitude": 20.456897,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Europe/Belgrade"
   },
   {
     "country": "Seychelles",
@@ -1445,7 +1625,8 @@
     "city": "Victoria",
     "latitude": -36.59861,
     "longitude": 144.678005,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Indian/Mahe"
   },
   {
     "country": "Sierra Leone",
@@ -1453,7 +1634,8 @@
     "city": "Freetown",
     "latitude": 8.479004,
     "longitude": -13.26795,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Africa/Freetown"
   },
   {
     "country": "Singapore",
@@ -1461,7 +1643,8 @@
     "city": "Singapore",
     "latitude": 1.357107,
     "longitude": 103.819499,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Asia/Singapore"
   },
   {
     "country": "Slovakia",
@@ -1469,7 +1652,8 @@
     "city": "Bratislava",
     "latitude": 48.151699,
     "longitude": 17.109306,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Europe/Bratislava"
   },
   {
     "country": "Slovenia",
@@ -1477,7 +1661,8 @@
     "city": "Ljubljana",
     "latitude": 46.04998,
     "longitude": 14.50686,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Europe/Ljubljana"
   },
   {
     "country": "Solomon Islands",
@@ -1485,7 +1670,8 @@
     "city": "Honiara",
     "latitude": -9.431077,
     "longitude": 159.955255,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Pacific/Guadalcanal"
   },
   {
     "country": "Somalia",
@@ -1493,7 +1679,8 @@
     "city": "Mogadishu",
     "latitude": 2.042778,
     "longitude": 45.338564,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Africa/Mogadishu"
   },
   {
     "country": "South Africa",
@@ -1501,7 +1688,8 @@
     "city": "Pretoria",
     "latitude": -25.745937,
     "longitude": 28.187944,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Africa/Johannesburg"
   },
   {
     "country": "South Georgia",
@@ -1509,7 +1697,8 @@
     "city": "King Edward Point",
     "latitude": -54.283545,
     "longitude": -36.494636,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Atlantic/South_Georgia"
   },
   {
     "country": "South Korea",
@@ -1517,7 +1706,8 @@
     "city": "Seoul",
     "latitude": 37.566679,
     "longitude": 126.978291,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Asia/Seoul"
   },
   {
     "country": "South Sudan",
@@ -1525,7 +1715,8 @@
     "city": "Juba",
     "latitude": 4.847202,
     "longitude": 31.595166,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Africa/Juba"
   },
   {
     "country": "Spain",
@@ -1533,7 +1724,8 @@
     "city": "Madrid",
     "latitude": 40.416705,
     "longitude": -3.703582,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Europe/Madrid"
   },
   {
     "country": "Sri Lanka",
@@ -1541,7 +1733,8 @@
     "city": "Colombo",
     "latitude": 6.934997,
     "longitude": 79.853846,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Asia/Colombo"
   },
   {
     "country": "Sudan",
@@ -1549,7 +1742,8 @@
     "city": "Khartoum",
     "latitude": 15.593325,
     "longitude": 32.53565,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Africa/Khartoum"
   },
   {
     "country": "Suriname",
@@ -1557,7 +1751,8 @@
     "city": "Paramaribo",
     "latitude": 5.821609,
     "longitude": -55.177043,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "America/Paramaribo"
   },
   {
     "country": "Svalbard and Jan Mayen",
@@ -1565,7 +1760,8 @@
     "city": "Longyearbyen",
     "latitude": 78.223156,
     "longitude": 15.646366,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Arctic/Longyearbyen"
   },
   {
     "country": "Swaziland",
@@ -1573,7 +1769,8 @@
     "city": "Lobamba",
     "latitude": -26.446285,
     "longitude": 31.208378,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Africa/Mbabane"
   },
   {
     "country": "Sweden",
@@ -1581,7 +1778,8 @@
     "city": "Stockholm",
     "latitude": 59.325117,
     "longitude": 18.071094,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Europe/Stockholm"
   },
   {
     "country": "Switzerland",
@@ -1589,7 +1787,8 @@
     "city": "Bern",
     "latitude": 46.948271,
     "longitude": 7.451451,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Europe/Zurich"
   },
   {
     "country": "Syria",
@@ -1597,7 +1796,8 @@
     "city": "Damascus",
     "latitude": 33.51307,
     "longitude": 36.309581,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Asia/Damascus"
   },
   {
     "country": "São Tomé and Príncipe",
@@ -1605,7 +1805,8 @@
     "city": "São Tomé",
     "latitude": 0.338924,
     "longitude": 6.731303,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Africa/Sao_Tome"
   },
   {
     "country": "Taiwan",
@@ -1613,7 +1814,8 @@
     "city": "Taipei",
     "latitude": 25.03752,
     "longitude": 121.56368,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Asia/Taipei"
   },
   {
     "country": "Tajikistan",
@@ -1621,7 +1823,8 @@
     "city": "Dushanbe",
     "latitude": 38.542584,
     "longitude": 68.815214,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Asia/Dushanbe"
   },
   {
     "country": "Tanzania",
@@ -1629,7 +1832,8 @@
     "city": "Dodoma",
     "latitude": -6.337282,
     "longitude": 35.737177,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Africa/Dar_es_Salaam"
   },
   {
     "country": "Thailand",
@@ -1637,7 +1841,8 @@
     "city": "Bangkok",
     "latitude": 13.754253,
     "longitude": 100.493087,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Asia/Bangkok"
   },
   {
     "country": "The Bahamas",
@@ -1645,7 +1850,8 @@
     "city": "Nassau",
     "latitude": 25.078346,
     "longitude": -77.338333,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "America/Nassau"
   },
   {
     "country": "The Gambia",
@@ -1653,7 +1859,8 @@
     "city": "Banjul",
     "latitude": 13.441346,
     "longitude": -16.562471,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Africa/Banjul"
   },
   {
     "country": "Togo",
@@ -1661,7 +1868,8 @@
     "city": "Lomé",
     "latitude": 6.130419,
     "longitude": 1.215829,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Africa/Lome"
   },
   {
     "country": "Tokelau",
@@ -1669,7 +1877,8 @@
     "city": "Fakaofo",
     "latitude": -9.374305,
     "longitude": -171.264536,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Pacific/Fakaofo"
   },
   {
     "country": "Tonga",
@@ -1677,7 +1886,8 @@
     "city": "Nuku'alofa",
     "latitude": -21.13434,
     "longitude": -175.201808,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Pacific/Tongatapu"
   },
   {
     "country": "Trinidad and Tobago",
@@ -1685,7 +1895,8 @@
     "city": "Port of Spain",
     "latitude": 10.657268,
     "longitude": -61.518017,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "America/Port_of_Spain"
   },
   {
     "country": "Tunisia",
@@ -1693,7 +1904,8 @@
     "city": "Tunis",
     "latitude": 33.843941,
     "longitude": 9.400138,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Africa/Tunis"
   },
   {
     "country": "Turkey",
@@ -1701,7 +1913,8 @@
     "city": "Ankara",
     "latitude": 39.920777,
     "longitude": 32.854067,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Europe/Istanbul"
   },
   {
     "country": "Turkmenistan",
@@ -1709,7 +1922,8 @@
     "city": "Ashgabat",
     "latitude": 37.939668,
     "longitude": 58.387426,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Asia/Ashgabat"
   },
   {
     "country": "Tuvalu",
@@ -1717,7 +1931,8 @@
     "city": "Funafuti",
     "latitude": -8.534995,
     "longitude": 179.11865,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Pacific/Funafuti"
   },
   {
     "country": "Uganda",
@@ -1725,7 +1940,8 @@
     "city": "Kampala",
     "latitude": 0.317714,
     "longitude": 32.581354,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Africa/Kampala"
   },
   {
     "country": "Ukraine",
@@ -1733,7 +1949,8 @@
     "city": "Kiev",
     "latitude": 50.450034,
     "longitude": 30.524136,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Europe/Kyiv"
   },
   {
     "country": "United Arab Emirates",
@@ -1741,7 +1958,8 @@
     "city": "Abu Dhabi",
     "latitude": 24.474796,
     "longitude": 54.370576,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Asia/Dubai"
   },
   {
     "country": "United Kingdom",
@@ -1749,7 +1967,8 @@
     "city": "London",
     "latitude": 51.507322,
     "longitude": -0.127647,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Europe/London"
   },
   {
     "country": "United States",
@@ -1757,7 +1976,8 @@
     "city": "Washington D.C.",
     "latitude": 38.894986,
     "longitude": -77.036571,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "America/New_York"
   },
   {
     "country": "Uruguay",
@@ -1765,7 +1985,8 @@
     "city": "Montevideo",
     "latitude": -34.905904,
     "longitude": -56.191357,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "America/Montevideo"
   },
   {
     "country": "Uzbekistan",
@@ -1773,7 +1994,8 @@
     "city": "Tashkent",
     "latitude": 41.312336,
     "longitude": 69.278708,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Asia/Tashkent"
   },
   {
     "country": "Vanuatu",
@@ -1781,7 +2003,8 @@
     "city": "Port Vila",
     "latitude": -17.741497,
     "longitude": 168.315016,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Pacific/Efate"
   },
   {
     "country": "Venezuela",
@@ -1789,7 +2012,8 @@
     "city": "Caracas",
     "latitude": 10.506098,
     "longitude": -66.914602,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "America/Caracas"
   },
   {
     "country": "Vietnam",
@@ -1797,7 +2021,8 @@
     "city": "Hanoi",
     "latitude": 21.02945,
     "longitude": 105.854444,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Asia/Ho_Chi_Minh"
   },
   {
     "country": "Wallis and Futuna",
@@ -1805,7 +2030,8 @@
     "city": "Mata-Utu",
     "latitude": -13.282042,
     "longitude": -176.174022,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Pacific/Wallis"
   },
   {
     "country": "Western Sahara",
@@ -1813,7 +2039,8 @@
     "city": "El Aaiún",
     "latitude": 27.154512,
     "longitude": -13.195392,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Africa/El_Aaiun"
   },
   {
     "country": "Yemen",
@@ -1821,7 +2048,8 @@
     "city": "Sana'a",
     "latitude": 15.353857,
     "longitude": 44.205884,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Asia/Aden"
   },
   {
     "country": "Zambia",
@@ -1829,7 +2057,8 @@
     "city": "Lusaka",
     "latitude": -15.416449,
     "longitude": 28.282154,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Africa/Lusaka"
   },
   {
     "country": "Zimbabwe",
@@ -1837,6 +2066,7 @@
     "city": "Harare",
     "latitude": -17.831773,
     "longitude": 31.045686,
-    "coordinateType": "capital"
+    "coordinateType": "capital",
+    "timezone": "Africa/Harare"
   }
 ]

@@ -1,8 +1,8 @@
 import 'package:alarm/alarm.dart';
+
 import '../config/prayer_scheduler_config.dart';
 import '../notifications/countdown_notification_service.dart';
 import '../utils/prayer_scheduler_ids.dart';
-
 
 class AdhanScheduler {
   const AdhanScheduler._();
@@ -10,6 +10,7 @@ class AdhanScheduler {
   static Future<bool> schedule({
     required int dayIndex,
     required dynamic moment,
+    required String adhanAssetPath,
   }) async {
     final id = PrayerSchedulerIds.adhan(
       moment.time,
@@ -20,7 +21,8 @@ class AdhanScheduler {
       '🔊 ADHAN START | '
           'id=$id | '
           'prayer=${moment.name} | '
-          'time=${moment.time}',
+          'time=${moment.time} | '
+          'asset=$adhanAssetPath',
     );
 
     final now = DateTime.now();
@@ -35,18 +37,33 @@ class AdhanScheduler {
     }
 
     try {
-      final alarmSettings =
-      AlarmSettings(
+      final alarmSettings = AlarmSettings(
         id: id,
         dateTime: moment.time,
-        assetAudioPath: adhanAsset,
+
+        // ======================================================
+        // ADHAN AUDIO
+        //
+        // Fajr:
+        //     fajrAdhanAssetPath
+        //
+        // Other prayers:
+        //     normalAdhanAssetPath
+        //
+        // The correct path is selected by
+        // PrayerNotificationLocalDataSourceImpl.
+        // ======================================================
+
+        assetAudioPath: adhanAssetPath,
+
         loopAudio: false,
-        vibrate: true,
+        vibrate: false,
 
         androidFullScreenIntent: false,
 
         androidStopAlarmOnTermination: false,
         allowAlarmOverlap: true,
+
         volumeSettings: VolumeSettings.fade(
           volume: 1.0,
           fadeDuration: const Duration(seconds: 1),
@@ -59,8 +76,6 @@ class AdhanScheduler {
           stopButton: 'إيقاف الأذان',
           icon: notificationIcon,
 
-          // لو المستخدم عمل swipe للـ notification
-          // لا نريد أن يتوقف الأذان.
           androidStopAlarmOnDismiss: false,
         ),
 
@@ -74,14 +89,17 @@ class AdhanScheduler {
       prayerSchedulerLog(
         '✅ ADHAN Alarm.set SUCCESS | '
             'id=$id | '
-            'time=${moment.time}',
+            'prayer=${moment.name} | '
+            'time=${moment.time} | '
+            'asset=$adhanAssetPath',
       );
 
       return true;
     } catch (e, stackTrace) {
       prayerSchedulerLog(
         '❌ ADHAN Alarm.set FAILED | '
-            'id=$id',
+            'id=$id | '
+            'prayer=${moment.name}',
       );
 
       prayerSchedulerLog(
@@ -96,5 +114,3 @@ class AdhanScheduler {
     }
   }
 }
-
-

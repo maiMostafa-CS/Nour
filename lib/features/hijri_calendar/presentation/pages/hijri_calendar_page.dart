@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../bloc/hijri_calendar_bloc.dart';
 import '../bloc/hijri_calendar_event.dart';
@@ -10,10 +11,37 @@ import '../widgets/hijri_week_days.dart';
 import '../widgets/hijri_calendar_grid.dart';
 import '../widgets/prayer_times_card.dart';
 
-class HijriCalendarPage extends StatelessWidget {
+class HijriCalendarPage extends StatefulWidget {
   const HijriCalendarPage({
     super.key,
   });
+
+  @override
+  State<HijriCalendarPage> createState() => _HijriCalendarPageState();
+}
+
+class _HijriCalendarPageState extends State<HijriCalendarPage> {
+  static const String _timezoneKey = 'prayer_location_timezone';
+  String _timezoneName = 'Africa/Cairo';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadTimezone();
+  }
+
+  Future<void> _loadTimezone() async {
+    final prefs = await SharedPreferences.getInstance();
+    final timezone = prefs.getString(_timezoneKey);
+
+    if (!mounted || timezone == null || timezone.isEmpty) {
+      return;
+    }
+
+    setState(() {
+      _timezoneName = timezone;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -144,6 +172,7 @@ class HijriCalendarPage extends StatelessWidget {
                 if (state.prayerTimes != null)
                   PrayerTimesCard(
                     prayerTimes: state.prayerTimes!,
+                    timezoneName: _timezoneName,
                   ),
               ],
             ),

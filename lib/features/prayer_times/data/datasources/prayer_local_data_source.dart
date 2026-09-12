@@ -32,13 +32,25 @@ class PrayerLocalDataSourceImpl implements PrayerLocalDataSource {
       precision: true,
     );
 
+    print('════════ ADHAN DEBUG ════════');
+    print('DATE INPUT       = $date');
+    print('FAJR RAW         = ${prayerTimes.fajr}');
+    print('FAJR TO DEVICE LOCAL = ${prayerTimes.fajr.toLocal()}');
+    print('FAJR UTC         = ${prayerTimes.fajr.toUtc()}');
+
+    print('SUNRISE RAW      = ${prayerTimes.sunrise}');
+    print('DHUHR RAW        = ${prayerTimes.dhuhr}');
+    print('ASR RAW          = ${prayerTimes.asr}');
+    print('MAGHRIB RAW      = ${prayerTimes.maghrib}');
+    print('ISHA RAW         = ${prayerTimes.isha}');
+    print('════════════════════════════');
     return PrayerTimesModel(
-      fajr: prayerTimes.fajr.toLocal(),
-      sunrise: prayerTimes.sunrise.toLocal(),
-      dhuhr: prayerTimes.dhuhr.toLocal(),
-      asr: prayerTimes.asr.toLocal(),
-      maghrib: prayerTimes.maghrib.toLocal(),
-      isha: prayerTimes.isha.toLocal(),
+      fajr: prayerTimes.fajr,
+      sunrise: prayerTimes.sunrise,
+      dhuhr: prayerTimes.dhuhr,
+      asr: prayerTimes.asr,
+      maghrib: prayerTimes.maghrib,
+      isha: prayerTimes.isha,
     );
   }
 }
