@@ -12,18 +12,18 @@ abstract class PrayerLocalDataSource {
 
 class PrayerLocalDataSourceImpl implements PrayerLocalDataSource {
   @override
+  @override
   PrayerTimesModel calculate({
     required double latitude,
     required double longitude,
     required DateTime date,
   }) {
-    final coordinates = Coordinates(
-      latitude,
-      longitude,
-    );
+    final coordinates = Coordinates(latitude, longitude);
 
     final params = CalculationMethodParameters.egyptian()
       ..madhab = Madhab.shafi;
+
+
 
     final prayerTimes = PrayerTimes(
       coordinates: coordinates,
@@ -32,18 +32,6 @@ class PrayerLocalDataSourceImpl implements PrayerLocalDataSource {
       precision: true,
     );
 
-    print('════════ ADHAN DEBUG ════════');
-    print('DATE INPUT       = $date');
-    print('FAJR RAW         = ${prayerTimes.fajr}');
-    print('FAJR TO DEVICE LOCAL = ${prayerTimes.fajr.toLocal()}');
-    print('FAJR UTC         = ${prayerTimes.fajr.toUtc()}');
-
-    print('SUNRISE RAW      = ${prayerTimes.sunrise}');
-    print('DHUHR RAW        = ${prayerTimes.dhuhr}');
-    print('ASR RAW          = ${prayerTimes.asr}');
-    print('MAGHRIB RAW      = ${prayerTimes.maghrib}');
-    print('ISHA RAW         = ${prayerTimes.isha}');
-    print('════════════════════════════');
     return PrayerTimesModel(
       fajr: prayerTimes.fajr,
       sunrise: prayerTimes.sunrise,

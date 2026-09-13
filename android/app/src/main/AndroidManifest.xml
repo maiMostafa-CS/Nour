@@ -47,6 +47,10 @@
         android:icon="@mipmap/ic_launcher"
         android:usesCleartextTraffic="true">
 
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_mosque_notification" />
+
         <!-- Main Flutter Activity -->
         <activity
             android:name=".MainActivity"

@@ -15,7 +15,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
 
-    Timer(const Duration(seconds: 2), () {
+    Timer(const Duration(seconds: 20), () {
       if (!mounted) return;
 
       Navigator.pushReplacementNamed(
@@ -30,7 +30,7 @@ class _SplashScreenState extends State<SplashScreen> {
     return Scaffold(
       body: SizedBox.expand(
         child: Image.asset(
-          'assets/images/splashScreen.png',
+          'assets/images/splash.jpeg',
           fit: BoxFit.cover,
         ),
       ),

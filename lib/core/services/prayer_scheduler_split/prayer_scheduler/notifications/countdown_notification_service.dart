@@ -351,7 +351,7 @@ class CountdownNotificationService {
 
         title: '🕌 الصلاة القادمة',
 
-        body: 'صلاة $nextPrayerName',
+        body: nextPrayerName,
 
         notificationDetails:
         NotificationDetails(

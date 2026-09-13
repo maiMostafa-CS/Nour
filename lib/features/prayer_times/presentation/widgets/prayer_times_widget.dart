@@ -117,7 +117,6 @@ class _PrayerTimesWidgetState extends State<PrayerTimesWidget> {
       height: 86.h,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        reverse: true,
         physics: const BouncingScrollPhysics(),
         itemCount: prayers.length,
         separatorBuilder: (_, __) => SizedBox(width: 7.w),

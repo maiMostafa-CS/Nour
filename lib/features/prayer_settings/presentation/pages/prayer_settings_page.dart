@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/router/app_router.dart';
-
+import '../../../home/presentation/bloc/bloc.dart';
+import '../../../home/presentation/bloc/home_state.dart';
+import '../widgets/setting_card.dart';
 
 class PrayerSettingsPage extends StatelessWidget {
   const PrayerSettingsPage({super.key});
@@ -11,7 +14,6 @@ class PrayerSettingsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF7F3EA),
-
       appBar: AppBar(
         backgroundColor: const Color(0xFFF7F3EA),
         elevation: 0,
@@ -25,7 +27,6 @@ class PrayerSettingsPage extends StatelessWidget {
           ),
         ),
       ),
-
       body: Center(
         child: Padding(
           padding: EdgeInsets.symmetric(
@@ -34,7 +35,7 @@ class PrayerSettingsPage extends StatelessWidget {
           ),
           child: Column(
             children: [
-              _SettingsCard(
+              SettingsCard(
                 icon: Icons.notifications_active_outlined,
                 title: 'إعدادات الأذان',
                 subtitle: 'تشغيل أو إيقاف الأذان لكل صلاة',
@@ -45,10 +46,8 @@ class PrayerSettingsPage extends StatelessWidget {
                   );
                 },
               ),
-
               SizedBox(height: 14.h),
-
-              _SettingsCard(
+              SettingsCard(
                 icon: Icons.mosque_outlined,
                 title: 'وقت الإقامة',
                 subtitle: 'تحديد عدد الدقائق بعد كل صلاة',
@@ -59,10 +58,8 @@ class PrayerSettingsPage extends StatelessWidget {
                   );
                 },
               ),
-
               SizedBox(height: 14.h),
-
-              _SettingsCard(
+              SettingsCard(
                 icon: Icons.record_voice_over_outlined,
                 title: 'صوت المؤذن',
                 subtitle: 'اختيار المؤذن المفضل لديك',
@@ -70,103 +67,24 @@ class PrayerSettingsPage extends StatelessWidget {
                   await Navigator.pushNamed(
                     context,
                     AppRouter.adhan,
-
                   );
-                  },
+                },
               ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _SettingsCard extends StatelessWidget {
-  const _SettingsCard({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.onTap,
-  });
-
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(18.r),
-        child: Container(
-          width: double.infinity,
-          padding: EdgeInsets.symmetric(
-            horizontal: 16.w,
-            vertical: 18.h,
-          ),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(18.r),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 52.w,
-                height: 52.w,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE8E8CE),
-                  borderRadius: BorderRadius.circular(15.r),
-                ),
-                child: Icon(
-                  icon,
-                  size: 27.sp,
-                  color: const Color(0xFF176B5B),
-                ),
-              ),
-
-              SizedBox(width: 14.w),
-
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: TextStyle(
-                        fontSize: 17.sp,
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xFF176B5B),
-                      ),
-                    ),
-
-                    SizedBox(height: 5.h),
-
-                    Text(
-                      subtitle,
-                      style: TextStyle(
-                        fontSize: 13.sp,
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              Icon(
-                Icons.arrow_forward_ios_rounded,
-                size: 17.sp,
-                color: Colors.grey.shade500,
+              SizedBox(height: 14.h),
+              BlocBuilder<HomeBloc, HomeState>(
+                builder: (context, state) {
+                  return SettingsCard(
+                    icon: Icons.location_on_outlined,
+                    title: 'الموقع',
+                    subtitle: state.cityName,
+                    onTap: () {
+                      Navigator.pushNamed(
+                        context,
+                        AppRouter.locationPage,
+                      );
+                    },
+                  );
+                },
               ),
             ],
           ),

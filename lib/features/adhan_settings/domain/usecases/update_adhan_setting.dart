@@ -1,5 +1,5 @@
 import '../entities/adhan_settings_entity.dart';
-import '../repositories/adhan_settings_repository.dart';
+import '../repositories/ adhan_settings_repository.dart';
 
 class UpdateAdhanSetting {
   final AdhanSettingsRepository repository;

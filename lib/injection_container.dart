@@ -2,6 +2,7 @@ import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'core/router/app_router.dart';
+import 'core/services/prayer_scheduler_split/prayer_scheduler/adhan_scheduler_service.dart';
 import 'core/services/prayer_scheduler_split/prayer_scheduler/data/datasources/prayer_notification_local_data_source.dart';
 import 'core/services/prayer_scheduler_split/prayer_scheduler/data/datasources/prayer_notification_local_data_source_impl.dart';
 import 'features/adhan/data/datasources/adhan_local_data_source.dart';
@@ -430,6 +431,19 @@ Future<void> configureDependencies() async {
       sl<GetIqamaSettings>(),
       updateIqamaSetting:
       sl<UpdateIqamaSetting>(),
+    ),
+  );
+
+
+  sl.registerLazySingleton<AdhanSchedulerService>(
+        () => AdhanSchedulerService(),
+  );
+  sl.registerFactory<HomeBloc>(
+        () => HomeBloc(
+      prefs: sl<SharedPreferences>(),
+      getCurrentLocation: sl<GetCurrentLocationUseCase>(),
+      getPrayerTimes: sl<GetPrayerTimes>(),
+      scheduler: sl<AdhanSchedulerService>(),
     ),
   );
 

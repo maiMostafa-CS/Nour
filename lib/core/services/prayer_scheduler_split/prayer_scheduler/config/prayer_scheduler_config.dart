@@ -24,7 +24,7 @@ const String prayerScheduledLatitudePrefsKey =
 
 const String prayerScheduledLongitudePrefsKey =
     'prayer_scheduled_longitude';
-const String notificationIcon = 'ic_mosque_notification';
+const String notificationIcon = "@drawable/ic_mosque_notification";
 
 const String adhanAsset =
     'assets/adhan-mp3/abdul_majid_al_surehi_1.mp3';

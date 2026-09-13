@@ -55,3 +55,7 @@ flutter:
     - assets/adhan-mp3/
     - assets/prayer_time_soon/
     - assets/countriesCapitals/
+  fonts:
+    - family: HafsSmart
+      fonts:
+        - asset: assets/fonts/HafsSmart_08.ttf

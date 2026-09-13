@@ -50,24 +50,25 @@ class _NextPrayerCardState extends State<NextPrayerCard> {
   }
 
   @override
+
   Widget build(BuildContext context) {
     final now = tz.TZDateTime.now(_location);
 
     final prayers = [
-      {'name': 'الفجر', 'time': widget.prayerTimes.fajr},
-      {'name': 'الشروق', 'time': widget.prayerTimes.sunrise},
-      {'name': 'الظهر', 'time': widget.prayerTimes.dhuhr},
-      {'name': 'العصر', 'time': widget.prayerTimes.asr},
-      {'name': 'المغرب', 'time': widget.prayerTimes.maghrib},
-      {'name': 'العشاء', 'time': widget.prayerTimes.isha},
+      {'name': 'الفجر',   'time': widget.prayerTimes.fajr},
+      {'name': 'الشروق',  'time': widget.prayerTimes.sunrise},
+      {'name': 'الظهر',   'time': widget.prayerTimes.dhuhr},
+      {'name': 'العصر',   'time': widget.prayerTimes.asr},
+      {'name': 'المغرب',  'time': widget.prayerTimes.maghrib},
+      {'name': 'العشاء',  'time': widget.prayerTimes.isha},
     ];
 
     DateTime? nextPrayerTime;
     String nextPrayerName = '';
 
     for (final prayer in prayers) {
-      final time = prayer['time'] as DateTime;
-
+      final rawTime = prayer['time'] as DateTime;
+      final time = tz.TZDateTime.from(rawTime, _location);   // ← كده
       if (time.isAfter(now)) {
         nextPrayerTime = time;
         nextPrayerName = prayer['name'] as String;
@@ -163,7 +164,7 @@ class _NextPrayerCardState extends State<NextPrayerCard> {
                       ),
                       SizedBox(height: 2.h),
                       Text(
-                        'صلاة $nextPrayerName',
+                        nextPrayerName,
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 22.sp,

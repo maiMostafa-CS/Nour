@@ -235,7 +235,7 @@ class AdhkarPage extends StatelessWidget {
                 ),
               ),
 
-              _buildBottomNavigation(),
+              // _buildBottomNavigation(),
             ],
           ),
         ),
@@ -342,7 +342,8 @@ class AdhkarPage extends StatelessWidget {
   void _openCategory(
       BuildContext context,
       AdhkarCategory category,
-      ) {
+      )
+  {
     switch (category.title) {
       case 'أذكار الصباح':
         break;
@@ -406,82 +407,82 @@ class AdhkarPage extends StatelessWidget {
     }
   }
 
-  Widget _buildBottomNavigation() {
-    return Container(
-      height: 68.h,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(
-          top: BorderSide(
-            color: Colors.grey.shade200,
-            width: 1.w,
-          ),
-        ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _buildNavItem(
-            icon: Icons.home_outlined,
-            label: 'الرئيسية',
-            active: false,
-          ),
-          _buildNavItem(
-            icon: Icons.menu_book_outlined,
-            label: 'القرآن',
-            active: false,
-          ),
-          _buildNavItem(
-            icon: Icons.auto_awesome,
-            label: 'الأذكار',
-            active: true,
-          ),
-          _buildNavItem(
-            icon: Icons.mosque_outlined,
-            label: 'الصلاة',
-            active: false,
-          ),
-          _buildNavItem(
-            icon: Icons.more_horiz,
-            label: 'المزيد',
-            active: false,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNavItem({
-    required IconData icon,
-    required String label,
-    required bool active,
-  }) {
-    const activeColor = Color(0xFF176B5B);
-    const inactiveColor = Color(0xFF777777);
-
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(
-          icon,
-          size: 21.sp,
-          color: active ? activeColor : inactiveColor,
-        ),
-
-        SizedBox(height: 4.h),
-
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 10.sp,
-            fontWeight:
-            active ? FontWeight.w700 : FontWeight.w500,
-            color: active ? activeColor : inactiveColor,
-          ),
-        ),
-      ],
-    );
-  }
+  // Widget _buildBottomNavigation() {
+  //   return Container(
+  //     height: 68.h,
+  //     decoration: BoxDecoration(
+  //       color: Colors.white,
+  //       border: Border(
+  //         top: BorderSide(
+  //           color: Colors.grey.shade200,
+  //           width: 1.w,
+  //         ),
+  //       ),
+  //     ),
+  //     child: Row(
+  //       mainAxisAlignment: MainAxisAlignment.spaceAround,
+  //       children: [
+  //         _buildNavItem(
+  //           icon: Icons.home_outlined,
+  //           label: 'الرئيسية',
+  //           active: false,
+  //         ),
+  //         _buildNavItem(
+  //           icon: Icons.menu_book_outlined,
+  //           label: 'القرآن',
+  //           active: false,
+  //         ),
+  //         _buildNavItem(
+  //           icon: Icons.auto_awesome,
+  //           label: 'الأذكار',
+  //           active: true,
+  //         ),
+  //         _buildNavItem(
+  //           icon: Icons.mosque_outlined,
+  //           label: 'الصلاة',
+  //           active: false,
+  //         ),
+  //         _buildNavItem(
+  //           icon: Icons.more_horiz,
+  //           label: 'المزيد',
+  //           active: false,
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
+  //
+  // Widget _buildNavItem({
+  //   required IconData icon,
+  //   required String label,
+  //   required bool active,
+  // }) {
+  //   const activeColor = Color(0xFF176B5B);
+  //   const inactiveColor = Color(0xFF777777);
+  //
+  //   return Column(
+  //     mainAxisAlignment: MainAxisAlignment.center,
+  //     children: [
+  //       Icon(
+  //         icon,
+  //         size: 21.sp,
+  //         color: active ? activeColor : inactiveColor,
+  //       ),
+  //
+  //       SizedBox(height: 4.h),
+  //
+  //       Text(
+  //         label,
+  //         style: TextStyle(
+  //           fontSize: 10.sp,
+  //           fontWeight:
+  //           active ? FontWeight.w700 : FontWeight.w500,
+  //           color: active ? activeColor : inactiveColor,
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
 }
 
 class AdhkarCategory {

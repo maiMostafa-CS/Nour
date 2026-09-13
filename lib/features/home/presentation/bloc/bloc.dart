@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:timezone/timezone.dart' as tz;
 import '../../../../core/services/prayer_scheduler_split/prayer_scheduler/adhan_scheduler_service.dart';
 import '../../../../core/services/prayer_scheduler_split/prayer_scheduler/config/prayer_scheduler_config.dart';
 import '../../../locations/domain/entity/current_location_entity.dart';
@@ -128,13 +129,13 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   }
 
   Future<void> _loadAndSchedule(
-    Emitter<HomeState> emit, {
-    required double latitude,
-    required double longitude,
-    required String cityName,
-    required String timezone,
-    required bool cancelOldAlarms,
-  }) async {
+      Emitter<HomeState> emit, {
+        required double latitude,
+        required double longitude,
+        required String cityName,
+        required String timezone,
+        required bool cancelOldAlarms,
+      }) async {
     if (cancelOldAlarms) {
       try {
         await _scheduler.cancelAdhans();
@@ -145,12 +146,27 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       }
     }
 
+    // ✅ التعديل: احسب التاريخ بتوقيت المكان المختار
+    tz.Location location;
+    try {
+      location = tz.getLocation(timezone);
+    } catch (_) {
+      location = tz.getLocation('Africa/Cairo');
+    }
+
+    final nowInLocation = tz.TZDateTime.now(location);
+    final dateInLocation = tz.TZDateTime(
+      location,
+      nowInLocation.year,
+      nowInLocation.month,
+      nowInLocation.day,
+      12, 0, 0,   // منتصف النهار عشان نتجنب مشاكل حدود اليوم
+    );
+
     final prayerTimes = await _getPrayerTimes(
       latitude: latitude,
       longitude: longitude,
-      date: DateTime.now(),
-      timezoneName: timezone,
-
+      date: dateInLocation,   // ← بدل DateTime.now()
     );
 
     emit(state.copyWith(
@@ -184,7 +200,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       clearError: true,
     ));
   }
-
   Future<void> _saveAutoLocation(CurrentLocationEntity location) async {
     await _prefs.setString(_modeKey, _autoMode);
     await _prefs.setString(_cityKey, location.city);
