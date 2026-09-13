@@ -42,7 +42,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
+  flutter_launcher_icons: ^0.14.4
   flutter_lints: ^6.0.0
 
 flutter:
@@ -58,4 +58,9 @@ flutter:
   fonts:
     - family: HafsSmart
       fonts:
-        - asset: assets/fonts/HafsSmart_08.ttf
+        - asset: assets/fonts/Cairo-VariableFont_slnt,wght.ttf
+
+flutter_launcher_icons:
+   android: true
+   ios: false
+   image_path: "assets/images/app_icon.png"
