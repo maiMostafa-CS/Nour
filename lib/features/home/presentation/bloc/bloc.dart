@@ -1,713 +1,201 @@
-// import 'dart:ui';
-//
-// import 'package:flutter/foundation.dart';
-// import 'package:flutter/material.dart';
-// import 'package:flutter_bloc/flutter_bloc.dart';
-// import 'package:geocoding/geocoding.dart';
-// import 'package:geolocator/geolocator.dart';
-// import 'package:shared_preferences/shared_preferences.dart';
-//
-// import '../../../../core/router/app_router.dart';
-// import '../../../../core/services/prayer_scheduler_split/prayer_scheduler/adhan_scheduler_service.dart';
-//
-// import '../../../locations/domain/entity/current_location_entity.dart';
-// import '../../../locations/domain/entity/location_entity.dart';
-// import '../../../locations/presentation/pages/locationPage.dart';
-// import 'home_event.dart';
-// import 'home_state.dart';
-//
-// class HomeBloc extends Bloc<HomeEvent, HomeState> {
-//   // ============================================================
-//   // SharedPreferences Keys
-//   // ============================================================
-//
-//   static const String locationModeKey = 'prayer_location_mode';
-//
-//   static const String locationModeAuto = 'auto';
-//
-//   static const String locationModeManual = 'manual';
-//
-//   static const String prayerCityNameKey = 'prayer_city_name';
-//
-//   static const String manualLatitudeKey =
-//       'prayer_manual_latitude';
-//
-//   static const String manualLongitudeKey =
-//       'prayer_manual_longitude';
-//
-//   static const String lastLatitudeKey =
-//       'prayer_last_latitude';
-//
-//   static const String lastLongitudeKey =
-//       'prayer_last_longitude';
-//
-//   // ============================================================
-//   // Home Location Data
-//   // ============================================================
-//
-//   double latitude;
-//
-//   double longitude;
-//
-//   String cityName;
-//
-//   bool locationReady = false;
-//
-//   bool adhanScheduled = false;
-//
-//   // ============================================================
-//   // Constructor
-//   // ============================================================
-//
-//   HomeBloc({
-//     double initialLatitude = 30.0444,
-//     double initialLongitude = 31.2357,
-//     this.cityName = '',
-//   })  : latitude = initialLatitude,
-//         longitude = initialLongitude,
-//         super(const HomeInitial()) {
-//     // Load location when Home starts
-//     on<LoadHomeLocation>(_loadLocationAndPrayerTimes);
-//
-//     // Location selected from LocationPage
-//     on<HomeLocationSelected>(_reloadPrayerTimesAndAlarms);
-//   }
-//
-//   // ============================================================
-//   // 1. OPEN LOCATION PAGE
-//   // ============================================================
-//
-//   Future<void> _openLocationPage(
-//       BuildContext context,
-//       ) async {
-//     final result = await Navigator.pushNamed(
-//       context,
-//       AppRouter.locationPage,
-//     );
-//
-//     if (result == null) {
-//       return;
-//     }
-//
-//     if (result is! Map) {
-//       debugPrint(
-//         '❌ INVALID LOCATION RESULT: '
-//             '${result.runtimeType}',
-//       );
-//
-//       return;
-//     }
-//
-//     final location = result['location'];
-//
-//     final type = result['type'];
-//
-//     if (location == null || type == null) {
-//       debugPrint(
-//         '❌ LOCATION RESULT IS MISSING DATA',
-//       );
-//
-//       return;
-//     }
-//
-//     add(
-//       HomeLocationSelected(
-//         location: location,
-//         type: type,
-//       ),
-//     );
-//   }
-//
-//   // ============================================================
-//   // 2. LOAD LOCATION AND PRAYER TIMES
-//   // ============================================================
-//
-//   Future<void> _loadLocationAndPrayerTimes(
-//       LoadHomeLocation event,
-//       Emitter<HomeState> emit,
-//       )
-//   async {
-//     try {
-//       emit(
-//         const HomeLocationLoading(),
-//       );
-//
-//       final prefs =
-//       await SharedPreferences.getInstance();
-//
-//       // --------------------------------------------------------
-//       // Load saved city
-//       // --------------------------------------------------------
-//
-//       final savedCity =
-//       prefs.getString(
-//         prayerCityNameKey,
-//       );
-//
-//       if (savedCity != null &&
-//           savedCity.trim().isNotEmpty) {
-//         cityName = savedCity;
-//       }
-//
-//       // --------------------------------------------------------
-//       // Load location mode
-//       // --------------------------------------------------------
-//
-//       final mode =
-//           prefs.getString(
-//             locationModeKey,
-//           ) ??
-//               locationModeAuto;
-//
-//       debugPrint(
-//         '📍 HOME LOCATION | mode=$mode',
-//       );
-//
-//       // ========================================================
-//       // MANUAL LOCATION
-//       // ========================================================
-//
-//       if (mode == locationModeManual) {
-//         latitude =
-//             prefs.getDouble(
-//               manualLatitudeKey,
-//             ) ??
-//                 latitude;
-//
-//         longitude =
-//             prefs.getDouble(
-//               manualLongitudeKey,
-//             ) ??
-//                 longitude;
-//
-//         debugPrint(
-//           '📍 HOME MANUAL LOCATION | '
-//               'lat=$latitude | '
-//               'lng=$longitude',
-//         );
-//       }
-//
-//       // ========================================================
-//       // AUTOMATIC LOCATION
-//       // ========================================================
-//
-//       else {
-//         final currentLocation =
-//         await _useAutomaticLocation();
-//
-//         latitude =
-//             currentLocation.latitude;
-//
-//         longitude =
-//             currentLocation.longitude;
-//
-//         cityName =
-//             currentLocation.city;
-//
-//         debugPrint(
-//           '📍 HOME GPS LOCATION | '
-//               'city=$cityName | '
-//               'lat=$latitude | '
-//               'lng=$longitude',
-//         );
-//       }
-//
-//       // --------------------------------------------------------
-//       // Location is ready
-//       // --------------------------------------------------------
-//
-//       locationReady = true;
-//
-//       emit(
-//         HomeLocationLoaded(
-//           latitude: latitude,
-//           longitude: longitude,
-//           cityName: cityName,
-//         ),
-//       );
-//
-//     } catch (e, stackTrace) {
-//       debugPrint(
-//         '❌ LOAD HOME LOCATION FAILED: $e',
-//       );
-//
-//       debugPrint(
-//         '$stackTrace',
-//       );
-//
-//       emit(
-//         HomeLocationError(
-//           e.toString(),
-//         ),
-//       );
-//     }
-//   }
-//
-//   // ============================================================
-//   // 3. USE AUTOMATIC LOCATION
-//   // ============================================================
-//
-//   Future<CurrentLocationEntity>
-//   _useAutomaticLocation() async {
-//     // ----------------------------------------------------------
-//     // Check GPS service
-//     // ----------------------------------------------------------
-//
-//     final serviceEnabled =
-//     await Geolocator.isLocationServiceEnabled();
-//
-//     if (!serviceEnabled) {
-//       throw Exception(
-//         'يرجى تشغيل خدمة الموقع GPS',
-//       );
-//     }
-//
-//     // ----------------------------------------------------------
-//     // Check permission
-//     // ----------------------------------------------------------
-//
-//     var permission =
-//     await Geolocator.checkPermission();
-//
-//     if (permission ==
-//         LocationPermission.denied) {
-//       permission =
-//       await Geolocator.requestPermission();
-//     }
-//
-//     if (permission ==
-//         LocationPermission.denied ||
-//         permission ==
-//             LocationPermission.deniedForever) {
-//       throw Exception(
-//         'لم يتم السماح بالوصول إلى الموقع',
-//       );
-//     }
-//
-//     // ----------------------------------------------------------
-//     // Get current GPS position
-//     // ----------------------------------------------------------
-//
-//     final position =
-//     await Geolocator.getCurrentPosition(
-//       locationSettings:
-//       const LocationSettings(
-//         accuracy: LocationAccuracy.high,
-//       ),
-//     );
-//
-//     final lat =
-//         position.latitude;
-//
-//     final lng =
-//         position.longitude;
-//
-//     debugPrint(
-//       '📍 GPS POSITION | '
-//           'lat=$lat | '
-//           'lng=$lng',
-//     );
-//
-//     // ----------------------------------------------------------
-//     // Reverse Geocoding
-//     // ----------------------------------------------------------
-//
-//     final city =
-//     await _getCityNameFromCoordinates(
-//       lat,
-//       lng,
-//     );
-//
-//     debugPrint(
-//       '🌍 REVERSE GEOCODING | '
-//           'city=$city',
-//     );
-//
-//     // ----------------------------------------------------------
-//     // Save automatic location
-//     // ----------------------------------------------------------
-//
-//     final prefs =
-//     await SharedPreferences.getInstance();
-//
-//     await prefs.setString(
-//       locationModeKey,
-//       locationModeAuto,
-//     );
-//
-//     await prefs.setString(
-//       prayerCityNameKey,
-//       city,
-//     );
-//
-//     await prefs.setDouble(
-//       lastLatitudeKey,
-//       lat,
-//     );
-//
-//     await prefs.setDouble(
-//       lastLongitudeKey,
-//       lng,
-//     );
-//
-//     // ----------------------------------------------------------
-//     // Return location entity
-//     // ----------------------------------------------------------
-//
-//     return CurrentLocationEntity(
-//       latitude: lat,
-//       longitude: lng,
-//       city: city,
-//       country: '',
-//     );
-//   }
-//
-//   // ============================================================
-//   // 4. RELOAD PRAYER TIMES AND ALARMS
-//   // ============================================================
-//
-//   Future<void> _reloadPrayerTimesAndAlarms(
-//       HomeLocationSelected event,
-//       Emitter<HomeState> emit,
-//       ) async {
-//     try {
-//       emit(
-//         const HomeLocationLoading(),
-//       );
-//
-//       final location =
-//           event.location;
-//
-//       final type =
-//           event.type;
-//
-//       double lat;
-//
-//       double lng;
-//
-//       String city;
-//
-//       // ========================================================
-//       // CURRENT GPS LOCATION
-//       // ========================================================
-//
-//       if (location is CurrentLocationEntity) {
-//         lat =
-//             location.latitude;
-//
-//         lng =
-//             location.longitude;
-//
-//         city =
-//             location.city;
-//
-//         debugPrint(
-//           '📍 CURRENT GPS | '
-//               'city=${location.city} | '
-//               'country=${location.country} | '
-//               'lat=$lat | '
-//               'lng=$lng',
-//         );
-//       }
-//
-//       // ========================================================
-//       // MANUAL LOCATION
-//       // ========================================================
-//
-//       else if (location is LocationEntity) {
-//         lat =
-//             location.latitude;
-//
-//         lng =
-//             location.longitude;
-//
-//         city =
-//             location.city;
-//
-//         debugPrint(
-//           '📍 MANUAL LOCATION | '
-//               'city=${location.city} | '
-//               'country=${location.country} | '
-//               'lat=$lat | '
-//               'lng=$lng',
-//         );
-//       }
-//
-//       // ========================================================
-//       // INVALID LOCATION
-//       // ========================================================
-//
-//       else {
-//         throw Exception(
-//           'Invalid location type: '
-//               '${location.runtimeType}',
-//         );
-//       }
-//
-//       // --------------------------------------------------------
-//       // Update Home values
-//       // --------------------------------------------------------
-//
-//       latitude = lat;
-//
-//       longitude = lng;
-//
-//       cityName = city;
-//
-//       // --------------------------------------------------------
-//       // Save location
-//       // --------------------------------------------------------
-//
-//       final prefs =
-//       await SharedPreferences.getInstance();
-//
-//       await prefs.setString(
-//         prayerCityNameKey,
-//         city,
-//       );
-//
-//       // ========================================================
-//       // CURRENT LOCATION = AUTO
-//       // ========================================================
-//
-//       if (type ==
-//           LocationSelectionType.current) {
-//         await prefs.setString(
-//           locationModeKey,
-//           locationModeAuto,
-//         );
-//
-//         debugPrint(
-//           '📍 HOME LOCATION MODE = AUTO',
-//         );
-//       }
-//
-//       // ========================================================
-//       // MANUAL LOCATION
-//       // ========================================================
-//
-//       else {
-//         await prefs.setString(
-//           locationModeKey,
-//           locationModeManual,
-//         );
-//
-//         await prefs.setDouble(
-//           manualLatitudeKey,
-//           lat,
-//         );
-//
-//         await prefs.setDouble(
-//           manualLongitudeKey,
-//           lng,
-//         );
-//
-//         debugPrint(
-//           '📍 HOME LOCATION MODE = MANUAL',
-//         );
-//       }
-//
-//       // --------------------------------------------------------
-//       // Save last location
-//       // --------------------------------------------------------
-//
-//       await prefs.setDouble(
-//         lastLatitudeKey,
-//         lat,
-//       );
-//
-//       await prefs.setDouble(
-//         lastLongitudeKey,
-//         lng,
-//       );
-//
-//       // --------------------------------------------------------
-//       // Reset scheduling flag
-//       // --------------------------------------------------------
-//
-//       locationReady = true;
-//
-//       adhanScheduled = false;
-//
-//       // ========================================================
-//       // CANCEL OLD ADHAN ALARMS
-//       // ========================================================
-//
-//       try {
-//         await AdhanSchedulerService()
-//             .cancelAdhans();
-//
-//         debugPrint(
-//           '✅ OLD ADHAN ALARMS CANCELLED',
-//         );
-//       } catch (e, stackTrace) {
-//         debugPrint(
-//           '❌ CANCEL OLD ALARMS FAILED: $e',
-//         );
-//
-//         debugPrint(
-//           '$stackTrace',
-//         );
-//       }
-//
-//       // --------------------------------------------------------
-//       // Log updated location
-//       // --------------------------------------------------------
-//
-//       debugPrint(
-//         '🏠 HOME LOCATION UPDATED | '
-//             'lat=$latitude | '
-//             'lng=$longitude | '
-//             'city=$cityName',
-//       );
-//
-//       // --------------------------------------------------------
-//       // Notify HomePage
-//       // --------------------------------------------------------
-//
-//       emit(
-//         HomeLocationLoaded(
-//           latitude: latitude,
-//           longitude: longitude,
-//           cityName: cityName,
-//         ),
-//       );
-//
-//     } catch (e, stackTrace) {
-//       debugPrint(
-//         '❌ LOCATION SELECTION FAILED: $e',
-//       );
-//
-//       debugPrint(
-//         '$stackTrace',
-//       );
-//
-//       emit(
-//         HomeLocationError(
-//           e.toString(),
-//         ),
-//       );
-//     }
-//   }
-//
-//   // ============================================================
-//   // 5. GET CITY NAME FROM COORDINATES
-//   // ============================================================
-//
-//   Future<String>
-//   _getCityNameFromCoordinates(
-//       double latitude,
-//       double longitude,
-//       ) async {
-//     try {
-//       debugPrint(
-//         '🌍 START REVERSE GEOCODING | '
-//             'lat=$latitude | '
-//             'lng=$longitude',
-//       );
-//
-//       final placemarks =
-//       await Geocoding()
-//           .placemarkFromCoordinates(
-//         latitude,
-//         longitude,
-//         locale:
-//         const Locale(
-//           'en',
-//           'US',
-//         ),
-//       );
-//
-//       debugPrint(
-//         '🌍 GEOCODING RESULTS COUNT = '
-//             '${placemarks.length}',
-//       );
-//
-//       if (placemarks.isEmpty) {
-//         return 'Current Location';
-//       }
-//
-//       // --------------------------------------------------------
-//       // Print all results
-//       // --------------------------------------------------------
-//
-//       for (final place in placemarks) {
-//         debugPrint(
-//           '📍 PLACE | '
-//               'name=${place.name} | '
-//               'locality=${place.locality} | '
-//               'subLocality=${place.subLocality} | '
-//               'subAdministrativeArea=${place.subAdministrativeArea} | '
-//               'administrativeArea=${place.administrativeArea} | '
-//               'country=${place.country}',
-//         );
-//       }
-//
-//       final place =
-//           placemarks.first;
-//
-//       // --------------------------------------------------------
-//       // Locality
-//       // --------------------------------------------------------
-//
-//       final locality =
-//       place.locality?.trim();
-//
-//       if (locality != null &&
-//           locality.isNotEmpty) {
-//         return locality;
-//       }
-//
-//       // --------------------------------------------------------
-//       // Sub Locality
-//       // --------------------------------------------------------
-//
-//       final subLocality =
-//       place.subLocality?.trim();
-//
-//       if (subLocality != null &&
-//           subLocality.isNotEmpty) {
-//         return subLocality;
-//       }
-//
-//       // --------------------------------------------------------
-//       // Sub Administrative Area
-//       // --------------------------------------------------------
-//
-//       final subAdministrativeArea =
-//       place.subAdministrativeArea
-//           ?.trim();
-//
-//       if (subAdministrativeArea != null &&
-//           subAdministrativeArea.isNotEmpty) {
-//         return subAdministrativeArea;
-//       }
-//
-//       // --------------------------------------------------------
-//       // Administrative Area
-//       // --------------------------------------------------------
-//
-//       final administrativeArea =
-//       place.administrativeArea
-//           ?.trim();
-//
-//       if (administrativeArea != null &&
-//           administrativeArea.isNotEmpty) {
-//         return administrativeArea;
-//       }
-//
-//       return 'Current Location';
-//
-//     } catch (e, stackTrace) {
-//       debugPrint(
-//         '❌ REVERSE GEOCODING FAILED: $e',
-//       );
-//
-//       debugPrint(
-//         '$stackTrace',
-//       );
-//
-//       return 'Current Location';
-//     }
-//   }
-// }
+import 'package:flutter/foundation.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../../../core/services/prayer_scheduler_split/prayer_scheduler/adhan_scheduler_service.dart';
+import '../../../../core/services/prayer_scheduler_split/prayer_scheduler/config/prayer_scheduler_config.dart';
+import '../../../locations/domain/entity/current_location_entity.dart';
+import '../../../locations/domain/usecase/get_current_location.dart';
+import '../../../prayer_times/domain/usecases/get_prayer_times.dart';
+import 'home_event.dart';
+import 'home_state.dart';
+
+class HomeBloc extends Bloc<HomeEvent, HomeState> {
+  HomeBloc({
+    required SharedPreferences prefs,
+    required GetCurrentLocationUseCase getCurrentLocation,
+    required GetPrayerTimes getPrayerTimes,
+    required AdhanSchedulerService scheduler,
+  })  : _prefs = prefs,
+        _getCurrentLocation = getCurrentLocation,
+        _getPrayerTimes = getPrayerTimes,
+        _scheduler = scheduler,
+        super(const HomeState()) {
+    on<LoadHome>(_onLoadHome);
+    on<HomeLocationChanged>(_onLocationChanged);
+  }
+
+  final SharedPreferences _prefs;
+  final GetCurrentLocationUseCase _getCurrentLocation;
+  final GetPrayerTimes _getPrayerTimes;
+  final AdhanSchedulerService _scheduler;
+
+  static const _modeKey = 'prayer_location_mode';
+  static const _manualMode = 'manual';
+  static const _autoMode = 'auto';
+  static const _cityKey = 'prayer_city_name';
+  static const _timezoneKey = 'prayer_location_timezone';
+  static const _manualLatKey = 'prayer_manual_latitude';
+  static const _manualLngKey = 'prayer_manual_longitude';
+
+  Future<void> _onLoadHome(
+    LoadHome event,
+    Emitter<HomeState> emit,
+  ) async {
+    emit(state.copyWith(loading: true, clearError: true));
+
+    try {
+      final city = _prefs.getString(_cityKey) ?? state.cityName;
+      final timezone =
+          _prefs.getString(_timezoneKey) ?? state.timezone;
+      final mode = _prefs.getString(_modeKey) ?? _autoMode;
+
+      double latitude;
+      double longitude;
+      String resolvedCity = city;
+      String resolvedTimezone = timezone;
+
+      if (mode == _manualMode) {
+        latitude = _prefs.getDouble(_manualLatKey) ?? state.latitude;
+        longitude = _prefs.getDouble(_manualLngKey) ?? state.longitude;
+      } else {
+        final location = await _getCurrentLocation();
+        latitude = location.latitude;
+        longitude = location.longitude;
+        if (location.city.trim().isNotEmpty) {
+          resolvedCity = location.city.trim();
+        }
+        if (location.timezone.trim().isNotEmpty) {
+          resolvedTimezone = location.timezone.trim();
+        }
+        await _saveAutoLocation(location);
+      }
+
+      await _loadAndSchedule(
+        emit,
+        latitude: latitude,
+        longitude: longitude,
+        cityName: resolvedCity,
+        timezone: resolvedTimezone,
+        cancelOldAlarms: false,
+      );
+    } catch (e, stackTrace) {
+      debugPrint('❌ HOME LOAD FAILED: $e');
+      debugPrint('$stackTrace');
+      emit(state.copyWith(
+        loading: false,
+        scheduling: false,
+        errorMessage: e.toString(),
+      ));
+    }
+  }
+
+  Future<void> _onLocationChanged(
+    HomeLocationChanged event,
+    Emitter<HomeState> emit,
+  ) async {
+    final location = event.location;
+
+    emit(state.copyWith(
+      loading: true,
+      scheduling: false,
+      clearError: true,
+    ));
+
+    try {
+      await _saveAutoLocation(location);
+
+      await _loadAndSchedule(
+        emit,
+        latitude: location.latitude,
+        longitude: location.longitude,
+        cityName: location.city.trim().isEmpty
+            ? state.cityName
+            : location.city.trim(),
+        timezone: location.timezone.trim().isEmpty
+            ? state.timezone
+            : location.timezone.trim(),
+        cancelOldAlarms: true,
+      );
+    } catch (e, stackTrace) {
+      debugPrint('❌ HOME LOCATION CHANGE FAILED: $e');
+      debugPrint('$stackTrace');
+      emit(state.copyWith(
+        loading: false,
+        scheduling: false,
+        errorMessage: e.toString(),
+      ));
+    }
+  }
+
+  Future<void> _loadAndSchedule(
+    Emitter<HomeState> emit, {
+    required double latitude,
+    required double longitude,
+    required String cityName,
+    required String timezone,
+    required bool cancelOldAlarms,
+  }) async {
+    if (cancelOldAlarms) {
+      try {
+        await _scheduler.cancelAdhans();
+        debugPrint('✅ OLD ADHAN ALARMS CANCELLED');
+      } catch (e, stackTrace) {
+        debugPrint('❌ CANCEL OLD ALARMS FAILED: $e');
+        debugPrint('$stackTrace');
+      }
+    }
+
+    final prayerTimes = await _getPrayerTimes(
+      latitude: latitude,
+      longitude: longitude,
+      date: DateTime.now(),
+      timezoneName: timezone,
+
+    );
+
+    emit(state.copyWith(
+      loading: false,
+      scheduling: true,
+      latitude: latitude,
+      longitude: longitude,
+      cityName: cityName,
+      timezone: timezone,
+      prayerTimes: prayerTimes,
+    ));
+
+    try {
+      await _scheduler.showNextPrayerCountdown(prayerTimes);
+      await _scheduler.schedulePrayerAdhan(
+        prayerTimes,
+        latitude: latitude,
+        longitude: longitude,
+      );
+      debugPrint(
+        '✅ ADHAN SCHEDULED | lat=$latitude | lng=$longitude',
+      );
+    } catch (e, stackTrace) {
+      debugPrint('❌ ADHAN SCHEDULING FAILED: $e');
+      debugPrint('$stackTrace');
+    }
+
+    emit(state.copyWith(
+      loading: false,
+      scheduling: false,
+      clearError: true,
+    ));
+  }
+
+  Future<void> _saveAutoLocation(CurrentLocationEntity location) async {
+    await _prefs.setString(_modeKey, _autoMode);
+    await _prefs.setString(_cityKey, location.city);
+    await _prefs.setString(_timezoneKey, location.timezone);
+    await _prefs.setDouble(
+      prayerLastLatitudePrefsKey,
+      location.latitude,
+    );
+    await _prefs.setDouble(
+      prayerLastLongitudePrefsKey,
+      location.longitude,
+    );
+  }
+}

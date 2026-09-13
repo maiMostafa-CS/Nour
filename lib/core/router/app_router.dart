@@ -15,8 +15,11 @@ import '../../features/hijri_calendar/presentation/bloc/hijri_calendar_bloc.dart
 import '../../features/hijri_calendar/presentation/bloc/hijri_calendar_event.dart';
 import '../../features/hijri_calendar/presentation/pages/hijri_calendar_page.dart';
 
+import '../../features/home/presentation/bloc/home_event.dart';
 import '../../features/home/presentation/pages/home_page.dart';
+import '../../features/home/presentation/widget/mainPage.dart';
 import '../../features/iqama_setting/presentation/bloc/iqama_settings_bloc.dart';
+import '../../features/home/presentation/bloc/bloc.dart';
 import '../../features/iqama_setting/presentation/bloc/iqama_settings_event.dart';
 import '../../features/iqama_setting/presentation/pages/iqama_settings_page.dart';
 import '../../features/locations/presentation/bloc/bloc.dart';
@@ -119,9 +122,17 @@ static const iqamaSettings= "/iqamaSettings";
       case home:
       default:
         return MaterialPageRoute(
-          builder: (_) => BlocProvider(
-            create: (_) => getIt<LocationBloc>(),
-            child: const HomePage(),
+          builder: (_) => MultiBlocProvider(
+            providers: [
+              BlocProvider<LocationBloc>(
+                create: (_) => getIt<LocationBloc>(),
+              ),
+              BlocProvider<HomeBloc>(
+                create: (_) => getIt<HomeBloc>()
+                  ..add(const LoadHome()),
+              ),
+            ],
+            child: const MainPage(),
           ),
         );
     }

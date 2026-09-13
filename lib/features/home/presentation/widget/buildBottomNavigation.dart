@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../../../core/router/app_router.dart';
 
 class _NavItem {
   final IconData icon;
@@ -43,112 +42,73 @@ class CustomBottomNavigation extends StatelessWidget {
     ),
     _NavItem(
       color: Color(0xFF176B5B),
-      icon: Icons.mosque_outlined,
-      label: 'الصلاة',
-    ),
-    _NavItem(
-      color: Color(0xFF176B5B),
-      icon: Icons.more_horiz_rounded,
-      label: 'المزيد',
+      icon: Icons.settings,
+      label: 'الإعدادات',
     ),
   ];
 
-  Future<void> _handleTap(
-      BuildContext context,
+  void _handleTap(
       int index,
-      ) async {
-    if (index == 0) {
-      onSelected(0);
-      return;
-    }
-
+      ) {
     onSelected(index);
-
-    switch (index) {
-      case 1:
-        await Navigator.pushNamed(
-          context,
-          AppRouter.quran,
-        );
-        break;
-
-      case 2:
-        await Navigator.pushNamed(
-          context,
-          AppRouter.adhkar,
-        );
-        break;
-
-      case 3:
-        break;
-
-      case 4:
-        break;
-    }
-
-    if (context.mounted) {
-      onSelected(0);
-    }
   }
-
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 72.h,
-      decoration: BoxDecoration(
-        color: const Color(0xFFF8F6F0),
-        border: Border(
-          top: BorderSide(
-            color: Colors.grey.shade200,
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Container(
+        height: 72.h,
+        decoration: BoxDecoration(
+          color: const Color(0xFFF8F6F0),
+          border: Border(
+            top: BorderSide(
+              color: Colors.grey.shade200,
+            ),
           ),
         ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: List.generate(
-          _items.length,
-              (index) {
-            final item = _items[index];
-            final selected = selectedIndex == index;
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: List.generate(
+            _items.length,
+                (index) {
+              final item = _items[index];
+              final selected = selectedIndex == index;
 
-            return GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: () => _handleTap(
-                context,
-                index,
-              ),
-              child: SizedBox(
-                width: 55.w,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      item.icon,
-                      size: 22.sp,
-                      color: selected
-                          ? item.color
-                          : const Color(0xFF777777),
-                    ),
-                    SizedBox(height: 4.h),
-                    Text(
-                      item.label,
-                      style: TextStyle(
-                        fontSize: 9.sp,
-                        fontWeight: selected
-                            ? FontWeight.bold
-                            : FontWeight.normal,
+              return GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () => _handleTap(index),
+                child: SizedBox(
+                  width: 55.w,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        item.icon,
+                        size: 22.sp,
                         color: selected
                             ? item.color
                             : const Color(0xFF777777),
                       ),
-                    ),
-                  ],
+                      SizedBox(height: 4.h),
+                      Text(
+                        item.label,
+                        style: TextStyle(
+                          fontSize: 9.sp,
+                          fontWeight: selected
+                              ? FontWeight.bold
+                              : FontWeight.normal,
+                          color: selected
+                              ? item.color
+                              : const Color(0xFF777777),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         ),
       ),
-    );
-  }
+    );  }
 }
