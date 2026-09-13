@@ -1,66 +1,142 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class CurrentLocationCard extends StatelessWidget {
-  final VoidCallback onTap;
+import '../bloc/bloc.dart';
+import '../bloc/blocEvent.dart';
+import '../bloc/blocState.dart';
+import 'current_location_dialog.dart';
+import 'current_location_helper.dart';
 
-  const CurrentLocationCard({
+class CurrentLocationCard extends StatelessWidget {
+  LocationState state;
+
+  CurrentLocationCard({
     super.key,
-    required this.onTap,
+    required this.state,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Theme.of(context).colorScheme.primaryContainer,
-      borderRadius: BorderRadius.circular(18.r),
+    final isLoading =
+        state.status == LocationStatus.loading;
+
+    final primaryColor =
+        Theme.of(context).colorScheme.primary;
+
+    return Card(
+      elevation: 2,
+      clipBehavior: Clip.antiAlias,
       child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(18.r),
+        onTap: isLoading
+            ? null
+            : () async {
+          final shouldUpdate =
+          await showCurrentLocationDialog(context);
+
+          if (!shouldUpdate) return;
+
+          final ready =
+          await CurrentLocationHelper
+              .checkAndRequestPermission(context);
+
+          if (!ready) return;
+
+          if (!context.mounted) return;
+
+          context.read<LocationBloc>().add(
+            const GetCurrentLocation(),
+          );
+        },
         child: Padding(
-          padding: EdgeInsets.all(18.w),
+          padding: EdgeInsets.all(20.w),
           child: Row(
             children: [
-              CircleAvatar(
-                radius: 24.r,
+              // ICON
+              Container(
+                width: 58.w,
+                height: 58.h,
+                decoration: BoxDecoration(
+                  color: primaryColor.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
                 child: Icon(
                   Icons.my_location,
-                  color: Theme.of(context).colorScheme.primary,
-                  size: 24.sp,
+                  size: 28.sp,
+                  color: primaryColor,
                 ),
               ),
 
-              SizedBox(width: 14.w),
+              SizedBox(width: 16.w),
 
+              // TEXT
               Expanded(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment:
+                  CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Current Location',
+                      'استخدام الموقع الحالي',
                       style: TextStyle(
-                        fontSize: 16.sp,
+                        fontSize: 17.sp,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
 
-                    SizedBox(height: 4.h),
+                    SizedBox(height: 6.h),
 
                     Text(
-                      'Use your device location',
+                      'تحديد موقعك تلقائيًا باستخدام GPS',
                       style: TextStyle(
                         fontSize: 13.sp,
+                        color: Colors.grey.shade600,
                       ),
                     ),
+
+                    if (state.currentLocation != null) ...[
+                      SizedBox(height: 6.h),
+
+                      Text(
+                        '${state.currentLocation!.city}, '
+                            '${state.currentLocation!.country}',
+                        style: TextStyle(
+                          fontSize: 13.sp,
+                          color: primaryColor,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+
+                      SizedBox(height: 3.h),
+
+                      Text(
+                        '${state.currentLocation!.latitude.toStringAsFixed(4)}, '
+                            '${state.currentLocation!.longitude.toStringAsFixed(4)}',
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),
 
-              Icon(
-                Icons.chevron_right,
-                size: 24.sp,
-              ),
+              SizedBox(width: 8.w),
+
+              if (isLoading)
+                SizedBox(
+                  width: 22.w,
+                  height: 22.h,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.w,
+                  ),
+                )
+              else
+                Icon(
+                  Icons.arrow_forward_ios,
+                  size: 17.sp,
+                ),
             ],
           ),
         ),

@@ -24,6 +24,7 @@ import '../../../locations/presentation/bloc/blocEvent.dart';
 import '../../../locations/presentation/bloc/blocState.dart';
 import '../../../locations/presentation/pages/locationPage.dart';
 import '../../../locations/presentation/widgets/current_location_dialog.dart';
+import '../../../locations/presentation/widgets/current_location_helper.dart';
 import '../../../prayer_times/presentation/bloc/prayer_bloc.dart';
 import '../../../prayer_times/presentation/widgets/prayer_times_widget.dart';
 import '../widget/buildBottomNavigation.dart';
@@ -763,7 +764,8 @@ class _HomeScreenState extends State<HomePage> with RouteAware {
     }
   }
 
-  Future<void> _reloadPrayerTimesAndAlarms() async {
+  Future<void> _reloadPrayerTimesAndAlarms()
+  async {
     if (!_locationReady) {
       return;
     }
@@ -908,7 +910,8 @@ class _HomeScreenState extends State<HomePage> with RouteAware {
   Future<void> _onLocationStateChanged(
       BuildContext context,
       LocationState state,
-      ) async {
+      )
+  async {
     if (state.status == LocationStatus.loading) {
       debugPrint('📍 Location loading...');
       return;

@@ -1,5 +1,7 @@
 import '../../../../core/services/prayer_scheduler_split/prayer_scheduler/data/datasources/prayer_notification_local_data_source.dart';
 import '../../domain/repositories/PrayerTimesRepository.dart';
+
+
 class PrayerNotificationRepositoryImpl
     implements PrayerNotificationRepository {
   PrayerNotificationRepositoryImpl({
@@ -8,9 +10,7 @@ class PrayerNotificationRepositoryImpl
 
   final PrayerNotificationLocalDataSource _localDataSource;
 
-  /// عدد الأيام اللي بنحافظ على جدولتها قدام دايماً (rolling window).
-  /// خليها ثابتة هنا عشان كل الـ callers (init, resume, onAlarmFired)
-  /// يستخدموا نفس الرقم من غير ما يكرروه.
+
   static const int _windowDays = 2;
 
   @override

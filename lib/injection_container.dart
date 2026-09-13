@@ -42,7 +42,6 @@ import 'features/locations/domain/usecase/get_cities.dart';
 import 'features/locations/domain/usecase/get_city_by_coordinates.dart';
 import 'features/locations/domain/usecase/get_current_location.dart';
 import 'features/locations/presentation/bloc/bloc.dart';
-import 'features/prayer_times/data/datasources/calculateNext30Days.dart';
 import 'features/prayer_times/data/datasources/prayer_local_data_source.dart';
 import 'features/prayer_times/data/models/SchedulePrayerNotificationsParams.dart';
 import 'features/prayer_times/data/repositories/prayer_repository_impl.dart';

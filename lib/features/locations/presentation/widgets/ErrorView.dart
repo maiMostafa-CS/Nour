@@ -40,7 +40,7 @@ class ErrorView extends StatelessWidget {
             ElevatedButton(
               onPressed: onRetry,
               child: Text(
-                'Retry',
+                'إعادة المحاولة',
                 style: TextStyle(
                   fontSize: 14.sp,
                 ),
