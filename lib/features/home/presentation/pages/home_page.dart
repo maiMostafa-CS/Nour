@@ -8,7 +8,7 @@ import '../../../prayer_times/presentation/widgets/prayer_times_widget.dart';
 import '../bloc/bloc.dart';
 import '../bloc/home_event.dart';
 import '../bloc/home_state.dart';
-import '../widget/buildDateLocation.dart';
+import '../widget/next_prayer_card.dart';
 import '../widget/build_mainGrid.dart';
 import '../widget/current_location_button.dart';
 import '../widget/getCurrentHijriDate.dart';
@@ -113,6 +113,7 @@ class _HomePageState extends State<HomePage> {
                 NextPrayerCard(
                   prayerTimes: prayerTimes,
                   timezoneName: state.timezone,
+                  cityName: state.cityName,
                 ),
                 SizedBox(height: 18.h),
                 _buildSectionTitle('مواقيت الصلاة'),
