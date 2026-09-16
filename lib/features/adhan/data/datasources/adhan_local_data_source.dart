@@ -25,13 +25,13 @@ class AdhanLocalDataSourceImpl implements AdhanLocalDataSource {
     return const [
       AdhanReciterEntity(
         id: 'abdul_majid',
-        name: 'عبد المجيد السريحي',
+        name: 'ياسين عساف',
 
         normalAdhanAssetPath:
-        'assets/adhan-mp3/abdul_majid_al_surehi_1.mp3',
+        'assets/adhan-mp3/Yaseen_Al_Aassaf_1.mp3',
 
         fajrAdhanAssetPath:
-        'assets/adhan-mp3/abdul_majid_al_surehi_fajr.mp3',
+        'assets/adhan-mp3/Yaseen_Al_Aassaf_2.mp3',
       ),
 
       AdhanReciterEntity(
@@ -39,44 +39,44 @@ class AdhanLocalDataSourceImpl implements AdhanLocalDataSource {
         name: 'ياسر الدوسري',
 
         normalAdhanAssetPath:
-        'assets/adhan-mp3/yasser_al_dosari.mp3',
+        'assets/adhan-mp3/yaserAldosery.mp3',
 
         fajrAdhanAssetPath:
-        'assets/adhan-mp3/yasser_al_dosari_fajr.mp3',
+        'assets/adhan-mp3/yaserAldosery2.mp3',
       ),
 
       AdhanReciterEntity(
         id: 'maher_al_muaiqly',
-        name: 'ماهر المعيقلي',
+        name: ' إبراهيم جبر',
 
         normalAdhanAssetPath:
-        'assets/adhan-mp3/maher_al_muaiqly.mp3',
+        'assets/adhan-mp3/Ibraheem_Jabr_Abu_Raheq.mp3',
 
         fajrAdhanAssetPath:
-        'assets/adhan-mp3/maher_al_muaiqly_fajr.mp3',
+        'assets/adhan-mp3/Ibraheem_Jabr_Abu_Raheq.mp3',
       ),
 
       AdhanReciterEntity(
         id: 'mishary_alafasy',
-        name: 'مشاري العفاسي',
+        name: "عبد الباسط ",
 
         normalAdhanAssetPath:
-        'assets/adhan-mp3/mishary_alafasy.mp3',
+        'assets/adhan-mp3/Abdulbasit_Abdusamad_5.mp3',
 
         fajrAdhanAssetPath:
-        'assets/adhan-mp3/mishary_alafasy_fajr.mp3',
+        'assets/adhan-mp3/Abdulbasit_Abdusamad_6_-_Fajr.mp3',
       ),
 
-      AdhanReciterEntity(
-        id: 'nasser_al_qatami',
-        name: 'ناصر القطامي',
-
-        normalAdhanAssetPath:
-        'assets/adhan-mp3/nasser_alqatami.mp3',
-
-        fajrAdhanAssetPath:
-        'assets/adhan-mp3/nasser_alqatami_fajr.mp3',
-      ),
+      // AdhanReciterEntity(
+      //   id: 'nasser_al_qatami',
+      //   name: 'ناصر القطامي',
+      //
+      //   normalAdhanAssetPath:
+      //   'assets/adhan-mp3/nasser_alqatami.mp3',
+      //
+      //   fajrAdhanAssetPath:
+      //   'assets/adhan-mp3/nasser_alqatami_fajr.mp3',
+      // ),
     ];
   }
 

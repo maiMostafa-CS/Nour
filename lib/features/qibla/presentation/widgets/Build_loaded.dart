@@ -7,10 +7,14 @@ import 'package:islamic_app/features/qibla/presentation/widgets/qibla_info_card.
 import '../bloc/bloc_state.dart';
 
 class BuildLoaded extends StatelessWidget {
-  QiblaState state;
-      double? _heading;
+  final QiblaState state;
+  final double? heading;
 
-   BuildLoaded({super.key,required this.state});
+  const BuildLoaded({
+    super.key,
+    required this.state,
+    required this.heading,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +25,6 @@ class BuildLoaded extends StatelessWidget {
       child: Column(
         children: [
           SizedBox(height: 10.h),
-
           Text(
             'وجّه هاتفك نحو القبلة',
             style: TextStyle(
@@ -30,36 +33,25 @@ class BuildLoaded extends StatelessWidget {
               color: const Color(0xFF176B5B),
             ),
           ),
-
           SizedBox(height: 8.h),
-
           Text(
-            'حرّك الهاتف حتى يشير السهم '
-                'إلى اتجاه الكعبة',
+            'حرّك الهاتف حتى يشير السهم إلى اتجاه الكعبة',
             textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 14.sp,
-              color: Colors.grey,
-            ),
+            style: TextStyle(fontSize: 14.sp, color: Colors.grey),
           ),
-
           SizedBox(height: 30.h),
 
           QiblaCompass(
             qiblaDirection: qibla.qiblaDirection,
-            heading: _heading,
+            heading: heading,  // ✅
           ),
 
           SizedBox(height: 25.h),
 
-          if (_heading != null)
+          if (heading != null)
             Text(
-              'اتجاه الهاتف: '
-                  '${_heading!.toStringAsFixed(0)}°',
-              style: TextStyle(
-                fontSize: 14.sp,
-                color: Colors.grey,
-              ),
+              'اتجاه الهاتف: ${heading!.toStringAsFixed(0)}°',
+              style: TextStyle(fontSize: 14.sp, color: Colors.grey),
             ),
 
           SizedBox(height: 20.h),
@@ -71,12 +63,12 @@ class BuildLoaded extends StatelessWidget {
           ),
 
           SizedBox(height: 20.h),
-
           _buildHint(),
         ],
       ),
     );
   }
+}
   Widget _buildHint() {
     return Container(
       padding: EdgeInsets.all(16.w),
@@ -111,4 +103,4 @@ class BuildLoaded extends StatelessWidget {
     );
   }
 
-}
+

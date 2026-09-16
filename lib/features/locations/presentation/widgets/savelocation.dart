@@ -15,60 +15,30 @@ Future<void> saveLocation(
 async {
   final prefs = await SharedPreferences.getInstance();
 
+  // Mode
   await prefs.setString(
     'prayer_location_mode',
     isCurrentLocation ? 'auto' : 'manual',
   );
 
-  if (isCurrentLocation) {
-    await prefs.setDouble(
-      'prayer_current_latitude',
-      latitude,
-    );
+  // 🟢 المفاتيح اللي _onLoadHome بتقرأ منها — استخدم نفس الأسماء بالظبط
+  await prefs.setDouble('prayer_manual_latitude', latitude);
+  await prefs.setDouble('prayer_manual_longitude', longitude);
 
-    await prefs.setDouble(
-      'prayer_current_longitude',
-      longitude,
-    );
-  } else {
-    await prefs.setDouble(
-      'prayer_manual_latitude',
-      latitude,
-    );
+  // 🟢 الموقع المجدول
+  await prefs.setDouble(prayerScheduledLatitudePrefsKey, latitude);
+  await prefs.setDouble(prayerScheduledLongitudePrefsKey, longitude);
 
-    await prefs.setDouble(
-      'prayer_manual_longitude',
-      longitude,
-    );
-  }
+  // 🟢 آخر موقع
+  await prefs.setDouble(prayerLastLatitudePrefsKey, latitude);
+  await prefs.setDouble(prayerLastLongitudePrefsKey, longitude);
 
-  await prefs.setString(
-    'prayer_city_name',
-    city,
-  );
-
-  await prefs.setString(
-    'prayer_country_name',
-    country,
-  );
-
+  // City + Country + Timezone
+  await prefs.setString('prayer_city_name', city);
+  await prefs.setString('prayer_country_name', country);
   if (timezone.isNotEmpty) {
-    await prefs.setString(
-      'prayer_location_timezone',
-      timezone,
-    );
+    await prefs.setString('prayer_location_timezone', timezone);
   }
-
-  // آخر موقع مستخدم فعليًا
-  await prefs.setDouble(
-    prayerLastLatitudePrefsKey,
-    latitude,
-  );
-
-  await prefs.setDouble(
-    prayerLastLongitudePrefsKey,
-    longitude,
-  );
 
   debugPrint(
     '📍 LOCATION SAVED | '

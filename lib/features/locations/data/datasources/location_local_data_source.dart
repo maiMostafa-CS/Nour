@@ -10,7 +10,7 @@ abstract class LocationLocalDataSource {
 
 class LocationLocalDataSourceImpl implements LocationLocalDataSource {
   static const String _jsonPath =
-      'assets/countriesCapitals/countries_capitals_coordinates.json';
+      'assets/countries_capitals/countries_capitals_coordinates.json';
 
   @override
   Future<List<LocationModel>> getLocations() async {

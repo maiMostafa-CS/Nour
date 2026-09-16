@@ -51,8 +51,9 @@ static const iqamaSettings= "/iqamaSettings";
     switch (settings.name) {
       case quran:
         return MaterialPageRoute(
-          builder: (_) => const QuranPage(),
+          builder: (_) => const QuranIndexPage(),
         );
+
 
       case adhkar:
         return MaterialPageRoute(

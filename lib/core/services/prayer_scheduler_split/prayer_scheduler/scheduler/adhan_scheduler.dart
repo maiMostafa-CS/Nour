@@ -11,12 +11,18 @@ class AdhanScheduler {
     required int dayIndex,
     required dynamic moment,
     required String adhanAssetPath,
+    required bool enabled,
   }) async {
     final id = PrayerSchedulerIds.adhan(
       moment.time,
       moment.index,
     );
 
+    if (!enabled) {
+      await Alarm.stop(id);
+      prayerSchedulerLog('🔇 ADHAN DISABLED | id=$id');
+      return false;
+    }
     prayerSchedulerLog(
       '🔊 ADHAN START | '
           'id=$id | '
@@ -67,7 +73,7 @@ class AdhanScheduler {
         volumeSettings: VolumeSettings.fade(
           volume: 1.0,
           fadeDuration: const Duration(seconds: 1),
-          volumeEnforced: true,
+          volumeEnforced: false,
         ),
 
         notificationSettings: NotificationSettings(
@@ -111,6 +117,23 @@ class AdhanScheduler {
       );
 
       return false;
+    }
+  }
+  static Future<void> cancel({
+    required DateTime time,
+    required int prayerIndex,
+  }) async {
+    final id = PrayerSchedulerIds.adhan(time, prayerIndex);
+    await Alarm.stop(id);
+    prayerSchedulerLog('🔇 ADHAN CANCELLED | id=$id');
+  }
+
+  static Future<void> cancelAllAdhans() async {
+    final alarms = await Alarm.getAlarms();
+    for (final a in alarms) {
+      if (a.payload == 'adhan') {
+        await Alarm.stop(a.id);
+      }
     }
   }
 }

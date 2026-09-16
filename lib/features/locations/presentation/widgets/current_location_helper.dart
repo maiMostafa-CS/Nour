@@ -1,36 +1,25 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 
 class CurrentLocationHelper {
   static Future<bool> checkAndRequestPermission(
-      BuildContext context,
-      ) async {
+    BuildContext context,
+  ) async {
     try {
-      final serviceEnabled =
-      await Geolocator.isLocationServiceEnabled();
+// ============================================================
+// 1. PERMISSION
+// ============================================================
 
-      debugPrint(
-        '📍 GPS SERVICE ENABLED = $serviceEnabled',
-      );
-
-      if (!serviceEnabled) {
-        if (!context.mounted) return false;
-
-        await showLocationServiceDialog(context);
-        return false;
-      }
-
-      LocationPermission permission =
-      await Geolocator.checkPermission();
+      LocationPermission permission = await Geolocator.checkPermission();
 
       debugPrint(
         '📍 LOCATION PERMISSION BEFORE = $permission',
       );
 
       if (permission == LocationPermission.denied) {
-        permission =
-        await Geolocator.requestPermission();
+        debugPrint('📍 REQUESTING LOCATION PERMISSION...');
+
+        permission = await Geolocator.requestPermission();
 
         debugPrint(
           '📍 LOCATION PERMISSION AFTER = $permission',
@@ -48,15 +37,58 @@ class CurrentLocationHelper {
         return false;
       }
 
-      if (permission ==
-          LocationPermission.deniedForever) {
+      if (permission == LocationPermission.deniedForever) {
         if (!context.mounted) return false;
 
         await showPermissionSettingsDialog(context);
+
         return false;
       }
 
-      debugPrint('📍 LOCATION READY');
+// ============================================================
+// 2. LOCATION SERVICE / GPS
+// ============================================================
+
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+
+      debugPrint(
+        '📍 GPS SERVICE ENABLED = $serviceEnabled',
+      );
+
+      if (!serviceEnabled) {
+        if (!context.mounted) return false;
+
+        final opened = await showLocationServiceDialog(context);
+
+        if (!opened) {
+          return false;
+        }
+
+// ========================================================
+// 3. المستخدم رجع من Settings
+//    نتحقق مرة أخرى
+// ========================================================
+
+        serviceEnabled = await Geolocator.isLocationServiceEnabled();
+
+        debugPrint(
+          '📍 GPS SERVICE AFTER SETTINGS = '
+          '$serviceEnabled',
+        );
+
+        if (!serviceEnabled) {
+          if (!context.mounted) return false;
+
+          showMessage(
+            context,
+            'يرجى تفعيل الموقع ثم المحاولة مرة أخرى.',
+          );
+
+          return false;
+        }
+      }
+
+      debugPrint('✅ LOCATION READY');
 
       return true;
     } catch (e, stackTrace) {
@@ -78,29 +110,34 @@ class CurrentLocationHelper {
     }
   }
 
-  static Future<void> showLocationServiceDialog(
-      BuildContext context,
-      ) async {
-    await showDialog(
+// ==============================================================
+// LOCATION SERVICE DIALOG
+// ==============================================================
+
+  static Future<bool> showLocationServiceDialog(
+    BuildContext context,
+  ) async {
+    final result = await showDialog<bool>(
       context: context,
+      barrierDismissible: false,
       builder: (dialogContext) {
         return AlertDialog(
           icon: const Icon(Icons.location_off),
           title: const Text('الموقع غير مفعّل'),
           content: const Text(
-            'يرجى تفعيل الموقع/GPS على جهازك '
-                'قبل المتابعة.',
+            'يحتاج التطبيق إلى تفعيل الموقع/GPS '
+            'للحصول على موقعك الحالي.',
           ),
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.pop(dialogContext);
+                Navigator.pop(dialogContext, false);
               },
               child: const Text('إلغاء'),
             ),
             ElevatedButton(
               onPressed: () async {
-                Navigator.pop(dialogContext);
+                Navigator.pop(dialogContext, true);
 
                 await Geolocator.openLocationSettings();
               },
@@ -110,13 +147,20 @@ class CurrentLocationHelper {
         );
       },
     );
+
+    return result == true;
   }
 
+// ==============================================================
+// PERMISSION SETTINGS
+// ==============================================================
+
   static Future<void> showPermissionSettingsDialog(
-      BuildContext context,
-      ) async {
+    BuildContext context,
+  ) async {
     await showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (dialogContext) {
         return AlertDialog(
           icon: const Icon(Icons.location_disabled),
@@ -125,7 +169,7 @@ class CurrentLocationHelper {
           ),
           content: const Text(
             'تم رفض إذن الموقع بشكل دائم. '
-                'يرجى تفعيله من إعدادات التطبيق.',
+            'يرجى تفعيله من إعدادات التطبيق.',
           ),
           actions: [
             TextButton(
@@ -148,10 +192,14 @@ class CurrentLocationHelper {
     );
   }
 
+// ==============================================================
+// MESSAGE
+// ==============================================================
+
   static void showMessage(
-      BuildContext context,
-      String message,
-      ) {
+    BuildContext context,
+    String message,
+  ) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),

@@ -110,6 +110,7 @@ state: state,);
       case QiblaStatus.loaded:
         return BuildLoaded(
          state: state,
+          heading: _heading,
         );
     }
   }

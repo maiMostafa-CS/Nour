@@ -11,48 +11,21 @@ class IqamaScheduler {
     required int dayIndex,
     required dynamic moment,
     required int iqamaMinutes,
+    Duration autoStopAfter = const Duration(seconds: 30),   // ← جديد
   }) async {
-    final id = PrayerSchedulerIds.iqama(
-      moment.time,
-      moment.index,
-    );
+    final id = PrayerSchedulerIds.iqama(moment.time, moment.index);
 
-    // ==========================================================
-    // IQAMA TIME
-    // ==========================================================
-
-    final iqamaTime = moment.time.add(
-      Duration(
-        minutes: iqamaMinutes,
-      ),
-    );
+    final iqamaTime = moment.time.add(Duration(minutes: iqamaMinutes));
 
     prayerSchedulerLog(
-      '🕋 IQAMA START | '
-          'id=$id | '
-          'prayer=${moment.name} | '
-          'delay=${iqamaMinutes}min | '
-          'prayerTime=${moment.time} | '
-          'iqamaTime=$iqamaTime',
+      '🕋 IQAMA START | id=$id | prayer=${moment.name} | '
+          'delay=${iqamaMinutes}min | iqamaTime=$iqamaTime',
     );
 
-    // ==========================================================
-    // CHECK FUTURE
-    // ==========================================================
-
     if (!iqamaTime.isAfter(DateTime.now())) {
-      prayerSchedulerLog(
-        '⏭️ IQAMA SKIPPED | '
-            'prayer=${moment.name} | '
-            'iqamaTime=$iqamaTime',
-      );
-
+      prayerSchedulerLog('⏭️ IQAMA SKIPPED | prayer=${moment.name}');
       return;
     }
-
-    // ==========================================================
-    // ALARM SETTINGS
-    // ==========================================================
 
     final alarmSettings = AlarmSettings(
       id: id,
@@ -66,7 +39,7 @@ class IqamaScheduler {
       volumeSettings: VolumeSettings.fade(
         volume: 1.0,
         fadeDuration: const Duration(seconds: 1),
-        volumeEnforced: true,
+        volumeEnforced: false,
       ),
       notificationSettings: NotificationSettings(
         title: 'حان الآن وقت الإقامة',
@@ -78,20 +51,8 @@ class IqamaScheduler {
       payload: 'iqama',
     );
 
-    // ==========================================================
-    // SET ALARM
-    // ==========================================================
+    await Alarm.set(alarmSettings: alarmSettings);
 
-    await Alarm.set(
-      alarmSettings: alarmSettings,
-    );
-
-    prayerSchedulerLog(
-      '✅ IQAMA Alarm.set SUCCESS | '
-          'id=$id | '
-          'prayer=${moment.name} | '
-          'delay=${iqamaMinutes}min | '
-          'time=$iqamaTime',
-    );
+    prayerSchedulerLog('✅ IQAMA Alarm.set SUCCESS | id=$id');
   }
 }

@@ -17,14 +17,6 @@ class AdhanSettingsEntity extends Equatable {
     required this.isha,
   });
 
-  /// Default settings:
-  ///
-  /// Fajr      ON
-  /// Sunrise   OFF
-  /// Dhuhr     ON
-  /// Asr       ON
-  /// Maghrib   ON
-  /// Isha      ON
   factory AdhanSettingsEntity.defaults() {
     return const AdhanSettingsEntity(
       fajr: true,
@@ -36,14 +28,6 @@ class AdhanSettingsEntity extends Equatable {
     );
   }
 
-  /// Returns whether adhan is enabled for a prayer index.
-  ///
-  /// 0 = Fajr
-  /// 1 = Sunrise
-  /// 2 = Dhuhr
-  /// 3 = Asr
-  /// 4 = Maghrib
-  /// 5 = Isha
   bool isEnabled(int index) {
     switch (index) {
       case 0:
@@ -78,6 +62,29 @@ class AdhanSettingsEntity extends Equatable {
       asr: asr ?? this.asr,
       maghrib: maghrib ?? this.maghrib,
       isha: isha ?? this.isha,
+    );
+  }
+
+  /// Helper: يرجع نسخة جديدة مع تغيير صلاة واحدة فقط
+  AdhanSettingsEntity toggle(int index, bool enabled) {
+    final values = <bool>[
+      fajr,
+      sunrise,
+      dhuhr,
+      asr,
+      maghrib,
+      isha,
+    ];
+
+    values[index] = enabled;
+
+    return copyWith(
+      fajr: values[0],
+      sunrise: values[1],
+      dhuhr: values[2],
+      asr: values[3],
+      maghrib: values[4],
+      isha: values[5],
     );
   }
 

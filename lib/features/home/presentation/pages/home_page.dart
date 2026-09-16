@@ -1,7 +1,9 @@
+import 'package:alarm/alarm.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart' as widgets;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../../../core/services/prayer_scheduler_split/prayer_scheduler/scheduler/adhan_scheduler.dart';
 import '../../../locations/presentation/bloc/bloc.dart';
 import '../../../locations/presentation/bloc/blocState.dart';
 import '../../../prayer_times/presentation/widgets/prayer_times_widget.dart';
@@ -22,7 +24,12 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int selectedNavIndex = 0;
-
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return BlocListener<LocationBloc, LocationState>(
@@ -110,6 +117,25 @@ class _HomePageState extends State<HomePage> {
               children: [
                 _buildTopBar(context, state),
                 SizedBox(height: 5.h),
+                // ElevatedButton(
+                //   onPressed: () async {
+                //     final alarms = await Alarm.getAlarms();
+                //
+                //     debugPrint('════════════════════════════════════');
+                //     debugPrint('📋 ALL ALARMS (${alarms.length})');
+                //     debugPrint('════════════════════════════════════');
+                //
+                //     for (final alarm in alarms) {
+                //       if (alarm.payload == 'adhan') {
+                //         debugPrint('🕌 ADHAN');
+                //         debugPrint('   id=${alarm.id}');
+                //         debugPrint('   time=${alarm.dateTime}');
+                //         debugPrint('   🎙️ asset=${alarm.assetAudioPath}');  // ← المهم
+                //       }
+                //     }
+                //   },
+                //   child: const Text('Print Adhan Alarms'),
+                // ),
                 NextPrayerCard(
                   prayerTimes: prayerTimes,
                   timezoneName: state.timezone,
@@ -135,21 +161,18 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildTopBar(BuildContext context, HomeState state) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         const CurrentLocationButton(),
-        Flexible(
-                    child: Text(
-                      state.cityName,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w600,
-                        color: const Color(0xFF222222),
-                      ),
-                    ),
-                  ),
+        Text(
+          state.cityName,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            fontSize: 14.sp,
+            fontWeight: FontWeight.w600,
+            color: const Color(0xFF222222),
+          ),
+        ),
       ],);
   }
   Widget _buildSectionTitle(String title) {

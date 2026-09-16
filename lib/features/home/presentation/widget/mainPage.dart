@@ -18,7 +18,7 @@ class _MainPageState extends State<MainPage> {
 
   late final List<Widget> pages = [
     const HomePage(),
-    const QuranPage(),
+    const QuranIndexPage(),
     const AdhkarPage(),
     const PrayerSettingsPage(),
   ];

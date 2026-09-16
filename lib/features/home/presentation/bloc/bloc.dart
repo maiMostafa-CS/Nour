@@ -23,6 +23,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         super(const HomeState()) {
     on<LoadHome>(_onLoadHome);
     on<HomeLocationChanged>(_onLocationChanged);
+    on<RefreshLocation>(_onRefreshLocation);
+
   }
 
   final SharedPreferences _prefs;
@@ -38,38 +40,111 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   static const _manualLatKey = 'prayer_manual_latitude';
   static const _manualLngKey = 'prayer_manual_longitude';
 
+
   Future<void> _onLoadHome(
-    LoadHome event,
-    Emitter<HomeState> emit,
-  ) async {
+      LoadHome event,
+      Emitter<HomeState> emit,
+      )
+  async {
+    debugPrint('═══════════════════════════════════════════');
+    debugPrint('🏠 _onLoadHome CALLED');
+    debugPrint('═══════════════════════════════════════════');
+
     emit(state.copyWith(loading: true, clearError: true));
 
     try {
+      // ═══════════════════════════════════════════════════════
+      // 1. اقرأ كل القيم المحفوظة
+      // ═══════════════════════════════════════════════════════
       final city = _prefs.getString(_cityKey) ?? state.cityName;
-      final timezone =
-          _prefs.getString(_timezoneKey) ?? state.timezone;
+      final timezone = _prefs.getString(_timezoneKey) ?? state.timezone;
       final mode = _prefs.getString(_modeKey) ?? _autoMode;
+
+      debugPrint('📖 READ FROM SHARED PREFERENCES:');
+      debugPrint('   mode: $mode');
+      debugPrint('   city: "$city"');
+      debugPrint('   timezone: $timezone');
+      debugPrint('   _manualLatKey: ${_prefs.getDouble(_manualLatKey)}');
+      debugPrint('   _manualLngKey: ${_prefs.getDouble(_manualLngKey)}');
+      debugPrint('   prayerLastLat: ${_prefs.getDouble(prayerLastLatitudePrefsKey)}');
+      debugPrint('   prayerLastLng: ${_prefs.getDouble(prayerLastLongitudePrefsKey)}');
+      debugPrint('───────────────────────────────────────────');
 
       double latitude;
       double longitude;
       String resolvedCity = city;
       String resolvedTimezone = timezone;
 
-      if (mode == _manualMode) {
-        latitude = _prefs.getDouble(_manualLatKey) ?? state.latitude;
-        longitude = _prefs.getDouble(_manualLngKey) ?? state.longitude;
+      // ═══════════════════════════════════════════════════════
+      // 2. جرّب الموقع المحفوظ الأول (سواء manual أو auto)
+      // ═══════════════════════════════════════════════════════
+      final savedLat = _prefs.getDouble(_manualLatKey) ??
+          _prefs.getDouble(prayerLastLatitudePrefsKey);
+      final savedLng = _prefs.getDouble(_manualLngKey) ??
+          _prefs.getDouble(prayerLastLongitudePrefsKey);
+
+      if (savedLat != null && savedLng != null) {
+        // ✅ فيه موقع محفوظ → استخدمه فوراً
+        latitude = savedLat;
+        longitude = savedLng;
+
+        debugPrint('✅ USING SAVED LOCATION:');
+        debugPrint('   latitude:  $latitude');
+        debugPrint('   longitude: $longitude');
+        debugPrint('   city:      "$resolvedCity"');
+        debugPrint('   timezone:  "$resolvedTimezone"');
+        debugPrint('   (NO GPS NEEDED)');
       } else {
-        final location = await _getCurrentLocation();
-        latitude = location.latitude;
-        longitude = location.longitude;
-        if (location.city.trim().isNotEmpty) {
-          resolvedCity = location.city.trim();
+        // ⚠️ أول مرة → محتاج GPS
+        debugPrint('📡 NO SAVED LOCATION → fetching GPS...');
+
+        CurrentLocationEntity location;
+        try {
+          location = await _getCurrentLocation().timeout(
+            const Duration(seconds: 15),
+            onTimeout: () {
+              debugPrint('⏰ GPS TIMEOUT!');
+              throw Exception('Location timeout');
+            },
+          );
+
+          debugPrint('📍 GPS LOCATION RECEIVED:');
+          debugPrint('   latitude:  ${location.latitude}');
+          debugPrint('   longitude: ${location.longitude}');
+          debugPrint('   city:      "${location.city}"');
+          debugPrint('   timezone:  "${location.timezone}"');
+
+          latitude = location.latitude;
+          longitude = location.longitude;
+
+          if (location.city.trim().isNotEmpty) {
+            resolvedCity = location.city.trim();
+          }
+          if (location.timezone.trim().isNotEmpty) {
+            resolvedTimezone = location.timezone.trim();
+          }
+
+          await _saveAutoLocation(location);
+        } catch (e, stackTrace) {
+          debugPrint('❌ GPS FAILED: $e');
+          debugPrint('$stackTrace');
+
+          // Fallback للـ default
+          latitude = state.latitude;
+          longitude = state.longitude;
+
+          debugPrint('⚠️ Using DEFAULT location: $latitude, $longitude');
         }
-        if (location.timezone.trim().isNotEmpty) {
-          resolvedTimezone = location.timezone.trim();
-        }
-        await _saveAutoLocation(location);
       }
+
+      // ═══════════════════════════════════════════════════════
+      // 3. جدول الأذان
+      // ═══════════════════════════════════════════════════════
+      debugPrint('🚀 CALLING _loadAndSchedule:');
+      debugPrint('   latitude:  $latitude');
+      debugPrint('   longitude: $longitude');
+      debugPrint('   cityName:  "$resolvedCity"');
+      debugPrint('   timezone:  "$resolvedTimezone"');
 
       await _loadAndSchedule(
         emit,
@@ -79,6 +154,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         timezone: resolvedTimezone,
         cancelOldAlarms: false,
       );
+
+      debugPrint('✅ _onLoadHome COMPLETED');
     } catch (e, stackTrace) {
       debugPrint('❌ HOME LOAD FAILED: $e');
       debugPrint('$stackTrace');
@@ -146,7 +223,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       }
     }
 
-    // ✅ التعديل: احسب التاريخ بتوقيت المكان المختار
     tz.Location location;
     try {
       location = tz.getLocation(timezone);
@@ -160,13 +236,13 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       nowInLocation.year,
       nowInLocation.month,
       nowInLocation.day,
-      12, 0, 0,   // منتصف النهار عشان نتجنب مشاكل حدود اليوم
+      12, 0, 0,
     );
 
     final prayerTimes = await _getPrayerTimes(
       latitude: latitude,
       longitude: longitude,
-      date: dateInLocation,   // ← بدل DateTime.now()
+      date: dateInLocation,
     );
 
     emit(state.copyWith(
@@ -201,16 +277,94 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     ));
   }
   Future<void> _saveAutoLocation(CurrentLocationEntity location) async {
+    debugPrint('💾 _saveAutoLocation CALLED');
+    debugPrint('   → city:     "${location.city}"');
+    debugPrint('   → timezone: "${location.timezone}"');
+    debugPrint('   → latitude: ${location.latitude}');
+    debugPrint('   → longitude: ${location.longitude}');
+
     await _prefs.setString(_modeKey, _autoMode);
     await _prefs.setString(_cityKey, location.city);
     await _prefs.setString(_timezoneKey, location.timezone);
-    await _prefs.setDouble(
-      prayerLastLatitudePrefsKey,
-      location.latitude,
-    );
-    await _prefs.setDouble(
-      prayerLastLongitudePrefsKey,
-      location.longitude,
-    );
+
+    await _prefs.setDouble(_manualLatKey, location.latitude);
+    await _prefs.setDouble(_manualLngKey, location.longitude);
+
+    // ✅ المفتاح اللي cancelAll بتقرأ منه
+    await _prefs.setDouble(prayerScheduledLatitudePrefsKey, location.latitude);
+    await _prefs.setDouble(prayerScheduledLongitudePrefsKey, location.longitude);
+
+    // (اختياري) سيبهم لو محتاجينهم في مكان تاني
+    await _prefs.setDouble(prayerLastLatitudePrefsKey, location.latitude);
+    await _prefs.setDouble(prayerLastLongitudePrefsKey, location.longitude);
+
+    // ✅ VERIFY من نفس المفاتيح
+    final checkLat = _prefs.getDouble(prayerScheduledLatitudePrefsKey);
+    final checkLng = _prefs.getDouble(prayerScheduledLongitudePrefsKey);
+
+    if (checkLat == null || checkLng == null) {
+      throw StateError(
+        '🔴 CRITICAL: Location NOT persisted! '
+            'lat=$checkLat lng=$checkLng',
+      );
+    }
+
+    debugPrint('✅ VERIFY:');
+    debugPrint('   scheduledLat: $checkLat');
+    debugPrint('   scheduledLng: $checkLng');
   }
+
+  Future<void> _onRefreshLocation(
+      RefreshLocation event,
+      Emitter<HomeState> emit,
+      ) async {
+    debugPrint('🔄 REFRESH LOCATION → fetching GPS...');
+
+    emit(state.copyWith(
+      loading: true,
+      scheduling: false,
+      clearError: true,
+    ));
+
+    try {
+      final location = await _getCurrentLocation().timeout(
+        const Duration(seconds: 15),
+        onTimeout: () => throw Exception('Location timeout'),
+      );
+
+      debugPrint('📍 GPS LOCATION RECEIVED:');
+      debugPrint('   latitude:  ${location.latitude}');
+      debugPrint('   longitude: ${location.longitude}');
+      debugPrint('   city:      "${location.city}"');
+      debugPrint('   timezone:  "${location.timezone}"');
+
+      // احفظ الموقع الجديد
+      await _saveAutoLocation(location);
+
+      // جدول الأذان من جديد
+      await _loadAndSchedule(
+        emit,
+        latitude: location.latitude,
+        longitude: location.longitude,
+        cityName: location.city.trim().isEmpty
+            ? state.cityName
+            : location.city.trim(),
+        timezone: location.timezone.trim().isEmpty
+            ? state.timezone
+            : location.timezone.trim(),
+        cancelOldAlarms: true,
+      );
+
+      debugPrint('✅ REFRESH LOCATION DONE');
+    } catch (e, stackTrace) {
+      debugPrint('❌ REFRESH LOCATION FAILED: $e');
+      debugPrint('$stackTrace');
+      emit(state.copyWith(
+        loading: false,
+        scheduling: false,
+        errorMessage: e.toString(),
+      ));
+    }
+  }
+
 }

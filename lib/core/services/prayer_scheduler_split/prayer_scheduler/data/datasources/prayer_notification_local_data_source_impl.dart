@@ -95,7 +95,8 @@ class PrayerNotificationLocalDataSourceImpl
     required double latitude,
     required double longitude,
     required int days,
-  }) async {
+  })
+  async {
     prayerSchedulerLog(
       '════════════════════════════════════',
     );
@@ -229,6 +230,7 @@ class PrayerNotificationLocalDataSourceImpl
               dayIndex: dayIndex,
               moment: moment,
               adhanAssetPath: adhanAssetPath,
+              enabled: adhanSettings.isEnabled(moment.index),
             );
 
             if (adhanScheduled) {
@@ -689,70 +691,47 @@ class PrayerNotificationLocalDataSourceImpl
 
     for (final day in schedule) {
       for (final moment in day.toMoments()) {
-        // ======================================================
-        // ADHAN DISABLED
-        // ======================================================
-
+        // 🟢 yield قبل أي continue
         if (!adhanSettings.isEnabled(moment.index)) {
           prayerSchedulerLog(
             '⏭️ Skip disabled Adhan check | '
                 'prayer=${moment.name} | '
                 'index=${moment.index}',
           );
-
+          await Future.delayed(Duration.zero);   // ← ضيف ده
           continue;
         }
-
-        // ======================================================
-        // PRAYER ALREADY PASSED
-        // ======================================================
 
         if (!moment.time.isAfter(now)) {
+          await Future.delayed(Duration.zero);   // ← ضيف ده
           continue;
         }
 
-        // ======================================================
-        // GET ADHAN ALARM ID
-        // ======================================================
+        final id = PrayerSchedulerIds.adhan(moment.time, moment.index);
 
-        final id = PrayerSchedulerIds.adhan(
-          moment.time,
-          moment.index,
-        );
+        // 🟢 ده أهم سطر — نداء platform
+        final alarm = await Alarm.getAlarm(id);
 
-        final alarm =
-        await Alarm.getAlarm(id);
-
-        // ======================================================
-        // ALARM MISSING
-        // ======================================================
+        // 🟢 yield بعد كل نداء platform
+        await Future.delayed(Duration.zero);   // ← ضيف ده
 
         if (alarm == null) {
           prayerSchedulerLog(
             '❌ Missing future Adhan alarm | '
-                'id=$id | '
-                'prayer=${moment.name} | '
-                'time=${moment.time}',
+                'id=$id | prayer=${moment.name} | time=${moment.time}',
           );
-
           return false;
         }
-
-        // ======================================================
-        // ALARM IS NOT FUTURE
-        // ======================================================
 
         if (!alarm.dateTime.isAfter(now)) {
           prayerSchedulerLog(
             '❌ Adhan alarm is not future | '
-                'id=$id | '
-                'alarmTime=${alarm.dateTime}',
+                'id=$id | alarmTime=${alarm.dateTime}',
           );
-
+          await Future.delayed(Duration.zero);
           return false;
         }
-      }
-    }
+      }    }
 
     prayerSchedulerLog(
       '✅ All ENABLED future Adhan alarms are scheduled',
@@ -790,12 +769,26 @@ class PrayerNotificationLocalDataSourceImpl
   // FORCE RESCHEDULE
   // ============================================================
 
+// 🟢 ضيف ده فوق الدالة (مع باقي الـ fields)
+  bool _isRescheduling = false;
+
   @override
   Future<void> forceReschedule({
     required double latitude,
     required double longitude,
     required int days,
-  }) async {
+  })
+  async {
+    // 🟢 حماية من التنفيذ المتزامن
+    if (_isRescheduling) {
+      prayerSchedulerLog(
+        '⚠️ FORCE RESCHEDULE already running → SKIP',
+      );
+      return;
+    }
+
+    _isRescheduling = true;
+
     prayerSchedulerLog(
       '🚨 FORCE RESCHEDULE START',
     );
@@ -842,20 +835,17 @@ class PrayerNotificationLocalDataSourceImpl
       );
 
       rethrow;
+    } finally {
+      _isRescheduling = false;
     }
   }
-
-  // ============================================================
-  // CANCEL ALL
-  // ============================================================
-
-  @override
 // ============================================================
 // CANCEL ALL
 // ============================================================
 
   @override
-  Future<void> cancelAll() async {
+  Future<void> cancelAll()
+  async {
     prayerSchedulerLog(
       '🛑 START cancelAll()',
     );
@@ -888,6 +878,36 @@ class PrayerNotificationLocalDataSourceImpl
     previousDays.clamp(1, 60);
 
     var cancelled = 0;
+
+    // ==========================================================
+    // 🔥 SAFETY NET: CANCEL ALL ALARMS VIA Alarm.getAlarms()
+    // Works even if prefs are lost/corrupted
+    // ==========================================================
+
+    try {
+      final allAlarms = await Alarm.getAlarms();
+      var safetyNetCancelled = 0;
+
+      for (final alarm in allAlarms) {
+        if (alarm.payload == 'adhan' ||
+            alarm.payload == 'iqama' ||
+            alarm.payload == 'reminder') {
+          await Alarm.stop(alarm.id);
+          safetyNetCancelled++;
+        }
+      }
+
+      prayerSchedulerLog(
+        '🔇 [Safety net] Cancelled $safetyNetCancelled alarms '
+            'via getAlarms() (total=${allAlarms.length})',
+      );
+    } catch (e) {
+      prayerSchedulerLog('⚠️ Safety net cancel error: $e');
+    }
+
+    // ==========================================================
+    // GET SCHEDULED LOCATION
+    // ==========================================================
 
     // ==========================================================
     // GET SCHEDULED LOCATION
@@ -1059,16 +1079,26 @@ class PrayerNotificationLocalDataSourceImpl
       prayerNotificationWindowPrefsKey,
     );
 
-    await prefs.remove(
-      prayerScheduledLatitudePrefsKey,
-    );
-
-    await prefs.remove(
-      prayerScheduledLongitudePrefsKey,
-    );
+    // await prefs.remove(
+    //   prayerScheduledLatitudePrefsKey,
+    // );
+    //
+    // await prefs.remove(
+    //   prayerScheduledLongitudePrefsKey,
+    // );
 
     prayerSchedulerLog(
       '✅ cancelAll() completed | '
           'cancelled=$cancelled',
     );
-  }}
+  }
+
+  Future<(double, double)?> getScheduledLocation() async {
+    final prefs = await SharedPreferences.getInstance();
+    final lat = prefs.getDouble(prayerScheduledLatitudePrefsKey);
+    final lng = prefs.getDouble(prayerScheduledLongitudePrefsKey);
+    if (lat == null || lng == null) return null;
+    return (lat, lng);
+  }
+
+}

@@ -1,3 +1,5 @@
+import 'package:flutter/cupertino.dart';
+
 import '../entity/current_location_entity.dart';
 import '../repositories/current_location_repository.dart';
 
@@ -9,6 +11,17 @@ class GetCurrentLocationUseCase {
   });
 
   Future<CurrentLocationEntity> call() async {
-    return repository.getCurrentLocation();
+    debugPrint('🎯 [GetCurrentLocationUseCase] START');
+try{
+ final   result=await repository.getCurrentLocation();
+ debugPrint('🎯 [GetCurrentLocationUseCase] SUCCESS: $result');
+
+ return result;
+}
+catch (e, st) {
+  debugPrint('🎯 [GetCurrentLocationUseCase] ERROR: $e');
+  debugPrint('$st');
+  rethrow;
+}
   }
 }

@@ -18,6 +18,7 @@
 // //       moment.time,
 // //       moment.index,
 // //     );
+// //     );
 // //
 // //     final reminderTime =
 // //         moment.time.subtract(const Duration(minutes: 5));
@@ -42,7 +43,7 @@
 // //       volumeSettings: VolumeSettings.fade(
 // //         volume: 1.0,
 // //         fadeDuration: const Duration(seconds: 1),
-// //         volumeEnforced: true,
+// //         volumeEnforced: false,
 // //       ),
 // //       notificationSettings: NotificationSettings(
 // //         title: 'اقترب موعد صلاة ${moment.name}',

@@ -60,17 +60,21 @@ import 'features/qibla/domain/repositories/qibla_repository.dart';
 import 'features/qibla/domain/usecases/get_qibla_direction.dart';
 import 'features/qibla/presentation/bloc/bloc.dart';
 
-import 'features/quran/data/datasources/quran_local_data_source.dart';
-import 'features/quran/data/repositories/quran_repository_impl.dart';
-import 'features/quran/domain/repositories/quran_repository.dart';
-import 'features/quran/domain/usecases/get_surahs.dart';
-import 'features/quran/presentation/bloc/quran_bloc.dart';
+
 
 import 'features/adhkar/data/datasources/adhkar_local_data_source.dart';
 import 'features/adhkar/data/repositories/adhkar_repository_impl.dart';
 import 'features/adhkar/domain/repositories/adhkar_repository.dart';
 import 'features/adhkar/domain/usecases/get_adhkar.dart';
 import 'features/adhkar/presentation/bloc/adhkar_bloc.dart';
+import 'features/quran/data/datasources/quran_local_data_source.dart';
+import 'features/quran/data/repositories/quran_repository_impl.dart';
+import 'features/quran/domain/repositories/quran_repository.dart';
+import 'features/quran/domain/usecases/get_page.dart';
+import 'features/quran/domain/usecases/get_surahs.dart';
+import 'features/quran/presentation/bloc/quran_bloc.dart';
+
+
 
 
 final sl = GetIt.instance;
@@ -98,27 +102,6 @@ Future<void> configureDependencies() async {
 
   sl.registerFactory<PrayerBloc>(
         () => PrayerBloc(sl()),
-  );
-
-
-  // ============================================================
-  // Quran
-  // ============================================================
-
-  sl.registerLazySingleton<QuranLocalDataSource>(
-        () => QuranLocalDataSourceImpl(),
-  );
-
-  sl.registerLazySingleton<QuranRepository>(
-        () => QuranRepositoryImpl(sl()),
-  );
-
-  sl.registerLazySingleton<GetSurahs>(
-        () => GetSurahs(sl()),
-  );
-
-  sl.registerFactory<QuranBloc>(
-        () => QuranBloc(sl()),
   );
 
 
@@ -203,7 +186,7 @@ Future<void> configureDependencies() async {
   // Prayer Notifications (30-day background adhan scheduling)
   // ============================================================
 
-  sl.registerLazySingleton<PrayerNotificationLocalDataSource>(
+  sl.registerLazySingleton<PrayerNotificationLocalDataSourceImpl>(
         () => PrayerNotificationLocalDataSourceImpl(
       prayerCalculator: sl<PrayerLocalDataSource>(),
       adhanSettingsRepository: sl<AdhanSettingsRepository>(),
@@ -362,6 +345,7 @@ Future<void> configureDependencies() async {
       getAdhans: sl<GetAdhans>(),
       getSelectedAdhan: sl<GetSelectedAdhan>(),
       saveSelectedAdhan: sl<SaveSelectedAdhan>(),
+      prayerScheduler: sl<PrayerNotificationLocalDataSourceImpl>(),
     ),
   );
 // Data Source
@@ -379,16 +363,13 @@ Future<void> configureDependencies() async {
   );
 
 // UseCases
+
   sl.registerLazySingleton<GetAdhanSettings>(
-        () => GetAdhanSettings(
-      repository: sl<AdhanSettingsRepository>(),
-    ),
+        () => GetAdhanSettings(repository: sl<AdhanSettingsRepository>()),
   );
 
   sl.registerLazySingleton<UpdateAdhanSetting>(
-        () => UpdateAdhanSetting(
-      repository: sl<AdhanSettingsRepository>(),
-    ),
+        () => UpdateAdhanSetting(repository: sl<AdhanSettingsRepository>()),
   );
 
 // Bloc
@@ -396,6 +377,7 @@ Future<void> configureDependencies() async {
         () => AdhanSettingsBloc(
       getAdhanSettings: sl<GetAdhanSettings>(),
       updateAdhanSetting: sl<UpdateAdhanSetting>(),
+      prayerScheduler: sl<PrayerNotificationLocalDataSourceImpl>(),
     ),
   );
   sl.registerLazySingleton<IqamaSettingsLocalDataSource>(
@@ -444,6 +426,45 @@ Future<void> configureDependencies() async {
       getCurrentLocation: sl<GetCurrentLocationUseCase>(),
       getPrayerTimes: sl<GetPrayerTimes>(),
       scheduler: sl<AdhanSchedulerService>(),
+    ),
+  );
+
+
+  // Bloc
+// ============================================================
+// QURAN
+// ============================================================
+
+// DataSource
+  sl.registerLazySingleton<QuranPagesDataSource>(
+        () => QuranPagesDataSourceImpl(),
+  );
+
+// Repository
+  sl.registerLazySingleton<QuranRepository>(
+        () => QuranRepositoryImpl(
+      sl<QuranPagesDataSource>(),
+    ),
+  );
+
+// UseCases
+  sl.registerLazySingleton<GetSurahs>(
+        () => GetSurahs(
+      sl<QuranRepository>(),
+    ),
+  );
+
+  sl.registerLazySingleton<GetPage>(
+        () => GetPage(
+      sl<QuranRepository>(),
+    ),
+  );
+
+// Bloc
+  sl.registerFactory<QuranBloc>(
+        () => QuranBloc(
+      getSurahs: sl<GetSurahs>(),
+      getPage: sl<GetPage>(),
     ),
   );
 

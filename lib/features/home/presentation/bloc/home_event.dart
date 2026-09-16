@@ -21,3 +21,6 @@ class HomeLocationChanged extends HomeEvent {
   @override
   List<Object?> get props => [location];
 }
+class RefreshLocation extends HomeEvent {
+  const RefreshLocation();
+}

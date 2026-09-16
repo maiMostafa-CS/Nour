@@ -1,6 +1,10 @@
+import 'dart:async';   // ← ضيف ده عشان unawaited
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/services/prayer_scheduler_split/prayer_scheduler/data/datasources/prayer_notification_local_data_source_impl.dart';
+import '../../domain/entities/adhan_settings_entity.dart';
 import '../../domain/usecases/get_adhan_settings.dart';
 import '../../domain/usecases/update_adhan_setting.dart';
 import 'adhan_settings_event.dart';
@@ -10,10 +14,16 @@ class AdhanSettingsBloc
     extends Bloc<AdhanSettingsEvent, AdhanSettingsState> {
   final GetAdhanSettings getAdhanSettings;
   final UpdateAdhanSetting updateAdhanSetting;
+  final PrayerNotificationLocalDataSourceImpl prayerScheduler;
+
+  /// منع تعارض العمليات اللي في الخلفية
+  /// لو المستخدم ضغط بسرعة على أكتر من صلاة، بنستنى اللي قبلها
+  Future<void>? _pendingReschedule;
 
   AdhanSettingsBloc({
     required this.getAdhanSettings,
     required this.updateAdhanSetting,
+    required this.prayerScheduler,
   }) : super(const AdhanSettingsState()) {
     on<LoadAdhanSettings>(_onLoadAdhanSettings);
     on<ToggleAdhanSetting>(_onToggleAdhanSetting);
@@ -27,44 +37,31 @@ class AdhanSettingsBloc
     debugPrint('📥 [AdhanSettingsBloc] LOAD SETTINGS');
     debugPrint('════════════════════════════════════');
 
-    emit(
-      state.copyWith(
-        status: AdhanSettingsStatus.loading,
-        clearError: true,
-      ),
-    );
+    emit(state.copyWith(
+      status: AdhanSettingsStatus.loading,
+      clearError: true,
+    ));
 
     try {
       final settings = await getAdhanSettings();
 
-      debugPrint('📦 [AdhanSettingsBloc] Settings loaded:');
-      debugPrint('   Fajr    = ${settings.fajr}');
-      debugPrint('   Sunrise = ${settings.sunrise}');
-      debugPrint('   Dhuhr   = ${settings.dhuhr}');
-      debugPrint('   Asr     = ${settings.asr}');
-      debugPrint('   Maghrib = ${settings.maghrib}');
-      debugPrint('   Isha    = ${settings.isha}');
-
-      emit(
-        state.copyWith(
-          status: AdhanSettingsStatus.loaded,
-          settings: settings,
-          clearError: true,
-        ),
-      );
+      emit(state.copyWith(
+        status: AdhanSettingsStatus.loaded,
+        settings: settings,
+        clearError: true,
+      ));
     } catch (e, stackTrace) {
-      debugPrint('❌ [AdhanSettingsBloc] LOAD ERROR');
-      debugPrint('Error: $e');
-      debugPrint('StackTrace: $stackTrace');
-
-      emit(
-        state.copyWith(
-          status: AdhanSettingsStatus.error,
-          errorMessage: e.toString(),
-        ),
-      );
+      debugPrint('❌ [AdhanSettingsBloc] LOAD ERROR: $e');
+      emit(state.copyWith(
+        status: AdhanSettingsStatus.error,
+        errorMessage: e.toString(),
+      ));
     }
   }
+
+  // ============================================================
+  // TOGGLE — OPTIMISTIC UI + BACKGROUND RESCHEDULE
+  // ============================================================
 
   Future<void> _onToggleAdhanSetting(
       ToggleAdhanSetting event,
@@ -74,68 +71,83 @@ class AdhanSettingsBloc
 
     debugPrint('════════════════════════════════════');
     debugPrint('🔄 [AdhanSettingsBloc] TOGGLE');
+    debugPrint('📌 prayerIndex = ${event.prayerIndex}');
+    debugPrint('📌 new enabled = ${event.enabled}');
     debugPrint('════════════════════════════════════');
 
-    debugPrint(
-      '📌 prayerIndex = ${event.prayerIndex}',
+    // ═══════════════════════════════════════════════════════
+    // 1) OPTIMISTIC UPDATE — حدّث الـ UI فوراً
+    // ═══════════════════════════════════════════════════════
+
+    final optimisticSettings = previousSettings.toggle(
+      event.prayerIndex,
+      event.enabled,
     );
 
-    debugPrint(
-      '📌 new enabled = ${event.enabled}',
+    emit(state.copyWith(
+      status: AdhanSettingsStatus.loaded,
+      settings: optimisticSettings,
+      clearError: true,
+    ));
+
+    debugPrint('⚡ [Bloc] UI updated (optimistic)');
+
+    // ═══════════════════════════════════════════════════════
+    // 2) BACKGROUND WORK — احفظ + أعد الجدولة
+    // ═══════════════════════════════════════════════════════
+
+    _pendingReschedule = _persistAndReschedule(
+      previous: previousSettings,
+      optimistic: optimisticSettings,
+      index: event.prayerIndex,
+      enabled: event.enabled,
     );
 
-    debugPrint('📦 Previous settings:');
-    debugPrint('   Fajr    = ${previousSettings.fajr}');
-    debugPrint('   Sunrise = ${previousSettings.sunrise}');
-    debugPrint('   Dhuhr   = ${previousSettings.dhuhr}');
-    debugPrint('   Asr     = ${previousSettings.asr}');
-    debugPrint('   Maghrib = ${previousSettings.maghrib}');
-    debugPrint('   Isha    = ${previousSettings.isha}');
+    unawaited(_pendingReschedule!);
+  }
 
-    emit(
-      state.copyWith(
-        status: AdhanSettingsStatus.updating,
-        clearError: true,
-      ),
-    );
+  // ============================================================
+  // PERSIST + RESCHEDULE (BACKGROUND)
+  // ============================================================
 
+  Future<void> _persistAndReschedule({
+    required dynamic previous,
+    required dynamic optimistic,
+    required int index,
+    required bool enabled,
+  }) async {
     try {
       final updatedSettings = await updateAdhanSetting(
-        currentSettings: previousSettings,
-        prayerIndex: event.prayerIndex,
-        enabled: event.enabled,
+        currentSettings: previous,
+        prayerIndex: index,
+        enabled: enabled,
       );
 
-      debugPrint('✅ [AdhanSettingsBloc] Updated settings:');
-      debugPrint('   Fajr    = ${updatedSettings.fajr}');
-      debugPrint('   Sunrise = ${updatedSettings.sunrise}');
-      debugPrint('   Dhuhr   = ${updatedSettings.dhuhr}');
-      debugPrint('   Asr     = ${updatedSettings.asr}');
-      debugPrint('   Maghrib = ${updatedSettings.maghrib}');
-      debugPrint('   Isha    = ${updatedSettings.isha}');
+      debugPrint('✅ [Bloc] Saved to prefs');
 
-      emit(
-        state.copyWith(
-          status: AdhanSettingsStatus.loaded,
-          settings: updatedSettings,
-          clearError: true,
-        ),
+      final location = await prayerScheduler.getScheduledLocation();
+
+      if (location == null) {
+        debugPrint('⚠️ [Bloc] No saved location → skip reschedule');
+        return;
+      }
+
+      await prayerScheduler.forceReschedule(
+        latitude: location.$1,
+        longitude: location.$2,
+        days: 7,
       );
 
-      debugPrint('✅ [AdhanSettingsBloc] STATE UPDATED');
-      debugPrint('════════════════════════════════════');
+      debugPrint('✅ [Bloc] Background reschedule done');
     } catch (e, stackTrace) {
-      debugPrint('❌ [AdhanSettingsBloc] TOGGLE ERROR');
-      debugPrint('Error: $e');
-      debugPrint('StackTrace: $stackTrace');
+      debugPrint('❌ [Bloc] Background reschedule failed: $e');
+      debugPrint('$stackTrace');
 
-      emit(
-        state.copyWith(
-          status: AdhanSettingsStatus.error,
-          settings: previousSettings,
-          errorMessage: e.toString(),
-        ),
-      );
     }
   }
+
+  // ============================================================
+  // HELPER — copyWithToggle
+  // ============================================================
+
 }
