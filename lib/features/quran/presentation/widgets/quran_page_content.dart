@@ -1,25 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:islamic_app/features/quran/presentation/widgets/quran_mushaf_content.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:qcf_quran/qcf_quran.dart';
 
-import '../../../../injection_container.dart';
-import '../../domain/entities/surah_entity.dart';
-import '../../domain/usecases/get_page.dart';
-import 'get_surah_name.dart';
+import '../../../../core/data/quran/quran_helpers.dart';
+
 
 class QuranPageContent extends StatefulWidget {
   final int pageNumber;
+  final PageController? controller;
 
   final void Function({
-    required String surahName,
-    required int? juz,
-    required int? hizb,
-    int? rub,
+  required int pageNumber,
+  required String surahName,
+  required int? juz,
+  required int? hizb,
+  int? rub,
   })? onPageInfoLoaded;
 
   const QuranPageContent({
     super.key,
     required this.pageNumber,
     this.onPageInfoLoaded,
+    this.controller
   });
 
   @override
@@ -27,153 +29,115 @@ class QuranPageContent extends StatefulWidget {
 }
 
 class _QuranPageContentState extends State<QuranPageContent> {
-  late Future<PageEntity> _pageFuture;
+  late final PageController _controller;
 
-  int? _reportedPage;
+  int _currentPage = 1;
+  String _currentSurahName = '';
+  int? _currentJuz;
 
   @override
   void initState() {
     super.initState();
-    _loadPage();
-  }
 
-  @override
-  void didUpdateWidget(covariant QuranPageContent oldWidget) {
-    super.didUpdateWidget(oldWidget);
+    _currentPage = widget.pageNumber;
 
-    if (oldWidget.pageNumber != widget.pageNumber) {
-      _reportedPage = null;
-      _loadPage();
-    }
-  }
-
-  void _loadPage() {
-    final getPage = sl<GetPage>();
-    _pageFuture = getPage(widget.pageNumber);
-  }
-
-  void _reportPageInfo(PageEntity page) {
-    if (_reportedPage == widget.pageNumber) {
-      return;
-    }
-
-    if (page.ayahs.isEmpty) {
-      return;
-    }
-
-    final firstAyah = page.ayahs.first;
-
-    final surahName = getSurahName(
-      firstAyah.surahNumber,
+    _controller = PageController(
+      initialPage: widget.pageNumber - 1,
     );
 
-    _reportedPage = widget.pageNumber;
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-
-      widget.onPageInfoLoaded?.call(
-        surahName: surahName,
-        juz: firstAyah.juz,
-        hizb: firstAyah.hizb,
-        rub: firstAyah.rub,
-      );
+      _reportPageInfo(widget.pageNumber);
     });
   }
 
   @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+  @override
   Widget build(BuildContext context) {
-    return FutureBuilder<PageEntity>(
-      future: _pageFuture,
-      builder: (context, snapshot) {
-// ============================================================
-// Loading
-// ============================================================
-
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const SizedBox.expand();
-        }
-
-// ============================================================
-// Error
-// ============================================================
-
-        if (snapshot.hasError) {
-          return SizedBox.expand(
-            child: Center(
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Text(
-                  'حدث خطأ في تحميل الصفحة:\n${snapshot.error}',
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            ),
-          );
-        }
-
-// ============================================================
-// لا توجد بيانات
-// ============================================================
-
-        final page = snapshot.data;
-
-        if (page == null || page.ayahs.isEmpty) {
-          return const SizedBox.expand(
-            child: Center(
-              child: Text(
-                'لا توجد آيات في هذه الصفحة',
-                textAlign: TextAlign.center,
-              ),
-            ),
-          );
-        }
-
-// ============================================================
-// إرسال معلومات الصفحة
-// ============================================================
-
-        _reportPageInfo(page);
-
-// ============================================================
-// عرض صفحة المصحف
-// ============================================================
-
-        return Directionality(
-          textDirection: TextDirection.rtl,
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              const horizontalPadding = 12.0;
-              const verticalPadding = 8.0;
-
-              final availableWidth =
-                  constraints.maxWidth - (horizontalPadding * 2);
-
-              final availableHeight =
-                  constraints.maxHeight - (verticalPadding * 2);
-
-              return SizedBox(
-                width: constraints.maxWidth,
-                height: constraints.maxHeight,
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                    horizontalPadding,
-                    verticalPadding,
-                    horizontalPadding,
-                    verticalPadding,
-                  ),
-                  child: QuranMushafContent(
-                    page: page,
-                    availableWidth: availableWidth,
-                    availableHeight: availableHeight,
-                    getSurahName: getSurahName,
-                  ),
-                ),
-              );
-            },
-          ),
-        );
-      },
+    final double offsetY = _currentPage <= 2 ? -40 : 10.0;
+    final bool isFirstTwoPages = _currentPage <= 2;
+    return Transform.translate(
+      offset: Offset(0, offsetY),
+      child:
+      PageviewQuran(
+        pageBackgroundColor: const Color(0xFFFCF5D7),
+        controller: _controller,
+        physics: const NeverScrollableScrollPhysics(),
+       sp: .9.w,
+        h:
+        // 1.4.h,
+        1.h,
+        onPageChanged: (pageNumber) {
+          _reportPageInfo(pageNumber);
+        },
+      ),
     );
   }
+
+
+
+  void _reportPageInfo(int pageNumber ) {
+    if (pageNumber < 1 || pageNumber > 604) {
+      return;
+    }
+
+    final pageData = getPageData(pageNumber);
+
+    debugPrint('══════════════════════════════════');
+    debugPrint('📖 الصفحة: $pageNumber');
+    debugPrint('📦 pageData: $pageData');
+
+    if (pageData.isEmpty) {
+      return;
+    }
+
+    final firstItem = pageData.first;
+
+    final int? surahNumber = firstItem['surah'] as int?;
+    final int? verseNumber = firstItem['start'] as int?;
+
+    if (surahNumber == null || verseNumber == null) {
+      debugPrint(
+        '⚠️ بيانات الصفحة غير مكتملة: '
+            'page=$pageNumber, '
+            'surah=$surahNumber, '
+            'start=$verseNumber',
+
+      );
+      return;
+    }
+
+    final String surahName = getSurahNameArabic(surahNumber);
+
+final  int juz = getJuzNumber(surahNumber, verseNumber);
+    final hizbNumber = getHizbNumber(
+      surahNumber,
+      verseNumber,
+    );
+    debugPrint('📄 رقم الصفحة: $pageNumber');
+    debugPrint('📕 السورة: $surahName');
+    debugPrint('🟢 الجزء: $juz');
+    debugPrint('🟢 الحزب: $hizbNumber');
+
+
+    if (mounted) {
+      setState(() {
+        _currentPage = pageNumber;
+        _currentSurahName = surahName;
+        _currentJuz = juz;
+      });
+    }
+
+    widget.onPageInfoLoaded?.call(
+      pageNumber: pageNumber,
+      surahName: surahName,
+      juz: juz,
+      hizb: hizbNumber ,
+      rub: null,
+    );
+  }
+
 }

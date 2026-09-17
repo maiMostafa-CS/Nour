@@ -70,8 +70,8 @@ import 'features/adhkar/presentation/bloc/adhkar_bloc.dart';
 import 'features/quran/data/datasources/quran_local_data_source.dart';
 import 'features/quran/data/repositories/quran_repository_impl.dart';
 import 'features/quran/domain/repositories/quran_repository.dart';
-import 'features/quran/domain/usecases/get_page.dart';
 import 'features/quran/domain/usecases/get_surahs.dart';
+import 'features/quran/domain/usecases/search_surahs.dart';
 import 'features/quran/presentation/bloc/quran_bloc.dart';
 
 
@@ -436,35 +436,42 @@ Future<void> configureDependencies() async {
 // ============================================================
 
 // DataSource
-  sl.registerLazySingleton<QuranPagesDataSource>(
-        () => QuranPagesDataSourceImpl(),
+  sl.registerLazySingleton<QuranIndexLocalDataSource>(
+        () => QuranIndexLocalDataSourceImpl(),
   );
 
-// Repository
-  sl.registerLazySingleton<QuranRepository>(
-        () => QuranRepositoryImpl(
-      sl<QuranPagesDataSource>(),
+  // =========================================================
+  // Quran Index - Repository
+  // =========================================================
+
+  sl.registerLazySingleton<QuranIndexRepository>(
+        () => QuranIndexRepositoryImpl(
+      localDataSource: sl<QuranIndexLocalDataSource>(),
     ),
   );
 
-// UseCases
+  // =========================================================
+  // Quran Index - UseCases
+  // =========================================================
+
   sl.registerLazySingleton<GetSurahs>(
         () => GetSurahs(
-      sl<QuranRepository>(),
+      sl<QuranIndexRepository>(),
     ),
   );
 
-  sl.registerLazySingleton<GetPage>(
-        () => GetPage(
-      sl<QuranRepository>(),
-    ),
+  sl.registerLazySingleton<SearchSurahs>(
+        () => const SearchSurahs(),
   );
 
-// Bloc
-  sl.registerFactory<QuranBloc>(
-        () => QuranBloc(
+  // =========================================================
+  // Quran Index - BLoC
+  // =========================================================
+
+  sl.registerFactory<QuranIndexBloc>(
+        () => QuranIndexBloc(
       getSurahs: sl<GetSurahs>(),
-      getPage: sl<GetPage>(),
+      searchSurahs: sl<SearchSurahs>(),
     ),
   );
 

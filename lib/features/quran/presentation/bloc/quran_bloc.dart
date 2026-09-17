@@ -1,66 +1,94 @@
-import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
+import 'package:islamic_app/features/quran/presentation/bloc/quran_event.dart';
+import 'package:islamic_app/features/quran/presentation/bloc/quran_state.dart';
 import '../../domain/entities/surah_entity.dart';
-import '../../domain/usecases/get_page.dart';
 import '../../domain/usecases/get_surahs.dart';
+import '../../domain/usecases/search_surahs.dart';
 
-part 'quran_event.dart';
-part 'quran_state.dart';
 
-class QuranBloc extends Bloc<QuranEvent, QuranState> {
+class QuranIndexBloc
+    extends Bloc<QuranIndexEvent, QuranIndexState> {
   final GetSurahs getSurahs;
-  final GetPage getPage;
+  final SearchSurahs searchSurahs;
 
-  QuranBloc({
+  List<Surah> _allSurahs = [];
+
+  QuranIndexBloc({
     required this.getSurahs,
-    required this.getPage,
-  }) : super(const QuranInitial()) {
+    required this.searchSurahs,
+  }) : super(QuranIndexInitial()) {
     on<LoadSurahs>(_onLoadSurahs);
-    on<LoadPage>(_onLoadPage);
+    on<SearchSurahsEvent>(_onSearchSurahs);
+    on<ClearSurahSearch>(_onClearSearch);
   }
 
   Future<void> _onLoadSurahs(
       LoadSurahs event,
-      Emitter<QuranState> emit,
+      Emitter<QuranIndexState> emit,
       ) async {
-    emit(const QuranLoading());
+    if (_allSurahs.isNotEmpty) {
+      emit(
+        QuranIndexLoaded(
+          allSurahs: _allSurahs,
+          filteredSurahs: _allSurahs,
+        ),
+      );
+
+      return;
+    }
+
+    emit(QuranIndexLoading());
 
     try {
-      final surahs = await getSurahs();
+      final result = await getSurahs();
+
+      _allSurahs = result;
 
       emit(
-        QuranLoaded(surahs),
+        QuranIndexLoaded(
+          allSurahs: result,
+          filteredSurahs: result,
+        ),
       );
     } catch (e) {
       emit(
-        QuranError(e.toString()),
+        const QuranIndexError(
+          'حدث خطأ أثناء تحميل فهرس القرآن',
+        ),
       );
     }
   }
 
-  Future<void> _onLoadPage(
-      LoadPage event,
-      Emitter<QuranState> emit,
-      ) async {
-    emit(
-      QuranPageLoading(
-        pageNumber: event.pageNumber,
-      ),
+  void _onSearchSurahs(
+      SearchSurahsEvent event,
+      Emitter<QuranIndexState> emit,
+      ) {
+    if (state is! QuranIndexLoaded) {
+      return;
+    }
+
+    final result = searchSurahs(
+      _allSurahs,
+      event.query,
     );
 
-    try {
-      final page = await getPage(
-        event.pageNumber,
-      );
+    emit(
+      QuranIndexLoaded(
+        allSurahs: _allSurahs,
+        filteredSurahs: result,
+      ),
+    );
+  }
 
-      emit(
-        QuranPageLoaded(page),
-      );
-    } catch (e) {
-      emit(
-        QuranError(e.toString()),
-      );
-    }
+  void _onClearSearch(
+      ClearSurahSearch event,
+      Emitter<QuranIndexState> emit,
+      ) {
+    emit(
+      QuranIndexLoaded(
+        allSurahs: _allSurahs,
+        filteredSurahs: _allSurahs,
+      ),
+    );
   }
 }

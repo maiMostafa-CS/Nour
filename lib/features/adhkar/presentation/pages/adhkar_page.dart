@@ -1,496 +1,276 @@
 // import 'package:flutter/material.dart';
-// import 'package:flutter_bloc/flutter_bloc.dart';
-// import '../../../../injection_container.dart';
-// import '../bloc/adhkar_bloc.dart';
+// import 'package:azkary/azkary.dart';
 //
-// class AdhkarPage extends StatelessWidget {
-//   const AdhkarPage({super.key});
+// class AzkarScreen extends StatelessWidget {
+//   const AzkarScreen({super.key});
+//
+//   static const Color backgroundColor = Color(0xFFFCF5D7);
 //
 //   @override
 //   Widget build(BuildContext context) {
-//     return BlocProvider(
-//       create: (_) => sl<AdhkarBloc>()..add(const LoadAdhkar()),
-//       child: Scaffold(
-//         appBar: AppBar(title: const Text('الأذكار')),
-//         body: BlocBuilder<AdhkarBloc, AdhkarState>(
-//           builder: (context, state) {
-//             if (state is AdhkarLoading) {
-//               return const Center(child: CircularProgressIndicator());
-//             }
-//             if (state is AdhkarError) return Center(child: Text(state.message));
-//             if (state is AdhkarLoaded) {
-//               print('🎨 Screen: AdhkarLoaded');
-//               print('📿 عدد العناصر: ${state.items.length}');
-//
-//               return ListView.builder(
-//                 padding: const EdgeInsets.all(12),
-//                 itemCount: state.items.length,
-//                 itemBuilder: (_, index) {
-//                   final item = state.items[index];
-//
-//                   print(
-//                     '🎨 عرض الذكر $index: ${item.text}',
-//                   );
-//
-//                   return Card(
-//                     child: ListTile(
-//                       title: Text(
-//                         item.text,
-//                         textDirection: TextDirection.rtl,
-//                         textAlign: TextAlign.right,
-//                       ),
-//                       subtitle: Text(
-//                         item.category,
-//                         textDirection: TextDirection.rtl,
-//                       ),
-//                       trailing: CircleAvatar(
-//                         child: Text('${item.count}'),
-//                       ),
-//                     ),
-//                   );
-//                 },
-//               );
-//             }            return const SizedBox.shrink();
-//           },
+//     return Scaffold(
+//       backgroundColor: backgroundColor,
+//       appBar: AppBar(
+//         title: const Text(
+//           'الأذكار',
+//           style: TextStyle(
+//             fontWeight: FontWeight.bold,
+//           ),
 //         ),
+//         centerTitle: true,
+//         backgroundColor: backgroundColor,
+//         elevation: 0,
+//       ),
+//       body: FutureBuilder(
+//         future: Azkary.instance.getCategories(),
+//         builder: (context, snapshot) {
+//           if (snapshot.connectionState == ConnectionState.waiting) {
+//             return const Center(
+//               child: CircularProgressIndicator(),
+//             );
+//           }
+//
+//           if (snapshot.hasError) {
+//             return Center(
+//               child: Padding(
+//                 padding: const EdgeInsets.all(24),
+//                 child: Text(
+//                   'حدث خطأ أثناء تحميل الأذكار:\n${snapshot.error}',
+//                   textAlign: TextAlign.center,
+//                   textDirection: TextDirection.rtl,
+//                 ),
+//               ),
+//             );
+//           }
+//
+//           if (!snapshot.hasData || snapshot.data!.isEmpty) {
+//             return const Center(
+//               child: Text(
+//                 'لا توجد أذكار متاحة',
+//                 textDirection: TextDirection.rtl,
+//               ),
+//             );
+//           }
+//
+//           final categories = snapshot.data!;
+//
+//           return ListView.builder(
+//             padding: const EdgeInsets.all(16),
+//             itemCount: categories.length,
+//             itemBuilder: (context, index) {
+//               final category = categories[index];
+//
+//               return Card(
+//                 margin: const EdgeInsets.only(bottom: 12),
+//                 elevation: 1,
+//                 child: ListTile(
+//                   contentPadding: const EdgeInsets.symmetric(
+//                     horizontal: 20,
+//                     vertical: 8,
+//                   ),
+//                   title: Text(
+//                     category.name,
+//                     textDirection: TextDirection.rtl,
+//                     style: const TextStyle(
+//                       fontSize: 17,
+//                       fontWeight: FontWeight.bold,
+//                     ),
+//                   ),
+//                   trailing: const Icon(
+//                     Icons.arrow_back_ios_new,
+//                     size: 18,
+//                   ),
+//                   onTap: () {
+//                     Navigator.push(
+//                       context,
+//                       MaterialPageRoute(
+//                         builder: (_) => AzkarDetailScreen(
+//                           category: category,
+//                         ),
+//                       ),
+//                     );
+//                   },
+//                 ),
+//               );
+//             },
+//           );
+//         },
 //       ),
 //     );
 //   }
 // }
-import 'package:flutter/material.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-
-class AdhkarPage extends StatelessWidget {
-  const AdhkarPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final categories = [
-      const AdhkarCategory(
-        title: 'أذكار الصباح',
-        icon: '☀️',
-      ),
-      const AdhkarCategory(
-        title: 'أذكار المساء',
-        icon: '🌙',
-      ),
-      const AdhkarCategory(
-        title: 'أذكار بعد الصلاة',
-        icon: '🕌',
-      ),
-      const AdhkarCategory(
-        title: 'أذكار النوم',
-        icon: '🌙',
-      ),
-      const AdhkarCategory(
-        title: 'أذكار الاستيقاظ',
-        icon: '⏰',
-      ),
-      const AdhkarCategory(
-        title: 'أذكار المسجد',
-        icon: '🕌',
-      ),
-      const AdhkarCategory(
-        title: 'أذكار الطعام',
-        icon: '🍴',
-      ),
-      const AdhkarCategory(
-        title: 'حصن المسلم',
-        icon: '📖',
-      ),
-      const AdhkarCategory(
-        title: 'أذكار دخول المنزل',
-        icon: '🚪',
-      ),
-      const AdhkarCategory(
-        title: 'أذكار الخروج من المنزل',
-        icon: '🚶',
-      ),
-      const AdhkarCategory(
-        title: 'أذكار دخول الخلاء',
-        icon: '🚻',
-      ),
-      const AdhkarCategory(
-        title: 'أذكار الخروج من الخلاء',
-        icon: '🛁',
-      ),
-      const AdhkarCategory(
-        title: 'أذكار اللباس',
-        icon: '👕',
-      ),
-      const AdhkarCategory(
-        title: 'أذكار السفر',
-        icon: '🚗',
-      ),
-      const AdhkarCategory(
-        title: 'أذكار المطر',
-        icon: '🌧️',
-      ),
-      const AdhkarCategory(
-        title: 'أذكار الرياح والرعد',
-        icon: '🌩️',
-      ),
-      const AdhkarCategory(
-        title: 'أذكار متنوعة',
-        icon: '🤲',
-      ),
-      const AdhkarCategory(
-        title: 'أدعية من القرآن',
-        icon: '📖',
-      ),
-      const AdhkarCategory(
-        title: 'أدعية الأنبياء',
-        icon: '❤️',
-      ),
-      const AdhkarCategory(
-        title: 'الرقية الشرعية',
-        icon: '🤍',
-      ),
-    ];
-
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: Scaffold(
-        backgroundColor: const Color(0xFFFCFBF8),
-
-        appBar: AppBar(
-          backgroundColor: const Color(0xFFFCFBF8),
-          elevation: 0,
-          centerTitle: true,
-
-          leading: IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: Icon(
-              Icons.arrow_back_ios_new_rounded,
-              size: 20.sp,
-              color: const Color(0xFF222222),
-            ),
-          ),
-
-          title: Text(
-            'الأذكار',
-            style: TextStyle(
-              fontSize: 18.sp,
-              fontWeight: FontWeight.w700,
-              color: const Color(0xFF222222),
-            ),
-          ),
-
-          actions: [
-            IconButton(
-              onPressed: () {},
-              icon: Icon(
-                Icons.settings_outlined,
-                size: 22.sp,
-                color: const Color(0xFF222222),
-              ),
-            ),
-          ],
-        ),
-
-        body: SafeArea(
-          child: Column(
-            children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 18.w,
-                  ),
-                  child: Column(
-                    children: [
-                      SizedBox(height: 4.h),
-
-                      _buildSearch(),
-
-                      SizedBox(height: 14.h),
-
-                      GridView.builder(
-                        shrinkWrap: true,
-                        physics:
-                        const NeverScrollableScrollPhysics(),
-                        itemCount: categories.length,
-                        gridDelegate:
-                        SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          crossAxisSpacing: 9.w,
-                          mainAxisSpacing: 9.h,
-                          childAspectRatio: 0.90,
-                        ),
-                        itemBuilder: (context, index) {
-                          final category = categories[index];
-
-                          return _buildCategoryCard(
-                            context,
-                            category,
-                          );
-                        },
-                      ),
-
-                      SizedBox(height: 20.h),
-                    ],
-                  ),
-                ),
-              ),
-
-              // _buildBottomNavigation(),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSearch() {
-    return Container(
-      height: 44.h,
-      decoration: BoxDecoration(
-        color: const Color(0xFFF3F1EB),
-        borderRadius: BorderRadius.circular(14.r),
-      ),
-      child: TextField(
-        textDirection: TextDirection.rtl,
-        decoration: InputDecoration(
-          hintText: 'ابحث في الأذكار',
-          hintStyle: TextStyle(
-            fontSize: 13.sp,
-            color: const Color(0xFF999999),
-          ),
-          prefixIcon: Icon(
-            Icons.search_rounded,
-            size: 20.sp,
-            color: const Color(0xFF999999),
-          ),
-          border: InputBorder.none,
-          contentPadding: EdgeInsets.symmetric(
-            horizontal: 12.w,
-            vertical: 11.h,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCategoryCard(
-      BuildContext context,
-      AdhkarCategory category,
-      ) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(14.r),
-      onTap: () {
-        _openCategory(context, category);
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          color: const Color(0xFFFEFDF9),
-          borderRadius: BorderRadius.circular(14.r),
-          border: Border.all(
-            color: const Color(0xFFECE9E1),
-            width: 1.w,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.025),
-              blurRadius: 5.r,
-              offset: Offset(0, 2.h),
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 48.w,
-              height: 48.h,
-              decoration: const BoxDecoration(
-                color: Color(0xFFF5F1E8),
-                shape: BoxShape.circle,
-              ),
-              alignment: Alignment.center,
-              child: Text(
-                category.icon,
-                style: TextStyle(
-                  fontSize: 27.sp,
-                ),
-              ),
-            ),
-
-            SizedBox(height: 8.h),
-
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 3.w),
-              child: Text(
-                category.title,
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 11.sp,
-                  fontWeight: FontWeight.w600,
-                  color: const Color(0xFF333333),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _openCategory(
-      BuildContext context,
-      AdhkarCategory category,
-      )
-  {
-    switch (category.title) {
-      case 'أذكار الصباح':
-        break;
-
-      case 'أذكار المساء':
-        break;
-
-      case 'أذكار بعد الصلاة':
-        break;
-
-      case 'أذكار النوم':
-        break;
-
-      case 'أذكار الاستيقاظ':
-        break;
-
-      case 'أذكار المسجد':
-        break;
-
-      case 'أذكار الطعام':
-        break;
-
-      case 'حصن المسلم':
-        break;
-
-      case 'أذكار دخول المنزل':
-        break;
-
-      case 'أذكار الخروج من المنزل':
-        break;
-
-      case 'أذكار دخول الخلاء':
-        break;
-
-      case 'أذكار الخروج من الخلاء':
-        break;
-
-      case 'أذكار اللباس':
-        break;
-
-      case 'أذكار السفر':
-        break;
-
-      case 'أذكار المطر':
-        break;
-
-      case 'أذكار الرياح والرعد':
-        break;
-
-      case 'أذكار متنوعة':
-        break;
-
-      case 'أدعية من القرآن':
-        break;
-
-      case 'أدعية الأنبياء':
-        break;
-
-      case 'الرقية الشرعية':
-        break;
-    }
-  }
-
-  // Widget _buildBottomNavigation() {
-  //   return Container(
-  //     height: 68.h,
-  //     decoration: BoxDecoration(
-  //       color: Colors.white,
-  //       border: Border(
-  //         top: BorderSide(
-  //           color: Colors.grey.shade200,
-  //           width: 1.w,
-  //         ),
-  //       ),
-  //     ),
-  //     child: Row(
-  //       mainAxisAlignment: MainAxisAlignment.spaceAround,
-  //       children: [
-  //         _buildNavItem(
-  //           icon: Icons.home_outlined,
-  //           label: 'الرئيسية',
-  //           active: false,
-  //         ),
-  //         _buildNavItem(
-  //           icon: Icons.menu_book_outlined,
-  //           label: 'القرآن',
-  //           active: false,
-  //         ),
-  //         _buildNavItem(
-  //           icon: Icons.auto_awesome,
-  //           label: 'الأذكار',
-  //           active: true,
-  //         ),
-  //         _buildNavItem(
-  //           icon: Icons.mosque_outlined,
-  //           label: 'الصلاة',
-  //           active: false,
-  //         ),
-  //         _buildNavItem(
-  //           icon: Icons.more_horiz,
-  //           label: 'المزيد',
-  //           active: false,
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
-  //
-  // Widget _buildNavItem({
-  //   required IconData icon,
-  //   required String label,
-  //   required bool active,
-  // }) {
-  //   const activeColor = Color(0xFF176B5B);
-  //   const inactiveColor = Color(0xFF777777);
-  //
-  //   return Column(
-  //     mainAxisAlignment: MainAxisAlignment.center,
-  //     children: [
-  //       Icon(
-  //         icon,
-  //         size: 21.sp,
-  //         color: active ? activeColor : inactiveColor,
-  //       ),
-  //
-  //       SizedBox(height: 4.h),
-  //
-  //       Text(
-  //         label,
-  //         style: TextStyle(
-  //           fontSize: 10.sp,
-  //           fontWeight:
-  //           active ? FontWeight.w700 : FontWeight.w500,
-  //           color: active ? activeColor : inactiveColor,
-  //         ),
-  //       ),
-  //     ],
-  //   );
-  // }
-}
-
-class AdhkarCategory {
-  final String title;
-  final String icon;
-
-  const AdhkarCategory({
-    required this.title,
-    required this.icon,
-  });
-}
+//
+// class AzkarDetailScreen extends StatefulWidget {
+//   final ZekrCategory category;
+//
+//   const AzkarDetailScreen({
+//     super.key,
+//     required this.category,
+//   });
+//
+//   @override
+//   State<AzkarDetailScreen> createState() => _AzkarDetailScreenState();
+// }
+//
+// class _AzkarDetailScreenState extends State<AzkarDetailScreen> {
+//   late final List<int> _counters;
+//
+//   @override
+//   void initState() {
+//     super.initState();
+//
+//     _counters = List<int>.filled(
+//       widget.category.azkar.length,
+//       0,
+//     );
+//   }
+//
+//   void _incrementZekr(int index) {
+//     final zekr = widget.category.azkar[index];
+//     final currentCount = _counters[index];
+//
+// // لا نزيد عن العدد المطلوب
+//     if (currentCount >= zekr.count) {
+//       return;
+//     }
+//
+//     setState(() {
+//       _counters[index]++;
+//     });
+//   }
+//
+//   void _resetZekr(int index) {
+//     setState(() {
+//       _counters[index] = 0;
+//     });
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     final azkarList = widget.category.azkar;
+//
+//     return Scaffold(
+//       backgroundColor: const Color(0xFFFCF5D7),
+//       appBar: AppBar(
+//         title: Text(
+//           widget.category.name,
+//           style: const TextStyle(
+//             fontWeight: FontWeight.bold,
+//           ),
+//         ),
+//         centerTitle: true,
+//         backgroundColor: const Color(0xFFFCF5D7),
+//         elevation: 0,
+//       ),
+//       body: ListView.builder(
+//         padding: const EdgeInsets.all(16),
+//         itemCount: azkarList.length,
+//         itemBuilder: (context, index) {
+//           final zekr = azkarList[index];
+//
+//           final currentCount = _counters[index];
+//           final requiredCount = zekr.count;
+//
+//           final isCompleted = currentCount >= requiredCount;
+//
+//           return Card(
+//             margin: const EdgeInsets.only(bottom: 16),
+//             elevation: 1,
+//             child: Padding(
+//               padding: const EdgeInsets.all(18),
+//               child: Column(
+//                 crossAxisAlignment: CrossAxisAlignment.stretch,
+//                 children: [
+//                   Align(
+//                     alignment: Alignment.centerRight,
+//                     child: Text(
+//                       'ذكر ${index + 1}',
+//                       textDirection: TextDirection.rtl,
+//                       style: TextStyle(
+//                         color: Colors.grey[600],
+//                         fontSize: 13,
+//                         fontWeight: FontWeight.bold,
+//                       ),
+//                     ),
+//                   ),
+//                   const SizedBox(height: 12),
+//                   Text(
+//                     zekr.text,
+//                     textAlign: TextAlign.center,
+//                     textDirection: TextDirection.rtl,
+//                     style: const TextStyle(
+//                       fontSize: 20,
+//                       height: 2,
+//                       fontFamily: 'Amiri',
+//                     ),
+//                   ),
+//                   const SizedBox(height: 18),
+//                   Text(
+//                     'المطلوب: $requiredCount',
+//                     textAlign: TextAlign.center,
+//                     textDirection: TextDirection.rtl,
+//                     style: TextStyle(
+//                       color: Colors.grey[700],
+//                       fontSize: 14,
+//                     ),
+//                   ),
+//                   const SizedBox(height: 8),
+//                   Text(
+//                     '$currentCount / $requiredCount',
+//                     textAlign: TextAlign.center,
+//                     style: TextStyle(
+//                       fontSize: 24,
+//                       fontWeight: FontWeight.bold,
+//                       color: isCompleted ? Colors.green : Colors.black87,
+//                     ),
+//                   ),
+//                   const SizedBox(height: 12),
+//                   LinearProgressIndicator(
+//                     value: requiredCount > 0
+//                         ? (currentCount / requiredCount).clamp(0.0, 1.0)
+//                         : 0.0,
+//                     minHeight: 7,
+//                     borderRadius: BorderRadius.circular(10),
+//                   ),
+//                   const SizedBox(height: 18),
+//                   SizedBox(
+//                     height: 50,
+//                     child: ElevatedButton.icon(
+//                       onPressed:
+//                           isCompleted ? null : () => _incrementZekr(index),
+//                       icon: Icon(
+//                         isCompleted ? Icons.check : Icons.add,
+//                       ),
+//                       label: Text(
+//                         isCompleted ? 'تم إكمال الذكر' : 'احسب الذكر',
+//                       ),
+//                       style: ElevatedButton.styleFrom(
+//                         backgroundColor: const Color(0xFFFCF5D7),
+//                         foregroundColor: Colors.black87,
+//                         disabledBackgroundColor:
+//                             Colors.green.withValues(alpha: 0.2),
+//                         disabledForegroundColor: Colors.green,
+//                         elevation: 0,
+//                       ),
+//                     ),
+//                   ),
+//                   if (currentCount > 0) ...[
+//                     const SizedBox(height: 8),
+//                     TextButton.icon(
+//                       onPressed: () => _resetZekr(index),
+//                       icon: const Icon(
+//                         Icons.refresh,
+//                         size: 18,
+//                       ),
+//                       label: const Text('إعادة العداد'),
+//                     ),
+//                   ],
+//                 ],
+//               ),
+//             ),
+//           );
+//         },
+//       ),
+//     );
+//   }
+// }

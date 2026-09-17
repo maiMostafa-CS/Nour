@@ -2,18 +2,15 @@ import '../../domain/entities/surah_entity.dart';
 import '../../domain/repositories/quran_repository.dart';
 import '../datasources/quran_local_data_source.dart';
 
-class QuranRepositoryImpl implements QuranRepository {
-  final QuranPagesDataSource dataSource;
+class QuranIndexRepositoryImpl implements QuranIndexRepository {
+  final QuranIndexLocalDataSource localDataSource;
 
-  QuranRepositoryImpl(this.dataSource);
-
-  @override
-  Future<List<SurahEntity>> getSurahs() {
-    return dataSource.getSurahs();
-  }
+  const QuranIndexRepositoryImpl({
+    required this.localDataSource,
+  });
 
   @override
-  Future<PageEntity> getPage(int pageNumber) {
-    return dataSource.getPage(pageNumber);
+  Future<List<Surah>> getSurahs() async {
+    return localDataSource.getSurahs();
   }
 }

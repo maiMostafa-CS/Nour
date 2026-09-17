@@ -55,10 +55,10 @@ static const iqamaSettings= "/iqamaSettings";
         );
 
 
-      case adhkar:
-        return MaterialPageRoute(
-          builder: (_) => const AdhkarPage(),
-        );
+      // case adhkar:
+      //   return MaterialPageRoute(
+      //     builder: (_) => const AzkarScreen(),
+      //   );
 
       case splashScreen:
         return MaterialPageRoute(

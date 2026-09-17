@@ -30,6 +30,7 @@ dependencies:
   permission_handler: ^13.0.2
   alarm: ^5.12.0
   flutter_screenutil: ^5.9.3
+  qcf_quran_plus: ^0.0.8
   http: ^1.6.0
   connectivity_plus: ^7.3.1
   flutter_svg: ^2.0.10
@@ -42,6 +43,8 @@ dependencies:
   shared_preferences: ^2.5.5
   audioplayers: ^6.8.1
   workmanager: ^0.10.10
+  qcf_quran: ^0.0.5
+  azkary: ^0.0.2
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -52,7 +55,6 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/pages_quran/
     - assets/quran/
     - assets/adhkar/
     - assets/images/
@@ -62,7 +64,7 @@ flutter:
   fonts:
     - family: HafsSmart
       fonts:
-        - asset: assets/fonts/Cairo-VariableFont_slnt,wght.ttf
+        - asset: assets/fonts/UthmanicHafs1Ver18.ttf
 
 flutter_launcher_icons:
    android: true

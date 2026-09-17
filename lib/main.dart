@@ -1,3 +1,4 @@
+import 'package:azkary/azkary.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -14,6 +15,7 @@ Future<void> main() async {
   await configureDependencies();
 
   runApp(const IslamicApp());
+  // await Azkary.initialize();
 
   SchedulerBinding.instance.addPostFrameCallback((_) async {
     await _backgroundSetup();

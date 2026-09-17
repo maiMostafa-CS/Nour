@@ -1,72 +1,39 @@
-part of 'quran_bloc.dart';
+import 'package:equatable/equatable.dart';
 
-sealed class QuranState extends Equatable {
-  const QuranState();
-}
+import '../../domain/entities/surah_entity.dart';
 
-class QuranInitial extends QuranState {
-  const QuranInitial();
 
-  @override
-  List<Object?> get props => [];
-}
-
-class QuranLoading extends QuranState {
-  const QuranLoading();
+abstract class QuranIndexState extends Equatable {
+  const QuranIndexState();
 
   @override
   List<Object?> get props => [];
 }
 
-// ============================================================
-// السور
-// ============================================================
+class QuranIndexInitial extends QuranIndexState {}
 
-class QuranLoaded extends QuranState {
-  final List<SurahEntity> surahs;
+class QuranIndexLoading extends QuranIndexState {}
 
-  const QuranLoaded(this.surahs);
+class QuranIndexLoaded extends QuranIndexState {
+  final List<Surah> allSurahs;
+  final List<Surah> filteredSurahs;
 
-  @override
-  List<Object?> get props => [surahs];
-}
-
-// ============================================================
-// تحميل صفحة
-// ============================================================
-
-class QuranPageLoading extends QuranState {
-  final int pageNumber;
-
-  const QuranPageLoading({
-    required this.pageNumber,
+  const QuranIndexLoaded({
+    required this.allSurahs,
+    required this.filteredSurahs,
   });
 
   @override
-  List<Object?> get props => [pageNumber];
+  List<Object?> get props => [
+    allSurahs,
+    filteredSurahs,
+  ];
 }
 
-// ============================================================
-// الصفحة تم تحميلها
-// ============================================================
-
-class QuranPageLoaded extends QuranState {
-  final PageEntity page;
-
-  const QuranPageLoaded(this.page);
-
-  @override
-  List<Object?> get props => [page];
-}
-
-// ============================================================
-// خطأ
-// ============================================================
-
-class QuranError extends QuranState {
+class QuranIndexError extends QuranIndexState {
   final String message;
 
-  const QuranError(this.message);
+  const QuranIndexError(this.message);
 
   @override
   List<Object?> get props => [message];

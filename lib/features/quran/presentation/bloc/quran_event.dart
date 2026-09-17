@@ -1,23 +1,11 @@
-part of 'quran_bloc.dart';
+abstract class QuranIndexEvent {}
 
-sealed class QuranEvent extends Equatable {
-  const QuranEvent();
+class LoadSurahs extends QuranIndexEvent {}
 
-  @override
-  List<Object?> get props => [];
+class SearchSurahsEvent extends QuranIndexEvent {
+  final String query;
+
+  SearchSurahsEvent(this.query);
 }
 
-class LoadSurahs extends QuranEvent {
-  const LoadSurahs();
-}
-
-class LoadPage extends QuranEvent {
-  final int pageNumber;
-
-  const LoadPage(this.pageNumber);
-
-  @override
-  List<Object?> get props => [
-    pageNumber,
-  ];
-}
+class ClearSurahSearch extends QuranIndexEvent {}
