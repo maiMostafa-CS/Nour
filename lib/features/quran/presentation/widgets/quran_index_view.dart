@@ -11,6 +11,8 @@ class QuranIndexView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFFCF5D7),
+
       appBar: AppBar(
         title: const Align(
           alignment: Alignment.centerRight,

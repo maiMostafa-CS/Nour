@@ -70,85 +70,78 @@ class MushafPageState extends State<MushafPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFFCF5D7),
       appBar: AppBar(
-
+        backgroundColor: const Color(0xFFFCF5D7),
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        toolbarHeight: 40,
+        titleSpacing: 8,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
               'الجزء ${_currentJuz ?? '-'}',
               style: const TextStyle(
-                fontSize: 14,
+                fontSize: 13,               // ← صغّر شوية
                 fontWeight: FontWeight.bold,
               ),
             ),
-
-
-
-
             Text(
               _currentSurahName,
               style: const TextStyle(
-                fontSize: 18,
+                fontSize: 16,               // ← صغّر شوية
                 fontWeight: FontWeight.bold,
               ),
             ),
-
-
-            // الحزب
             Text(
               'الحزب ${_currentHizb ?? '-'}',
               style: const TextStyle(
-                fontSize: 14,
+                fontSize: 13,               // ← صغّر شوية
                 fontWeight: FontWeight.bold,
               ),
             ),
           ],
-        ),      ),
-
-      body: Column(
-        children: [
-          Expanded(
-            child: PageView.builder(
-              controller: _controller,
-              itemCount: 604,
-              reverse: true,
-              physics: const PageScrollPhysics(),
-
-              onPageChanged: (index) {
-                setState(() {
-                  _currentPage = index + 1;
-                });
-              },
-
-              itemBuilder: (context, index) {
-                final pageNumber = index + 1;
-
-                return QuranPageContent(
-                  pageNumber: pageNumber,
-                  onPageInfoLoaded: _updatePageInfo,
-                );
-              },
+        ),
+      ),
+      body: SafeArea(
+        top: false,
+        child: Column(
+          children: [
+            Expanded(
+              child: PageView.builder(
+                controller: _controller,
+                itemCount: 604,
+                reverse: true,
+                physics: const PageScrollPhysics(),
+                onPageChanged: (index) {
+                  setState(() {
+                    _currentPage = index + 1;
+                  });
+                },
+                itemBuilder: (context, index) {
+                  final pageNumber = index + 1;
+                  return QuranPageContent(
+                    pageNumber: pageNumber,
+                    onPageInfoLoaded: _updatePageInfo,
+                  );
+                },
+              ),
             ),
-          ),
-
-          // ====================================================
-          // رقم الصفحة
-          // ====================================================
-
-          SizedBox(
-            height: 28,
-            child: Center(
-              child: Text(
-                '$_currentPage',
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+            SizedBox(
+              height: 28,
+              child: Center(
+                child: Text(
+                  '$_currentPage',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

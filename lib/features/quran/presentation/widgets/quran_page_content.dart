@@ -10,10 +10,10 @@ class QuranPageContent extends StatefulWidget {
   final int pageNumber;
 
   final void Function({
-  required String surahName,
-  required int? juz,
-  required int? hizb,
-  int? rub,
+    required String surahName,
+    required int? juz,
+    required int? hizb,
+    int? rub,
   })? onPageInfoLoaded;
 
   const QuranPageContent({
@@ -34,14 +34,11 @@ class _QuranPageContentState extends State<QuranPageContent> {
   @override
   void initState() {
     super.initState();
-
     _loadPage();
   }
 
   @override
-  void didUpdateWidget(
-      covariant QuranPageContent oldWidget,
-      ) {
+  void didUpdateWidget(covariant QuranPageContent oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     if (oldWidget.pageNumber != widget.pageNumber) {
@@ -52,7 +49,6 @@ class _QuranPageContentState extends State<QuranPageContent> {
 
   void _loadPage() {
     final getPage = sl<GetPage>();
-
     _pageFuture = getPage(widget.pageNumber);
   }
 
@@ -90,21 +86,17 @@ class _QuranPageContentState extends State<QuranPageContent> {
     return FutureBuilder<PageEntity>(
       future: _pageFuture,
       builder: (context, snapshot) {
-        // ======================================================
-        // Loading
-        // ======================================================
+// ============================================================
+// Loading
+// ============================================================
 
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const SizedBox.expand(
-            child: Center(
-              child: CircularProgressIndicator(),
-            ),
-          );
+          return const SizedBox.expand();
         }
 
-        // ======================================================
-        // Error
-        // ======================================================
+// ============================================================
+// Error
+// ============================================================
 
         if (snapshot.hasError) {
           return SizedBox.expand(
@@ -120,50 +112,61 @@ class _QuranPageContentState extends State<QuranPageContent> {
           );
         }
 
-        final page = snapshot.data;
+// ============================================================
+// لا توجد بيانات
+// ============================================================
 
-        // ======================================================
-        // لا توجد بيانات
-        // ======================================================
+        final page = snapshot.data;
 
         if (page == null || page.ayahs.isEmpty) {
           return const SizedBox.expand(
             child: Center(
               child: Text(
                 'لا توجد آيات في هذه الصفحة',
+                textAlign: TextAlign.center,
               ),
             ),
           );
         }
 
-        // ======================================================
-        // معلومات الصفحة
-        // ======================================================
+// ============================================================
+// إرسال معلومات الصفحة
+// ============================================================
 
         _reportPageInfo(page);
 
-        // ======================================================
-        // صفحة المصحف
-        // ======================================================
+// ============================================================
+// عرض صفحة المصحف
+// ============================================================
 
         return Directionality(
           textDirection: TextDirection.rtl,
           child: LayoutBuilder(
             builder: (context, constraints) {
+              const horizontalPadding = 12.0;
+              const verticalPadding = 8.0;
+
+              final availableWidth =
+                  constraints.maxWidth - (horizontalPadding * 2);
+
+              final availableHeight =
+                  constraints.maxHeight - (verticalPadding * 2);
+
               return SizedBox(
                 width: constraints.maxWidth,
                 height: constraints.maxHeight,
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(
-                    12,
-                    8,
-                    12,
-                    8,
+                    horizontalPadding,
+                    verticalPadding,
+                    horizontalPadding,
+                    verticalPadding,
                   ),
                   child: QuranMushafContent(
                     page: page,
-                    availableWidth: constraints.maxWidth - 24,
-                    availableHeight: constraints.maxHeight - 16,
+                    availableWidth: availableWidth,
+                    availableHeight: availableHeight,
+                    getSurahName: getSurahName,
                   ),
                 ),
               );
