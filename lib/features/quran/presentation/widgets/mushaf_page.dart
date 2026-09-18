@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:islamic_app/features/quran/presentation/widgets/quran_page_content.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../core/services/quran_bookmark_service.dart';
+import '../../../../injection_container.dart';
+import '../bloc/quran_bloc.dart';
+import '../bloc/quran_event.dart';
 import '../pages/quran_search_page.dart';
 
 class MushafPage extends StatefulWidget {
@@ -113,7 +117,10 @@ class MushafPageState extends State<MushafPage> {
   }
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return
+      BlocProvider<QuranIndexBloc>(
+        create: (_) => sl<QuranIndexBloc>()..add(const LoadSurahs()),
+    child: Scaffold(
       backgroundColor: const Color(0xFFFCF5D7),
       appBar: QuranAppBar(
         surahName: _currentSurahName,
@@ -201,7 +208,9 @@ class MushafPageState extends State<MushafPage> {
           ],
         ),
       ),
-    );
+    ),
+
+      );
   }
 }
 

@@ -1,9 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:hijri/hijri_calendar.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../../../core/router/app_router.dart';
 import '../../../../core/services/quran_bookmark_service.dart';
 import '../../../quran/presentation/widgets/mushaf_page.dart';
