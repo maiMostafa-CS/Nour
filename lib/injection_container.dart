@@ -1,4 +1,5 @@
 import 'package:get_it/get_it.dart';
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'core/router/app_router.dart';
@@ -68,15 +69,21 @@ import 'features/adhkar/domain/usecases/get_adhkar.dart';
 import 'features/adhkar/presentation/bloc/adhkar_bloc.dart';
 import 'features/quran/data/datasources/quran_ayah_number_helper.dart';
 import 'features/quran/data/datasources/quran_local_data_source.dart';
+import 'features/quran/data/datasources/quranpedia_remote_data_source.dart';
 import 'features/quran/data/repositories/quran_audio_repository_impl.dart';
 import 'features/quran/data/repositories/quran_repository_impl.dart';
+import 'features/quran/data/repositories/tafsir_books_repository_impl.dart';
 import 'features/quran/domain/repositories/quran_audio_repository.dart';
 import 'features/quran/domain/repositories/quran_repository.dart';
+import 'features/quran/domain/repositories/tafsir_books_repository.dart';
 import 'features/quran/domain/usecases/ get_ayah_audio_url.dart';
+import 'features/quran/domain/usecases/GetAyahTafsir.dart';
 import 'features/quran/domain/usecases/get_quran_reciters.dart';
 import 'features/quran/domain/usecases/get_surahs.dart';
+import 'features/quran/domain/usecases/get_tafsir_books.dart';
 import 'features/quran/domain/usecases/search_surahs.dart';
 import 'features/quran/presentation/bloc/quran_bloc.dart';
+
 
 final sl = GetIt.instance;
 
@@ -486,7 +493,64 @@ Future<void> configureDependencies() async {
       searchSurahs: sl<SearchSurahs>(),
       getQuranReciters: sl<GetQuranReciters>(),
       getAyahAudioUrl: sl<GetAyahAudioUrl>(),
+
+      // Tafsir
+      getTafsirBooks: sl<GetTafsirBooks>(),
+      getAyahTafsir: sl<GetAyahTafsir>(),
+
+      // Audio
       audioService: sl<AyahAudioService>(),
     ),
   );
+  //
+  // sl.registerLazySingleton<QuranRepository>(
+  //       () => QuranRepositoryImpl(dataSource: sl()),
+  // );
+  //
+  // sl.registerFactory(
+  //       () => GetAyahTafsir(sl()),
+  // );
+  //
+  // sl.registerFactory(
+  //       () => GetAyahAsbabNuzul(sl()),
+  // );
+  //
+  // sl.registerFactory(
+  //       () => SearchQuran(sl()),
+  // );
+  // sl.registerFactory<QuranBloc>(
+  //       () => QuranBloc(),
+  // );
+// ============================================================
+// Quranpedia
+// ============================================================
+
+  sl.registerLazySingleton<http.Client>(
+        () => http.Client(),
+  );
+
+  sl.registerLazySingleton<QuranpediaRemoteDataSource>(
+        () => QuranpediaRemoteDataSourceImpl(
+      client: sl<http.Client>(),
+    ),
+  );
+
+  sl.registerLazySingleton<TafsirBooksRepository>(
+        () => TafsirBooksRepositoryImpl(
+      remoteDataSource: sl<QuranpediaRemoteDataSource>(),
+    ),
+  );
+
+  sl.registerLazySingleton<GetTafsirBooks>(
+        () => GetTafsirBooks(
+      sl<TafsirBooksRepository>(),
+    ),
+  );
+
+  sl.registerLazySingleton<GetAyahTafsir>(
+        () => GetAyahTafsir(
+      sl<TafsirBooksRepository>(),
+    ),
+  );
+
 }

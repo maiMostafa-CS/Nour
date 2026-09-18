@@ -944,6 +944,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.0.8"
+  quran_kit:
+    dependency: "direct main"
+    description:
+      name: quran_kit
+      sha256: "3b2469aeab27f1040523f0a1bee06b6f51b2eebe1734872f510d6478240f5228"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.0"
   record_use:
     dependency: transitive
     description:

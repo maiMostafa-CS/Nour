@@ -72,3 +72,44 @@ class ResumeAyah extends QuranIndexEvent {
 class StopAyah extends QuranIndexEvent {
   const StopAyah();
 }
+// ============================================================
+// TAFSIR
+// ============================================================
+
+class LoadTafsirBooks extends QuranIndexEvent {
+  final int surahNumber;
+
+  const LoadTafsirBooks(this.surahNumber);
+
+  @override
+  List<Object?> get props => [surahNumber];
+}
+
+class SelectTafsirBook extends QuranIndexEvent {
+  final int bookId;
+
+  const SelectTafsirBook(this.bookId);
+
+  @override
+  List<Object?> get props => [bookId];
+}
+
+class LoadAyahTafsir extends QuranIndexEvent {
+  final int surahNumber;
+  final int ayahNumber;
+
+  const LoadAyahTafsir({
+    required this.surahNumber,
+    required this.ayahNumber,
+  });
+
+  @override
+  List<Object?> get props => [
+    surahNumber,
+    ayahNumber,
+  ];
+}
+
+class ClearAyahTafsir extends QuranIndexEvent {
+  const ClearAyahTafsir();
+}

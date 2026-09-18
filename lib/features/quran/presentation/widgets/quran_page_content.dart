@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -10,22 +13,23 @@ import '../bloc/quran_event.dart';
 import '../bloc/quran_state.dart';
 import 'ayah_action_button.dart';
 import 'build_ayah_actions.dart';
+import 'no_internet_listener.dart';
 
 class QuranPageContent extends StatefulWidget {
   final int pageNumber;
   final PageController? controller;
 
   final void Function({
-    required int pageNumber,
-    required String surahName,
-    required int? juz,
-    required int? hizb,
-    int? rub,
+  required int pageNumber,
+  required String surahName,
+  required int? juz,
+  required int? hizb,
+  int? rub,
   })? onPageInfoLoaded;
 
   final void Function({
-    required int surahNumber,
-    required int verseNumber,
+  required int surahNumber,
+  required int verseNumber,
   })? onAyahTap;
 
   const QuranPageContent({
@@ -54,6 +58,12 @@ class _QuranPageContentState extends State<QuranPageContent>
 
   int? _selectedSurahNumber;
   int? _selectedVerseNumber;
+
+  // ============================================================
+  // آخر عملية تحتاج إنترنت (لزر "إعادة المحاولة")
+  // ============================================================
+
+  VoidCallback? _lastRetryAction;
 
   // ============================================================
   // فلاش الآية
@@ -91,7 +101,7 @@ class _QuranPageContentState extends State<QuranPageContent>
       ),
       TweenSequenceItem(
         tween:
-            Tween(begin: 1.0, end: 0.0).chain(CurveTween(curve: Curves.easeIn)),
+        Tween(begin: 1.0, end: 0.0).chain(CurveTween(curve: Curves.easeIn)),
         weight: 70,
       ),
     ]).animate(controller);
@@ -115,7 +125,6 @@ class _QuranPageContentState extends State<QuranPageContent>
     super.dispose();
   }
 
-
   void _triggerAyahFlash() {
     _flashController?.forward(from: 0);
   }
@@ -137,79 +146,89 @@ class _QuranPageContentState extends State<QuranPageContent>
 
   @override
   Widget build(BuildContext context) {
-    final double offsetY = _currentPage <= 2 ? -40 : 10.0;
+    final double offsetY = _currentPage <= 2 ? -50 : -20.0;
 
-    return Transform.translate(
-      offset: Offset(0, offsetY),
-      child: Stack(
-        children: [
-          // ======================================================
-          // المصحف
-          // ======================================================
-
-          PageviewQuran(
-            pageBackgroundColor: const Color(0xFFFCF5D7),
-            controller: _controller,
-            physics: const NeverScrollableScrollPhysics(),
-            sp: .9.w,
-            h: 1.h,
-
-            verseBackgroundColor: _verseBackgroundColor,
-
-            onTap: (surahNumber, verseNumber) {
-              debugPrint(
-                '📖 AYAH TAP: $surahNumber:$verseNumber',
-              );
-
-              if (!mounted) return;
-
-              setState(() {
-                _selectedSurahNumber = surahNumber;
-                _selectedVerseNumber = verseNumber;
-              });
-
-              _triggerAyahFlash();
-
-              widget.onAyahTap?.call(
-                surahNumber: surahNumber,
-                verseNumber: verseNumber,
-              );
-            },
-
+    // dialog "لا يوجد إنترنت" للصفحة كلها (الصوت + التفسير)
+    return NoInternetListener(
+      onRetry: () => _lastRetryAction?.call(),
+      child: Transform.translate(
+        offset: Offset(0, offsetY),
+        child: Stack(
+          children: [
             // ====================================================
-            // تغيير الصفحة
+            // المصحف
             // ====================================================
 
-            onPageChanged: (pageNumber) {
-              _reportPageInfo(pageNumber);
+            PageviewQuran(
+              pageBackgroundColor: const Color(0xFFFCF5D7),
+              controller: _controller,
+              physics: const NeverScrollableScrollPhysics(),
+              sp: .9.w,
+              h: 1.h,
 
-              if (!mounted) return;
+              verseBackgroundColor: _verseBackgroundColor,
 
-              setState(() {
-                _selectedSurahNumber = null;
-                _selectedVerseNumber = null;
-              });
+              onTap: (surahNumber, verseNumber) {
+                debugPrint(
+                  '📖 AYAH TAP → '
+                      'surah=$surahNumber, '
+                      'ayah=$verseNumber',
+                );
 
-              _flashController?.reset();
-            },
-          ),
+                if (!mounted) return;
 
-          if (_selectedSurahNumber != null && _selectedVerseNumber != null)
-            Positioned(
+                setState(() {
+                  _selectedSurahNumber = surahNumber;
+                  _selectedVerseNumber = verseNumber;
+                });
+
+                debugPrint(
+                  '📌 SELECTED → '
+                      'surah=$_selectedSurahNumber, '
+                      'ayah=$_selectedVerseNumber',
+                );
+
+                _triggerAyahFlash();
+
+                widget.onAyahTap?.call(
+                  surahNumber: surahNumber,
+                  verseNumber: verseNumber,
+                );
+              },
+
+              // ==================================================
+              // تغيير الصفحة
+              // ==================================================
+
+              onPageChanged: (pageNumber) {
+                _reportPageInfo(pageNumber);
+
+                if (!mounted) return;
+
+                setState(() {
+                  _selectedSurahNumber = null;
+                  _selectedVerseNumber = null;
+                });
+
+                _flashController?.reset();
+              },
+            ),
+
+            if (_selectedSurahNumber != null && _selectedVerseNumber != null)
+              Positioned(
                 left: 12.w,
                 right: 12.w,
                 bottom: 18.h,
-                child: _buildAyahActions()
-                // _buildAyahActions(),
-                ),
-        ],
+                child: _buildAyahActions(),
+              ),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildAyahActions() {
-    if (_selectedSurahNumber == null ||
-        _selectedVerseNumber == null) {
+    if (_selectedSurahNumber == null || _selectedVerseNumber == null) {
       return const SizedBox.shrink();
     }
 
@@ -242,29 +261,33 @@ class _QuranPageContentState extends State<QuranPageContent>
           // ======================================================
 
           onListen: () {
-              debugPrint('🔵 onListen triggered');
-              debugPrint('   selectedReciter = $selectedReciter');
-              debugPrint('   surahNumber = $_selectedSurahNumber');
-              debugPrint('   verseNumber = $_selectedVerseNumber');
+            debugPrint('🔵 onListen triggered');
+            debugPrint('   selectedReciter = $selectedReciter');
+            debugPrint('   surahNumber = $_selectedSurahNumber');
+            debugPrint('   verseNumber = $_selectedVerseNumber');
 
-              if (selectedReciter == null) {
-                debugPrint('⚠️ selectedReciter is null → show reciter selection');
-                _showReciterSelection(context);
-                return;
-              }
+            if (selectedReciter == null) {
+              debugPrint('⚠️ selectedReciter is null → show reciter selection');
+              _showReciterSelection(context);
+              return;
+            }
 
             final globalAyahNumber = getGlobalAyahNumber(
               _selectedSurahNumber!,
               _selectedVerseNumber!,
             );
 
-            context.read<QuranIndexBloc>().add(
-              PlayAyah(
-                reciterIdentifier:
-                selectedReciter.identifier,
-                globalAyahNumber: globalAyahNumber,
-              ),
+            final bloc = context.read<QuranIndexBloc>();
+
+            final playEvent = PlayAyah(
+              reciterIdentifier: selectedReciter.identifier,
+              globalAyahNumber: globalAyahNumber,
             );
+
+            // لو مفيش نت، زر "إعادة المحاولة" يعيد التشغيل
+            _lastRetryAction = () => bloc.add(playEvent);
+
+            bloc.add(playEvent);
           },
 
           // ======================================================
@@ -353,9 +376,9 @@ class _QuranPageContentState extends State<QuranPageContent>
     if (surahNumber == null || verseNumber == null) {
       debugPrint(
         '⚠️ بيانات الصفحة غير مكتملة: '
-        'page=$pageNumber, '
-        'surah=$surahNumber, '
-        'start=$verseNumber',
+            'page=$pageNumber, '
+            'surah=$surahNumber, '
+            'start=$verseNumber',
       );
 
       return;
@@ -388,6 +411,7 @@ class _QuranPageContentState extends State<QuranPageContent>
       rub: null,
     );
   }
+
   void _showReciterSelection(BuildContext context) {
     final state = context.read<QuranIndexBloc>().state;
 
@@ -421,7 +445,45 @@ class _QuranPageContentState extends State<QuranPageContent>
       },
     );
   }
-  void _showTafsir(BuildContext context) {
+
+  Future<void> _showTafsir(BuildContext context) async {
+    final surahNumber = _selectedSurahNumber;
+    final verseNumber = _selectedVerseNumber;
+
+    if (surahNumber == null || verseNumber == null) {
+      return;
+    }
+
+    final bloc = context.read<QuranIndexBloc>();
+
+    // فحص الإنترنت قبل فتح الـ BottomSheet
+    final online = await _hasInternet();
+
+    if (!context.mounted) return;
+
+    if (!online) {
+      showNoInternetDialog(
+        context,
+        onRetry: () => _showTafsir(context),
+      );
+      return;
+    }
+
+    // لو انقطع النت وأنت جوه الـ BottomSheet، "إعادة المحاولة" تعيد تحميل الآية
+    _lastRetryAction = () => bloc.add(
+      LoadAyahTafsir(
+        surahNumber: surahNumber,
+        ayahNumber: verseNumber,
+      ),
+    );
+
+    bloc.add(
+      LoadAyahTafsir(
+        surahNumber: surahNumber,
+        ayahNumber: verseNumber,
+      ),
+    );
+
     showModalBottomSheet(
       context: context,
       backgroundColor: const Color(0xFFFCF5D7),
@@ -431,39 +493,285 @@ class _QuranPageContentState extends State<QuranPageContent>
           top: Radius.circular(24.r),
         ),
       ),
-      builder: (_) {
-        return SafeArea(
-          child: Padding(
-            padding: EdgeInsets.all(20.w),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'تفسير ${getSurahNameArabic(_selectedSurahNumber!)}',
-                  style: TextStyle(
-                    fontSize: 18.sp,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: 12.h),
-                Text(
-                  'الآية ${_selectedVerseNumber!}',
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    color: Colors.black54,
-                  ),
-                ),
-                SizedBox(height: 20.h),
-                const Text(
-                  'سيتم تحميل التفسير هنا.',
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: 20.h),
-              ],
-            ),
+      builder: (sheetContext) {
+        return BlocProvider.value(
+          value: bloc,
+          child: StatefulBuilder(
+            builder: (context, setSheetState) {
+              return BlocBuilder<QuranIndexBloc, QuranIndexState>(
+                builder: (context, state) {
+                  if (state is! QuranIndexLoaded) {
+                    return SizedBox(
+                      height: 300.h,
+                      child: const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    );
+                  }
+
+                  final books = state.tafsirBooks;
+                  final selectedBook = state.selectedTafsirBook;
+                  final tafsir = state.ayahTafsir;
+                  final isLoading = state.isTafsirLoading;
+
+                  return SafeArea(
+                    child: SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.75,
+                      child: Padding(
+                        padding: EdgeInsets.all(20.w),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            // ==================================================
+                            // Header
+                            // ==================================================
+
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    'تفسير ${getSurahNameArabic(surahNumber)}',
+                                    style: TextStyle(
+                                      fontSize: 19.sp,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                IconButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  icon: const Icon(Icons.close),
+                                ),
+                              ],
+                            ),
+
+                            SizedBox(height: 4.h),
+
+                            Text(
+                              'الآية $verseNumber',
+                              style: TextStyle(
+                                fontSize: 14.sp,
+                                color: Colors.black54,
+                              ),
+                            ),
+
+                            SizedBox(height: 16.h),
+
+                            // ==================================================
+                            // Loading books
+                            // ==================================================
+
+                            if (isLoading && books.isEmpty)
+                              const Expanded(
+                                child: Center(
+                                  child: CircularProgressIndicator(),
+                                ),
+                              )
+
+                            // ==================================================
+                            // No books
+                            // ==================================================
+
+                            else if (books.isEmpty)
+                              Expanded(
+                                child: Center(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        Icons.menu_book_outlined,
+                                        size: 48.sp,
+                                        color: Colors.black38,
+                                      ),
+                                      SizedBox(height: 12.h),
+                                      Text(
+                                        'لا توجد كتب تفسير متاحة',
+                                        style: TextStyle(
+                                          fontSize: 15.sp,
+                                          color: Colors.black54,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              )
+
+                            // ==================================================
+                            // Content
+                            // ==================================================
+
+                            else ...[
+                                // اختيار كتاب التفسير
+                                Text(
+                                  'كتاب التفسير',
+                                  style: TextStyle(
+                                    fontSize: 14.sp,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+
+                                SizedBox(height: 8.h),
+
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 12.w,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.65),
+                                    borderRadius: BorderRadius.circular(14.r),
+                                    border: Border.all(
+                                      color: Colors.black12,
+                                    ),
+                                  ),
+                                  child: DropdownButtonHideUnderline(
+                                    child: DropdownButton<int>(
+                                      value: selectedBook?.id,
+                                      isExpanded: true,
+                                      borderRadius: BorderRadius.circular(14.r),
+                                      items: books.map((book) {
+                                        return DropdownMenuItem<int>(
+                                          value: book.id,
+                                          child: Text(
+                                            book.name,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        );
+                                      }).toList(),
+                                      onChanged: (bookId) {
+                                        if (bookId == null) return;
+
+                                        bloc.add(
+                                          SelectTafsirBook(bookId),
+                                        );
+
+                                        bloc.add(
+                                          LoadAyahTafsir(
+                                            surahNumber: surahNumber,
+                                            ayahNumber: verseNumber,
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ),
+
+                                SizedBox(height: 20.h),
+
+                                // اسم الكتاب الحالي
+                                if (selectedBook != null)
+                                  Container(
+                                    padding: EdgeInsets.all(12.w),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withOpacity(0.45),
+                                      borderRadius: BorderRadius.circular(12.r),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          Icons.menu_book,
+                                          size: 20.sp,
+                                        ),
+                                        SizedBox(width: 8.w),
+                                        Expanded(
+                                          child: Text(
+                                            selectedBook.name,
+                                            style: TextStyle(
+                                              fontSize: 14.sp,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+
+                                SizedBox(height: 16.h),
+
+                                // التفسير
+                                Expanded(
+                                  child: isLoading
+                                      ? const Center(
+                                    child: CircularProgressIndicator(),
+                                  )
+                                      : tafsir == null
+                                      ? Center(
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          Icons.info_outline,
+                                          size: 42.sp,
+                                          color: Colors.black38,
+                                        ),
+                                        SizedBox(height: 10.h),
+                                        Text(
+                                          'لا يوجد تفسير لهذه الآية',
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            fontSize: 15.sp,
+                                            color: Colors.black54,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                      : SingleChildScrollView(
+                                    physics:
+                                    const BouncingScrollPhysics(),
+                                    child: Container(
+                                      width: double.infinity,
+                                      padding: EdgeInsets.all(16.w),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white
+                                            .withOpacity(0.55),
+                                        borderRadius:
+                                        BorderRadius.circular(
+                                          16.r,
+                                        ),
+                                      ),
+                                      child: Directionality(
+                                        textDirection:
+                                        TextDirection.rtl,
+                                        child: Text(
+                                          tafsir.text,
+                                          textAlign:
+                                          TextAlign.justify,
+                                          style: TextStyle(
+                                            fontSize: 16.sp,
+                                            height: 1.9,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
           ),
         );
       },
     );
+  }
+
+  Future<bool> _hasInternet() async {
+    try {
+      final result = await InternetAddress.lookup('api.quran.com')
+          .timeout(const Duration(seconds: 5));
+
+      return result.isNotEmpty && result.first.rawAddress.isNotEmpty;
+    } on SocketException {
+      return false;
+    } on TimeoutException {
+      return false;
+    }
   }
 }

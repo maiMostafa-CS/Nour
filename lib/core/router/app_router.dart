@@ -44,6 +44,7 @@ static const adhan= "/adhan";
   static const adhanSetting= "/adhanSetting";
 static const iqamaSettings= "/iqamaSettings";
   static const prayerSettingsPage= "/prayerSettingsPage";
+  static const quranHomePage= "/quranHomePage";
 
   static Route<dynamic> onGenerateRoute(
       RouteSettings settings,
@@ -120,6 +121,18 @@ static const iqamaSettings= "/iqamaSettings";
             child: const IqamaSettingsPage(),
           ),
         );
+      // case quranHomePage:
+      //   return MaterialPageRoute(
+      //     builder: (_) => BlocProvider<QuranBloc>(
+      //       create: (_) => sl<QuranBloc>()
+      //         ..add(
+      //           const QuranStarted(),
+      //         ),
+      //       child: const QuranHomePage(),
+      //     ),
+      //   );
+
+
       case home:
       default:
         return MaterialPageRoute(

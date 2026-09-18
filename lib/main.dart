@@ -2,6 +2,7 @@ import 'package:azkary/azkary.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:quran_kit/kit.dart';
 
 import 'app.dart';
 import 'core/services/prayer_scheduler_split/prayer_scheduler/adhan_scheduler_service.dart';
@@ -16,8 +17,24 @@ Future<void> main() async {
 
   runApp(const IslamicApp());
   // await Azkary.initialize();
+  await QuranKit.initialize(
+    QuranKitConfig(
+      fontBaseUrl: 'https://YOUR-DOMAIN.com/qfc4',
 
-  SchedulerBinding.instance.addPostFrameCallback((_) async {
+      enableAudio: true,
+      enableTafsir: true,
+      enableSearch: true,
+      enableWordByWord: true,
+      enableAsbabNuzul: true,
+
+      defaultReciterIndex: 0,
+      defaultTafsirId: 'al-tabari',
+      defaultEditionId: 'ar-uthmani',
+      defaultQiraa: 'hafs',
+
+      showTajweed: true,
+    ),
+  );  SchedulerBinding.instance.addPostFrameCallback((_) async {
     await _backgroundSetup();
   });
 }
