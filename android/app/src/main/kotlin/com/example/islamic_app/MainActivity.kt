@@ -1,7 +1,7 @@
 //package com.example.islamic_app
 //
 //import android.content.Intent
-//import android.os.Bundle
+//import android.os.Build
 //import android.provider.Settings
 //import android.util.Log
 //import io.flutter.embedding.android.FlutterActivity
@@ -70,9 +70,9 @@
 //        }
 //    }
 //
-//    // ================================================================
-//    // Flutter Engine
-//    // ================================================================
+//// ================================================================
+//// Flutter Engine
+//// ================================================================
 //
 //    override fun configureFlutterEngine(
 //        flutterEngine: FlutterEngine
@@ -203,16 +203,11 @@
 //
 //                    Log.d(
 //                        "KhatmaNative",
-//                        "✅ Current ayah saved: " +
-//                                "$surahName $ayahNumber"
+//                        "✅ Current ayah saved: $surahName $ayahNumber"
 //                    )
 //
 //                    result.success(true)
 //                }
-//
-//                // ====================================================
-//                // Unknown Khatma Method
-//                // ====================================================
 //
 //                else -> {
 //                    result.notImplemented()
@@ -247,6 +242,11 @@
 //                                false
 //                            )
 //
+//                    Log.d(
+//                        "UnlockCard",
+//                        "ℹ️ Service enabled = $enabled"
+//                    )
+//
 //                    result.success(enabled)
 //                }
 //
@@ -262,6 +262,10 @@
 //                            MODE_PRIVATE
 //                        )
 //
+//                    // ------------------------------------------------
+//                    // Save enabled state FIRST
+//                    // ------------------------------------------------
+//
 //                    prefs.edit()
 //                        .putBoolean(
 //                            "enabled",
@@ -269,22 +273,84 @@
 //                        )
 //                        .apply()
 //
+//                    // ------------------------------------------------
+//                    // Check Overlay Permission
+//                    // ------------------------------------------------
+//
+//                    if (!Settings.canDrawOverlays(this)) {
+//
+//                        Log.e(
+//                            "UnlockCard",
+//                            "❌ Overlay permission is not granted"
+//                        )
+//
+//                        // لا نبدأ الخدمة بدون صلاحية الـ Overlay.
+//                        // نرجع false إلى Flutter.
+//                        result.success(false)
+//
+//                        return@setMethodCallHandler
+//                    }
+//
+//                    // ------------------------------------------------
+//                    // Start Foreground Service
+//                    // ------------------------------------------------
+//
 //                    val serviceIntent =
 //                        Intent(
 //                            this,
 //                            UnlockService::class.java
 //                        )
 //
-//                    startService(
-//                        serviceIntent
-//                    )
+//                    try {
 //
-//                    Log.d(
-//                        "UnlockCard",
-//                        "✅ UnlockService started"
-//                    )
+//                        if (
+//                            Build.VERSION.SDK_INT >=
+//                            Build.VERSION_CODES.O
+//                        ) {
 //
-//                    result.success(true)
+//                            startForegroundService(
+//                                serviceIntent
+//                            )
+//
+//                        } else {
+//
+//                            startService(
+//                                serviceIntent
+//                            )
+//                        }
+//
+//                        Log.d(
+//                            "UnlockCard",
+//                            "✅ UnlockService started"
+//                        )
+//
+//                        result.success(true)
+//
+//                    } catch (e: Exception) {
+//
+//                        // --------------------------------------------
+//                        // إذا فشل تشغيل الخدمة نرجع الحالة إلى OFF
+//                        // --------------------------------------------
+//
+//                        prefs.edit()
+//                            .putBoolean(
+//                                "enabled",
+//                                false
+//                            )
+//                            .apply()
+//
+//                        Log.e(
+//                            "UnlockCard",
+//                            "❌ Failed to start UnlockService",
+//                            e
+//                        )
+//
+//                        result.error(
+//                            "SERVICE_START_FAILED",
+//                            "Failed to start UnlockService",
+//                            e.message
+//                        )
+//                    }
 //                }
 //
 //                // ====================================================
@@ -293,30 +359,57 @@
 //
 //                "stopService" -> {
 //
-//                    getSharedPreferences(
-//                        PRAYER_CARD_PREFS,
-//                        MODE_PRIVATE
-//                    )
-//                        .edit()
+//                    val prefs =
+//                        getSharedPreferences(
+//                            PRAYER_CARD_PREFS,
+//                            MODE_PRIVATE
+//                        )
+//
+//                    // ------------------------------------------------
+//                    // Save disabled state
+//                    // ------------------------------------------------
+//
+//                    prefs.edit()
 //                        .putBoolean(
 //                            "enabled",
 //                            false
 //                        )
 //                        .apply()
 //
-//                    stopService(
-//                        Intent(
-//                            this,
-//                            UnlockService::class.java
+//                    // ------------------------------------------------
+//                    // Stop Service
+//                    // ------------------------------------------------
+//
+//                    try {
+//
+//                        stopService(
+//                            Intent(
+//                                this,
+//                                UnlockService::class.java
+//                            )
 //                        )
-//                    )
 //
-//                    Log.d(
-//                        "UnlockCard",
-//                        "🛑 UnlockService stopped"
-//                    )
+//                        Log.d(
+//                            "UnlockCard",
+//                            "🛑 UnlockService stopped"
+//                        )
 //
-//                    result.success(true)
+//                        result.success(true)
+//
+//                    } catch (e: Exception) {
+//
+//                        Log.e(
+//                            "UnlockCard",
+//                            "❌ Failed to stop UnlockService",
+//                            e
+//                        )
+//
+//                        result.error(
+//                            "SERVICE_STOP_FAILED",
+//                            "Failed to stop UnlockService",
+//                            e.message
+//                        )
+//                    }
 //                }
 //
 //                // ====================================================
@@ -382,9 +475,9 @@
 //        }
 //    }
 //
-//    // ================================================================
-//    // Activity Destroyed
-//    // ================================================================
+//// ================================================================
+//// Activity Destroyed
+//// ================================================================
 //
 //    override fun onDestroy() {
 //
@@ -397,6 +490,7 @@
 //
 //        super.onDestroy()
 //    }
+//
 //}
 package com.example.islamic_app
 
@@ -429,6 +523,9 @@ class MainActivity : FlutterActivity() {
 
         private const val KHATMA_PREFS =
             "khatma_unlock"
+
+        private const val KHATMA_WEEKLY_PREFS =
+            "khatma_weekly"
 
         private const val PRAYER_CARD_PREFS =
             "prayer_card"
@@ -470,9 +567,9 @@ class MainActivity : FlutterActivity() {
         }
     }
 
-// ================================================================
-// Flutter Engine
-// ================================================================
+    // ================================================================
+    // Flutter Engine
+    // ================================================================
 
     override fun configureFlutterEngine(
         flutterEngine: FlutterEngine
@@ -609,6 +706,95 @@ class MainActivity : FlutterActivity() {
                     result.success(true)
                 }
 
+                // ====================================================
+                // Save Weekly Khatma Report
+                // ====================================================
+
+                "saveWeeklyReport" -> {
+
+                    val args =
+                        call.arguments as? Map<*, *>
+
+                    if (args == null) {
+
+                        result.error(
+                            "INVALID_ARGUMENTS",
+                            "Weekly report arguments are missing",
+                            null
+                        )
+
+                        return@setMethodCallHandler
+                    }
+
+                    val totalAyahs =
+                        (args["totalAyahs"] as? Number)
+                            ?.toInt()
+
+                    val currentWeekAyahs =
+                        (args["currentWeekAyahs"] as? Number)
+                            ?.toInt()
+
+                    val weekNumber =
+                        (args["weekNumber"] as? Number)
+                            ?.toInt()
+
+                    // =================================================
+                    // Validate
+                    // =================================================
+
+                    if (
+                        totalAyahs == null ||
+                        currentWeekAyahs == null ||
+                        weekNumber == null
+                    ) {
+
+                        result.error(
+                            "INVALID_WEEKLY_REPORT",
+                            "Incomplete weekly report data",
+                            null
+                        )
+
+                        return@setMethodCallHandler
+                    }
+
+                    // =================================================
+                    // Save Weekly Report
+                    // =================================================
+
+                    getSharedPreferences(
+                        KHATMA_WEEKLY_PREFS,
+                        MODE_PRIVATE
+                    )
+                        .edit()
+                        .putInt(
+                            "totalAyahs",
+                            totalAyahs
+                        )
+                        .putInt(
+                            "currentWeekAyahs",
+                            currentWeekAyahs
+                        )
+                        .putInt(
+                            "weekNumber",
+                            weekNumber
+                        )
+                        .apply()
+
+                    Log.d(
+                        "KhatmaNative",
+                        "📊 Weekly report saved: " +
+                                "total=$totalAyahs, " +
+                                "currentWeek=$currentWeekAyahs, " +
+                                "week=$weekNumber"
+                    )
+
+                    result.success(true)
+                }
+
+                // ====================================================
+                // Unknown Khatma Method
+                // ====================================================
+
                 else -> {
                     result.notImplemented()
                 }
@@ -684,8 +870,6 @@ class MainActivity : FlutterActivity() {
                             "❌ Overlay permission is not granted"
                         )
 
-                        // لا نبدأ الخدمة بدون صلاحية الـ Overlay.
-                        // نرجع false إلى Flutter.
                         result.success(false)
 
                         return@setMethodCallHandler
@@ -727,10 +911,6 @@ class MainActivity : FlutterActivity() {
                         result.success(true)
 
                     } catch (e: Exception) {
-
-                        // --------------------------------------------
-                        // إذا فشل تشغيل الخدمة نرجع الحالة إلى OFF
-                        // --------------------------------------------
 
                         prefs.edit()
                             .putBoolean(
@@ -875,9 +1055,9 @@ class MainActivity : FlutterActivity() {
         }
     }
 
-// ================================================================
-// Activity Destroyed
-// ================================================================
+    // ================================================================
+    // Activity Destroyed
+    // ================================================================
 
     override fun onDestroy() {
 
@@ -890,5 +1070,4 @@ class MainActivity : FlutterActivity() {
 
         super.onDestroy()
     }
-
 }

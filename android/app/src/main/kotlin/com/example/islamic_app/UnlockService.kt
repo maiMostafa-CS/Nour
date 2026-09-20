@@ -144,20 +144,6 @@ class UnlockService : Service() {
             )
         }
 
-
-        val stopIntent = PendingIntent.getService(
-            this,
-            100,
-            Intent(
-                this,
-                UnlockService::class.java
-            ).apply {
-                action = ACTION_STOP
-            },
-            PendingIntent.FLAG_IMMUTABLE or
-                    PendingIntent.FLAG_UPDATE_CURRENT
-        )
-
         return NotificationCompat.Builder(
             this,
             NOTIFICATION_CHANNEL_ID
@@ -177,13 +163,5 @@ class UnlockService : Service() {
             .setSilent(true)
             .setShowWhen(false)
             .setOnlyAlertOnce(true)
-
-            .addAction(
-                0,
-                "إيقاف",
-                stopIntent
-            )
-
             .build()
-    }
-}
+    }}

@@ -2,18 +2,20 @@ import 'package:flutter/services.dart';
 
 import '../domain/entities/khatma_progress.dart';
 
-
 class KhatmaUnlockSyncService {
   KhatmaUnlockSyncService._();
 
-  static const MethodChannel _channel =
-  MethodChannel(
+  static const MethodChannel _channel = MethodChannel(
     'com.example.islamic_app/khatma',
   );
 
+// ============================================================
+// Save Current Ayah
+// ============================================================
+
   static Future<void> saveCurrentAyah(
-      KhatmaUnlockAyah ayah,
-      ) async {
+    KhatmaUnlockAyah ayah,
+  ) async {
     await _channel.invokeMethod(
       'saveCurrentAyah',
       {
@@ -27,11 +29,34 @@ class KhatmaUnlockSyncService {
     );
   }
 
+// ============================================================
+// Save Weekly Khatma Report
+// ============================================================
+
+  static Future<void> saveWeeklyReport({
+    required int totalAyahs,
+    required int currentWeekAyahs,
+    required int weekNumber,
+  }) async {
+    await _channel.invokeMethod(
+      'saveWeeklyReport',
+      {
+        'totalAyahs': totalAyahs,
+        'currentWeekAyahs': currentWeekAyahs,
+        'weekNumber': weekNumber,
+      },
+    );
+  }
+
+// ============================================================
+// Native → Flutter
+// ============================================================
+
   static void setKhatmaReadHandler(
-      Future<void> Function() onRead,
-      ) {
+    Future<void> Function() onRead,
+  ) {
     _channel.setMethodCallHandler(
-          (call) async {
+      (call) async {
         if (call.method == 'markCurrentAyahAsRead') {
           await onRead();
         }

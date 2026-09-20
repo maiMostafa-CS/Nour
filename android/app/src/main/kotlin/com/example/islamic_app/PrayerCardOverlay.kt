@@ -10,29 +10,33 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
-import android.widget.Button
+import android.widget.ImageButton
 import android.widget.TextView
 
 object PrayerCardOverlay {
+
+    private const val TAG = "UnlockCard"
 
     private var view: View? = null
 
     private val handler =
         Handler(Looper.getMainLooper())
 
-// ================================================================
-// Show Card
-// ================================================================
+    // ================================================================
+    // Show Card
+    // ================================================================
 
     fun show(
         context: Context,
         title: String,
         subtitle: String
     ) {
-        val app = context.applicationContext
+
+        val app =
+            context.applicationContext
 
         Log.d(
-            "UnlockCard",
+            TAG,
             "🔥 PrayerCardOverlay.show()"
         )
 
@@ -41,15 +45,17 @@ object PrayerCardOverlay {
         // ============================================================
 
         if (!Settings.canDrawOverlays(app)) {
+
             Log.e(
-                "UnlockCard",
+                TAG,
                 "❌ Overlay permission NOT granted"
             )
+
             return
         }
 
         Log.d(
-            "UnlockCard",
+            TAG,
             "✅ Overlay permission granted"
         )
 
@@ -73,10 +79,12 @@ object PrayerCardOverlay {
         // ============================================================
 
         val cardView =
-            LayoutInflater.from(app).inflate(
-                R.layout.overlay_prayer_card,
-                null
-            )
+            LayoutInflater
+                .from(app)
+                .inflate(
+                    R.layout.overlay_prayer_card,
+                    null
+                )
 
         // ============================================================
         // Ayah Text
@@ -99,27 +107,28 @@ object PrayerCardOverlay {
             .text = subtitle
 
         // ============================================================
-        // Read Button
+        // Read Icon
         // ============================================================
 
         cardView
-            .findViewById<Button>(
+            .findViewById<ImageButton>(
                 R.id.readButton
             )
             .setOnClickListener {
 
                 Log.d(
-                    "UnlockCard",
-                    "✅ Read button clicked"
+                    TAG,
+                    "✅ Read icon clicked"
                 )
 
-                // Flutter هو Source of Truth.
-                // Kotlin فقط يرسل Event إلى Flutter.
+                // ====================================================
+                // Flutter هو Source of Truth
+                // ====================================================
 
                 MainActivity.notifyKhatmaRead()
 
                 Log.d(
-                    "UnlockCard",
+                    TAG,
                     "🚀 Khatma read sent to Flutter"
                 )
 
@@ -127,18 +136,18 @@ object PrayerCardOverlay {
             }
 
         // ============================================================
-        // Later Button
+        // Later Icon
         // ============================================================
 
         cardView
-            .findViewById<Button>(
+            .findViewById<ImageButton>(
                 R.id.laterButton
             )
             .setOnClickListener {
 
                 Log.d(
-                    "UnlockCard",
-                    "⏳ Later button clicked"
+                    TAG,
+                    "⏳ Later icon clicked"
                 )
 
                 // لا نغير حالة الختمة.
@@ -159,11 +168,12 @@ object PrayerCardOverlay {
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
                         WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
                 PixelFormat.TRANSLUCENT
-            ).apply {
+            )
+                .apply {
 
-                gravity = Gravity.TOP
-                y = 80
-            }
+                    // الكارد في منتصف الشاشة
+                    gravity = Gravity.CENTER
+                }
 
         // ============================================================
         // Add Overlay
@@ -179,27 +189,28 @@ object PrayerCardOverlay {
             view = cardView
 
             Log.d(
-                "UnlockCard",
+                TAG,
                 "🔥🔥 Overlay added successfully"
             )
 
         } catch (e: Exception) {
 
             Log.e(
-                "UnlockCard",
+                TAG,
                 "❌ Overlay addView FAILED",
                 e
             )
         }
     }
 
-// ================================================================
-// Dismiss
-// ================================================================
+    // ================================================================
+    // Dismiss
+    // ================================================================
 
     fun dismiss(
         context: Context
     ) {
+
         handler.removeCallbacksAndMessages(null)
 
         view?.let { currentView ->
@@ -218,7 +229,7 @@ object PrayerCardOverlay {
             }.onFailure { error ->
 
                 Log.e(
-                    "UnlockCard",
+                    TAG,
                     "❌ Failed to remove overlay",
                     error
                 )
@@ -228,9 +239,8 @@ object PrayerCardOverlay {
         view = null
 
         Log.d(
-            "UnlockCard",
+            TAG,
             "Overlay dismissed"
         )
     }
-
 }

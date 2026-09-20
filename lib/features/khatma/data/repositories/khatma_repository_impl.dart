@@ -1,4 +1,5 @@
 import '../../domain/entities/khatma_progress.dart';
+import '../../domain/entities/khatma_weekly_report.dart';
 import '../../domain/repositories/khatma_repository.dart';
 import '../datasources/khatma_local_data_source.dart';
 
@@ -17,6 +18,11 @@ class KhatmaRepositoryImpl implements KhatmaRepository {
   @override
   Future<KhatmaProgress> markCurrentAyahAsRead() {
     return localDataSource.markCurrentAyahAsRead();
+  }
+
+  @override
+  Future<KhatmaWeeklyReport> getWeeklyReport() {
+    return localDataSource.getWeeklyReport();
   }
 
   @override

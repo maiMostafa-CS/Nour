@@ -41,6 +41,7 @@ import 'features/khatma/data/repositories/khatma_repository_impl.dart';
 import 'features/khatma/domain/repositories/khatma_repository.dart';
 import 'features/khatma/domain/useCase/get_current_khatma_ayah.dart';
 import 'features/khatma/domain/useCase/get_khatma_progress.dart';
+import 'features/khatma/domain/useCase/get_khatma_weekly_report.dart';
 import 'features/khatma/domain/useCase/markCurrent_ayahAs_read.dart';
 import 'features/khatma/domain/useCase/reset_khatma.dart';
 import 'features/locations/data/datasources/current_location_data_source.dart';
@@ -599,6 +600,8 @@ Future<void> configureDependencies() async {
       sl<KhatmaRepository>(),
     ),
   );
-
+  sl.registerLazySingleton<GetKhatmaWeeklyReport>(
+        () => GetKhatmaWeeklyReport(sl()),
+  );
   // sl.registerFactory(() => UnlockCardCubit());
 }

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/router/app_router.dart';
+import '../../../../core/services/unlock_card.dart';
 import '../../../home/presentation/bloc/bloc.dart';
 import '../../../home/presentation/bloc/home_state.dart';
 import '../widgets/setting_card.dart';
@@ -19,7 +20,7 @@ class PrayerSettingsPage extends StatelessWidget {
         elevation: 0,
         centerTitle: true,
         title: Text(
-          'إعدادات الصلاة',
+          'إعدادات ',
           style: TextStyle(
             fontSize: 20.sp,
             fontWeight: FontWeight.bold,
@@ -85,6 +86,16 @@ class PrayerSettingsPage extends StatelessWidget {
                     },
                   );
                 },
+              ),
+
+              SizedBox(height: 14.h),
+
+              SettingsCard(
+                icon: Icons.record_voice_over_outlined,
+                title: 'تفعيل الخاتمه ',
+                subtitle: 'آية عند فتح الهاتف',
+                trailing: UnlockAyahSwitch(),
+
               ),
             ],
           ),

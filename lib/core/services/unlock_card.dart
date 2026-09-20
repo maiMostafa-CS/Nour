@@ -10,8 +10,8 @@ class UnlockCard {
 
   static Future<bool> hasOverlayPermission() async {
     return await _ch.invokeMethod<bool>(
-          'hasOverlayPermission',
-        ) ??
+      'hasOverlayPermission',
+    ) ??
         false;
   }
 
@@ -33,18 +33,16 @@ class UnlockCard {
 
   static Future<bool> isEnabled() async {
     return await _ch.invokeMethod<bool>(
-          'isEnabled',
-        ) ??
+      'isEnabled',
+    ) ??
         false;
   }
 
-  static Future<void> savePrayers(
-    List<MapEntry<String, DateTime>> prayers,
-  ) {
+  static Future<void> savePrayers(List<MapEntry<String, DateTime>> prayers,) {
     final data = prayers
         .map(
           (e) => '${e.key}|${e.value.millisecondsSinceEpoch}',
-        )
+    )
         .join(';');
 
     return _ch.invokeMethod(
@@ -53,6 +51,134 @@ class UnlockCard {
     );
   }
 }
+
+// class UnlockAyahSwitch extends StatefulWidget {
+//   const UnlockAyahSwitch({super.key});
+//
+//   @override
+//   State<UnlockAyahSwitch> createState() => _UnlockAyahSwitchState();
+// }
+//
+// class _UnlockAyahSwitchState extends State<UnlockAyahSwitch> {
+//   bool enabled = false;
+//   bool loading = false;
+//
+//   @override
+//   void initState() {
+//     super.initState();
+//     _loadState();
+//   }
+//
+//   Future<void> _loadState() async {
+//     final value = await UnlockCard.isEnabled();
+//
+//     if (!mounted) return;
+//
+//     setState(() {
+//       enabled = value;
+//     });
+//   }
+//
+//   Future<void> _toggle(bool value) async {
+//     if (loading) return;
+//
+//     setState(() {
+//       loading = true;
+//     });
+//
+//     try {
+//       if (value) {
+// // ==================================================
+// // 1. التأكد من صلاحية الظهور فوق التطبيقات
+// // ==================================================
+//
+//         final hasPermission = await UnlockCard.hasOverlayPermission();
+//
+//         if (!hasPermission) {
+//           await UnlockCard.requestOverlayPermission();
+//
+//           if (!mounted) return;
+//
+//           setState(() {
+//             enabled = false;
+//           });
+//
+//           return;
+//         }
+//
+// // ==================================================
+// // 2. تشغيل خدمة كارد الآية
+// // ==================================================
+//
+//         final started = await UnlockCard.start();
+//
+//         if (!mounted) return;
+//
+//         setState(() {
+//           enabled = started;
+//         });
+//       } else {
+// // ==================================================
+// // إيقاف الخدمة
+// // ==================================================
+//
+//         final stopped = await UnlockCard.stop();
+//
+//         if (!mounted) return;
+//
+//         setState(() {
+//           enabled = !stopped;
+//         });
+//       }
+//     } on PlatformException catch (e) {
+//       debugPrint(
+//         'UnlockCard PlatformException: '
+//         '${e.code} - ${e.message}',
+//       );
+//
+//       if (!mounted) return;
+//
+//       setState(() {
+//         enabled = false;
+//       });
+//     } catch (e) {
+//       debugPrint(
+//         'UnlockCard ERROR: $e',
+//       );
+//
+//       if (!mounted) return;
+//
+//       setState(() {
+//         enabled = false;
+//       });
+//     } finally {
+//       if (mounted) {
+//         setState(() {
+//           loading = false;
+//         });
+//       }
+//     }
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return SwitchListTile(
+//       title: const Text(
+//         'آية عند فتح الهاتف',
+//       ),
+//       subtitle: Text(
+//         loading
+//             ? 'جاري التحديث...'
+//             : enabled
+//                 ? 'مفعلة'
+//                 : 'متوقفة',
+//       ),
+//       value: enabled,
+//       onChanged: loading ? null : _toggle,
+//     );
+//   }
+// }
+
 
 class UnlockAyahSwitch extends StatefulWidget {
   const UnlockAyahSwitch({super.key});
@@ -72,13 +198,17 @@ class _UnlockAyahSwitchState extends State<UnlockAyahSwitch> {
   }
 
   Future<void> _loadState() async {
-    final value = await UnlockCard.isEnabled();
+    try {
+      final value = await UnlockCard.isEnabled();
 
-    if (!mounted) return;
+      if (!mounted) return;
 
-    setState(() {
-      enabled = value;
-    });
+      setState(() {
+        enabled = value;
+      });
+    } catch (e) {
+      debugPrint('UnlockCard load state error: $e');
+    }
   }
 
   Future<void> _toggle(bool value) async {
@@ -90,28 +220,30 @@ class _UnlockAyahSwitchState extends State<UnlockAyahSwitch> {
 
     try {
       if (value) {
-// ==================================================
-// 1. التأكد من صلاحية الظهور فوق التطبيقات
-// ==================================================
-
-        final hasPermission = await UnlockCard.hasOverlayPermission();
+        // 1. التأكد من صلاحية الظهور فوق التطبيقات
+        final hasPermission =
+        await UnlockCard.hasOverlayPermission();
 
         if (!hasPermission) {
           await UnlockCard.requestOverlayPermission();
 
           if (!mounted) return;
 
-          setState(() {
-            enabled = false;
-          });
+          // بعد الرجوع من الإعدادات نتحقق مرة أخرى
+          final permissionGranted =
+          await UnlockCard.hasOverlayPermission();
 
-          return;
+          if (!mounted) return;
+
+          if (!permissionGranted) {
+            setState(() {
+              enabled = false;
+            });
+            return;
+          }
         }
 
-// ==================================================
-// 2. تشغيل خدمة كارد الآية
-// ==================================================
-
+        // 2. تشغيل خدمة كارد الآية
         final started = await UnlockCard.start();
 
         if (!mounted) return;
@@ -120,10 +252,7 @@ class _UnlockAyahSwitchState extends State<UnlockAyahSwitch> {
           enabled = started;
         });
       } else {
-// ==================================================
-// إيقاف الخدمة
-// ==================================================
-
+        // إيقاف الخدمة
         final stopped = await UnlockCard.stop();
 
         if (!mounted) return;
@@ -135,7 +264,7 @@ class _UnlockAyahSwitchState extends State<UnlockAyahSwitch> {
     } on PlatformException catch (e) {
       debugPrint(
         'UnlockCard PlatformException: '
-        '${e.code} - ${e.message}',
+            '${e.code} - ${e.message}',
       );
 
       if (!mounted) return;
@@ -164,19 +293,14 @@ class _UnlockAyahSwitchState extends State<UnlockAyahSwitch> {
 
   @override
   Widget build(BuildContext context) {
-    return SwitchListTile(
-      title: const Text(
-        'آية عند فتح الهاتف',
-      ),
-      subtitle: Text(
-        loading
-            ? 'جاري التحديث...'
-            : enabled
-                ? 'مفعلة'
-                : 'متوقفة',
-      ),
+    return Switch(
       value: enabled,
       onChanged: loading ? null : _toggle,
+      activeColor: const Color(0xFF176B5B),
     );
   }
 }
+
+
+
+

@@ -167,7 +167,9 @@ class AyahActions extends StatelessWidget {
               icon: Icons.close,
               tooltip: 'إغلاق',
               iconColor: const Color(0xFF666666),
-              onPressed: onClose ?? () {},
+              onPressed: () {
+                onClose?.call();
+              },
             ),
           ],
         ),

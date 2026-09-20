@@ -46,7 +46,7 @@ class KhatmaAyahResolver {
           surahNumber: surah,
           ayahNumber: ayah,
           surahName: getSurahNameArabic(surah),
-          text: getVerse(surah, ayah, verseEndSymbol: true),
+          text: "  ${getVerse(surah, ayah)}",
           pageNumber: getPageNumber(surah, ayah),
         );
       }

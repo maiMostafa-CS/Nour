@@ -303,7 +303,6 @@ class QuranIndexBloc extends Bloc<QuranIndexEvent, QuranIndexState> {
   // ==========================================================
   // PLAY AYAH
   // ==========================================================
-
   Future<void> _onPlayAyah(
       PlayAyah event,
       Emitter<QuranIndexState> emit,
@@ -314,7 +313,7 @@ class QuranIndexBloc extends Bloc<QuranIndexEvent, QuranIndexState> {
       final currentState = state as QuranIndexLoaded;
 
       // ------------------------------------------------------
-      // فحص الإنترنت قبل التشغيل
+      // فحص الإنترنت
       // ------------------------------------------------------
 
       final online = await InternetChecker.hasInternet();
@@ -330,6 +329,10 @@ class QuranIndexBloc extends Bloc<QuranIndexEvent, QuranIndexState> {
         return;
       }
 
+      // ------------------------------------------------------
+      // القراء
+      // ------------------------------------------------------
+
       final reciters = currentState.reciters.isNotEmpty
           ? currentState.reciters
           : getQuranReciters();
@@ -344,7 +347,9 @@ class QuranIndexBloc extends Bloc<QuranIndexEvent, QuranIndexState> {
         orElse: () => reciters.first,
       );
 
-      debugPrint('🎧 selected.identifier = "${selected.identifier}"');
+      debugPrint(
+        '🎧 selected.identifier = "${selected.identifier}"',
+      );
 
       final audioUrl = getAyahAudioUrl(
         reciterIdentifier: selected.identifier,
@@ -353,17 +358,13 @@ class QuranIndexBloc extends Bloc<QuranIndexEvent, QuranIndexState> {
 
       debugPrint('🔊 Audio URL = $audioUrl');
 
-      await audioService.playUrl(
-        audioUrl: audioUrl,
-        reciterIdentifier: selected.identifier,
-        globalAyahNumber: event.globalAyahNumber,
-      );
-
-      // الحالة الأحدث بعد الـ await
-      if (state is! QuranIndexLoaded) return;
+      // ======================================================
+      // ⭐ أهم تعديل
+      // نغير حالة الـ UI قبل تشغيل الصوت
+      // ======================================================
 
       emit(
-        (state as QuranIndexLoaded).copyWith(
+        currentState.copyWith(
           reciters: reciters,
           selectedReciter: selected,
           isPlaying: true,
@@ -371,12 +372,22 @@ class QuranIndexBloc extends Bloc<QuranIndexEvent, QuranIndexState> {
           playingAyah: event.globalAyahNumber,
         ),
       );
+
+      // ======================================================
+      // تشغيل الصوت
+      // ======================================================
+
+      await audioService.playUrl(
+        audioUrl: audioUrl,
+        reciterIdentifier: selected.identifier,
+        globalAyahNumber: event.globalAyahNumber,
+      );
+
     } catch (e, st) {
       debugPrint('❌ Play ayah error: $e');
       debugPrint('$st');
 
-      // لا نستبدل QuranIndexLoaded بـ Error
-      // حتى لا نخسر بيانات الفهرس والتفسير.
+      // لو التشغيل فشل نرجع الأيقونة إلى Play
       if (state is QuranIndexLoaded) {
         emit(
           (state as QuranIndexLoaded).copyWith(
@@ -387,7 +398,6 @@ class QuranIndexBloc extends Bloc<QuranIndexEvent, QuranIndexState> {
       }
     }
   }
-
   // ==========================================================
   // PAUSE
   // ==========================================================

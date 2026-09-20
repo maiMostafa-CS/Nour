@@ -167,44 +167,45 @@ class MushafPageState extends State<MushafPage> {
                 },
               ),
             ),
-            Container(
-              margin: EdgeInsets.only(right: 10),
-              height: 32,
-              width: 180,
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF3E5C8),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Text(
-                    ' رقم الصفحه  $_currentPage',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF8B5A2B),
-                    ),
-                  ),
-
-                  Container(
-                    height: 16,
-                    width: 1,
-                    color: const Color(0xFF8B5A2B).withOpacity(0.3),
-                    margin: const EdgeInsets.symmetric(horizontal: 10),
-                  ),
-                  Text(
-                    'الحزب  ${_currentHizb ?? ''}',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF8B5A2B),
-                    ),
-                  ),
-                ],
+    Container(
+    margin: const EdgeInsets.only(right: 10),
+        height: 32,
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF3E5C8),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'رقم الصفحة $_currentPage',
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF8B5A2B),
               ),
             ),
+
+            Container(
+              height: 16,
+              width: 1,
+              margin: const EdgeInsets.symmetric(horizontal: 8),
+              color: const Color(0xFF8B5A2B).withOpacity(0.3),
+            ),
+
+            Text(
+              'الحزب $_currentHizb',
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF8B5A2B),
+              ),
+            ),
+          ],
+        ),
+      ),
+
           ],
         ),
       ),

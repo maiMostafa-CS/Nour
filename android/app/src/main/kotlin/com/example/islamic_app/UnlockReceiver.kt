@@ -13,6 +13,15 @@ class UnlockReceiver : BroadcastReceiver() {
 
     private val handler = Handler(Looper.getMainLooper())
 
+    companion object {
+        private const val TAG = "UnlockCard"
+
+        private const val KHATMA_WEEKLY_PREFS = "khatma_weekly"
+
+        // آخر أسبوع تم عرض تقريره
+        private const val LAST_SHOWN_WEEK_KEY = "last_shown_week"
+    }
+
     override fun onReceive(
         context: Context,
         intent: Intent
@@ -20,7 +29,7 @@ class UnlockReceiver : BroadcastReceiver() {
         val app = context.applicationContext
 
         Log.d(
-            "UnlockCard",
+            TAG,
             "🔥 RECEIVER RECEIVED: ${intent.action}"
         )
 
@@ -29,19 +38,20 @@ class UnlockReceiver : BroadcastReceiver() {
             Intent.ACTION_SCREEN_OFF -> {
 
                 Log.d(
-                    "UnlockCard",
+                    TAG,
                     "SCREEN_OFF -> dismiss"
                 )
 
                 handler.removeCallbacksAndMessages(null)
 
                 PrayerCardOverlay.dismiss(app)
+                KhatmaWeeklyOverlay.dismiss(app)
             }
 
             Intent.ACTION_USER_PRESENT -> {
 
                 Log.d(
-                    "UnlockCard",
+                    TAG,
                     "🔥 USER_PRESENT RECEIVED"
                 )
 
@@ -56,7 +66,7 @@ class UnlockReceiver : BroadcastReceiver() {
                     ) as KeyguardManager
 
                 Log.d(
-                    "UnlockCard",
+                    TAG,
                     "USER_PRESENT " +
                             "interactive=${pm.isInteractive}, " +
                             "locked=${km.isKeyguardLocked}"
@@ -70,7 +80,7 @@ class UnlockReceiver : BroadcastReceiver() {
                     val locked = km.isKeyguardLocked
 
                     Log.d(
-                        "UnlockCard",
+                        TAG,
                         "After delay: " +
                                 "interactive=$interactive " +
                                 "locked=$locked"
@@ -79,19 +89,31 @@ class UnlockReceiver : BroadcastReceiver() {
                     if (!interactive || locked) {
 
                         Log.d(
-                            "UnlockCard",
+                            TAG,
                             "Skipped: screen off or still locked"
                         )
 
                         return@postDelayed
                     }
 
-                    showCurrentKhatmaAyah(app)
+                    // نتحقق أولاً من التقرير الأسبوعي.
+                    // لو فيه تقرير جديد، يظهر هو أولاً.
+                    val weeklyShown =
+                        showWeeklyReportIfNeeded(app)
+
+                    // لو مفيش تقرير جديد، نعرض آية الختمة مباشرة.
+                    if (!weeklyShown) {
+                        showCurrentKhatmaAyah(app)
+                    }
 
                 }, 400)
             }
         }
     }
+
+    // =========================================================
+    // كارد الآية الحالي
+    // =========================================================
 
     private fun showCurrentKhatmaAyah(
         context: Context
@@ -124,7 +146,7 @@ class UnlockReceiver : BroadcastReceiver() {
         ) {
 
             Log.d(
-                "UnlockCard",
+                TAG,
                 "No khatma ayah synced"
             )
 
@@ -132,7 +154,7 @@ class UnlockReceiver : BroadcastReceiver() {
         }
 
         Log.d(
-            "UnlockCard",
+            TAG,
             "🔥 Showing Khatma Ayah " +
                     "surah=$surahName " +
                     "ayah=$ayahNumber"
@@ -143,5 +165,89 @@ class UnlockReceiver : BroadcastReceiver() {
             text,
             "$surahName • آية $ayahNumber"
         )
+    }
+
+    // =========================================================
+    // كارد التقرير الأسبوعي
+    // =========================================================
+
+    private fun showWeeklyReportIfNeeded(
+        context: Context
+    ): Boolean {
+
+        val prefs = context.getSharedPreferences(
+            KHATMA_WEEKLY_PREFS,
+            Context.MODE_PRIVATE
+        )
+
+        val totalAyahs = prefs.getInt(
+            "totalAyahs",
+            0
+        )
+
+        val weekNumber = prefs.getInt(
+            "weekNumber",
+            0
+        )
+
+        val lastShownWeek = prefs.getInt(
+            LAST_SHOWN_WEEK_KEY,
+            0
+        )
+
+        Log.d(
+            TAG,
+            "📊 Weekly report check: " +
+                    "total=$totalAyahs " +
+                    "week=$weekNumber " +
+                    "lastShown=$lastShownWeek"
+        )
+
+        // لا يوجد تقرير
+        if (totalAyahs <= 0 || weekNumber <= 0) {
+
+            Log.d(
+                TAG,
+                "📊 No weekly report available"
+            )
+
+            return false
+        }
+
+        // التقرير تم عرضه بالفعل
+        if (weekNumber <= lastShownWeek) {
+
+            Log.d(
+                TAG,
+                "📊 Weekly report already shown"
+            )
+
+            return false
+        }
+
+        Log.d(
+            TAG,
+            "📊 Showing NEW weekly report"
+        )
+
+        KhatmaWeeklyOverlay.show(
+            context = context,
+            totalAyahs = totalAyahs,
+            weekNumber = weekNumber
+        )
+
+        prefs.edit()
+            .putInt(
+                LAST_SHOWN_WEEK_KEY,
+                weekNumber
+            )
+            .apply()
+
+        Log.d(
+            TAG,
+            "✅ Weekly report marked as shown: week=$weekNumber"
+        )
+
+        return true
     }
 }

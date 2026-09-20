@@ -13,6 +13,7 @@ import 'core/services/prayer_scheduler_split/prayer_scheduler/notifications/coun
 import 'core/services/unlock_card.dart';
 
 import 'features/khatma/domain/useCase/get_current_khatma_ayah.dart';
+import 'features/khatma/domain/useCase/get_khatma_weekly_report.dart';
 import 'features/khatma/domain/useCase/markCurrent_ayahAs_read.dart';
 import 'features/khatma/services/khatma_notification_service.dart';
 import 'features/khatma/services/khatma_unlock_service.dart';
@@ -183,11 +184,17 @@ Future<void> _syncKhatmaUnlockAyah() async {
     );
   }
 }
+
+
 Future<void> _onNativeKhatmaRead() async {
   try {
     debugPrint(
       '📖 KHATMA: Native requested read',
     );
+
+    // ============================================================
+    // 1. Mark current ayah as read
+    // ============================================================
 
     final markCurrentAyahAsRead =
     sl<MarkCurrentAyahAsRead>();
@@ -200,6 +207,42 @@ Future<void> _onNativeKhatmaRead() async {
           'currentAyah=${progress.currentAyah}, '
           'readAyahs=${progress.readAyahs}',
     );
+
+    // ============================================================
+    // 2. Get weekly report
+    // ============================================================
+
+    final getKhatmaWeeklyReport =
+    sl<GetKhatmaWeeklyReport>();
+
+    final report =
+    await getKhatmaWeeklyReport();
+
+    debugPrint(
+      '📊 KHATMA WEEKLY: '
+          'total=${report.totalAyahs}, '
+          'currentWeek=${report.currentWeekAyahs}, '
+          'week=${report.weekNumber}',
+    );
+
+    // ============================================================
+    // 3. Send weekly report to Android
+    // ============================================================
+
+    await KhatmaUnlockSyncService
+        .saveWeeklyReport(
+      totalAyahs: report.totalAyahs,
+      currentWeekAyahs: report.currentWeekAyahs,
+      weekNumber: report.weekNumber,
+    );
+
+    debugPrint(
+      '✅ KHATMA WEEKLY: report synced to Android',
+    );
+
+    // ============================================================
+    // 4. Sync next ayah to Android
+    // ============================================================
 
     await _syncKhatmaUnlockAyah();
 
@@ -216,3 +259,4 @@ Future<void> _onNativeKhatmaRead() async {
     );
   }
 }
+

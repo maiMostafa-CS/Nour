@@ -119,13 +119,12 @@ class _HomePageState extends State<HomePage> {
               children: [
                 _buildTopBar(context, state),
                 SizedBox(height: 5.h),
-                UnlockAyahSwitch(),
-                ElevatedButton(
-                  onPressed: () async {
-                    enableUnlockCard(context);
-                  },
-                  child: const Text('Print Adhan Alarms'),
-                ),
+                // ElevatedButton(
+                //   onPressed: () async {
+                //     enableUnlockCard(context);
+                //   },
+                //   child: const Text('Print Adhan Alarms'),
+                // ),
                 NextPrayerCard(
                   prayerTimes: prayerTimes,
                   timezoneName: state.timezone,

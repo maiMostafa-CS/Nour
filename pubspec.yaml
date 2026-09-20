@@ -67,7 +67,7 @@ flutter:
   fonts:
     - family: HafsSmart
       fonts:
-        - asset: assets/fonts/UthmanicHafs1Ver18.ttf
+        - asset: assets/fonts/Cairo-VariableFont_slnt,wght.ttf
 
 flutter_launcher_icons:
    android: true

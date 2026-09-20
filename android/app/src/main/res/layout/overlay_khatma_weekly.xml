@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#99000000"
+    android:clickable="true"
+    android:focusable="false">
+
+    <LinearLayout
+        android:id="@+id/card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:background="@drawable/overlay_card_background"
+        android:elevation="12dp"
+        android:layoutDirection="rtl"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <!-- العنوان -->
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="إنجاز الختمة"
+            android:textColor="#8B5A2B"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <!-- الرقم -->
+
+        <TextView
+            android:id="@+id/totalAyahs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:gravity="center"
+            android:textColor="#3E2B1F"
+            android:textSize="34sp"
+            android:textStyle="bold" />
+
+        <!-- الوصف -->
+
+        <TextView
+            android:id="@+id/weekText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:textColor="#8B5A2B"
+            android:textSize="15sp" />
+
+        <!-- زر الإغلاق -->
+
+        <ImageButton
+            android:id="@+id/closeButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
+            android:background="@android:color/transparent"
+            android:contentDescription="إغلاق"
+            android:padding="10dp"
+            android:src="@drawable/ic_close"
+            android:tint="#8B5A2B" />
+
+    </LinearLayout>
+
+</FrameLayout>
