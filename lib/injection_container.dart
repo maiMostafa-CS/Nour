@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -7,6 +8,7 @@ import 'core/services/ayah_audio_service.dart';
 import 'core/services/prayer_scheduler_split/prayer_scheduler/adhan_scheduler_service.dart';
 import 'core/services/prayer_scheduler_split/prayer_scheduler/data/datasources/prayer_notification_local_data_source.dart';
 import 'core/services/prayer_scheduler_split/prayer_scheduler/data/datasources/prayer_notification_local_data_source_impl.dart';
+import 'core/services/unlock_card.dart';
 import 'features/adhan/data/datasources/adhan_local_data_source.dart';
 import 'features/adhan/data/repositories/adhan_repository_impl.dart';
 import 'features/adhan/domain/usecases/get_adhans.dart';
@@ -34,6 +36,13 @@ import 'features/iqama_setting/domain/repositories/iqama_settings_repository.dar
 import 'features/iqama_setting/domain/usecases/get_iqama_settings.dart';
 import 'features/iqama_setting/domain/usecases/update_iqama_setting.dart';
 import 'features/iqama_setting/presentation/bloc/iqama_settings_bloc.dart';
+import 'features/khatma/data/datasources/khatma_local_data_source.dart';
+import 'features/khatma/data/repositories/khatma_repository_impl.dart';
+import 'features/khatma/domain/repositories/khatma_repository.dart';
+import 'features/khatma/domain/useCase/get_current_khatma_ayah.dart';
+import 'features/khatma/domain/useCase/get_khatma_progress.dart';
+import 'features/khatma/domain/useCase/markCurrent_ayahAs_read.dart';
+import 'features/khatma/domain/useCase/reset_khatma.dart';
 import 'features/locations/data/datasources/current_location_data_source.dart';
 import 'features/locations/data/datasources/location_local_data_source.dart';
 import 'features/locations/data/repositories/current_location_repository_impl.dart';
@@ -552,5 +561,44 @@ Future<void> configureDependencies() async {
       sl<TafsirBooksRepository>(),
     ),
   );
+// ============================================================
+// KHATMA
+// ============================================================
 
+  sl.registerLazySingleton<KhatmaLocalDataSource>(
+        () => KhatmaLocalDataSourceImpl(
+      sl<SharedPreferences>(),
+    ),
+  );
+  sl.registerLazySingleton<KhatmaRepository>(
+        () => KhatmaRepositoryImpl(
+      localDataSource: sl<KhatmaLocalDataSource>(),
+    ),
+  );
+
+  sl.registerLazySingleton<GetKhatmaProgress>(
+        () => GetKhatmaProgress(
+      sl<KhatmaRepository>(),
+    ),
+  );
+
+  sl.registerLazySingleton<MarkCurrentAyahAsRead>(
+        () => MarkCurrentAyahAsRead(
+      sl<KhatmaRepository>(),
+    ),
+  );
+
+  sl.registerLazySingleton<ResetKhatma>(
+        () => ResetKhatma(
+      sl<KhatmaRepository>(),
+    ),
+  );
+
+  sl.registerLazySingleton<GetCurrentKhatmaAyah>(
+        () => GetCurrentKhatmaAyah(
+      sl<KhatmaRepository>(),
+    ),
+  );
+
+  // sl.registerFactory(() => UnlockCardCubit());
 }

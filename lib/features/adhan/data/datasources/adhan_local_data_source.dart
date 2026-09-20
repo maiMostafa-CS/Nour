@@ -28,10 +28,10 @@ class AdhanLocalDataSourceImpl implements AdhanLocalDataSource {
         name: 'ياسين عساف',
 
         normalAdhanAssetPath:
-        'assets/adhan-mp3/Yaseen_Al_Aassaf_1.mp3',
+        'assets/adhan-mp3/abdul_majid_al_surehi_1.mp3',
 
         fajrAdhanAssetPath:
-        'assets/adhan-mp3/Yaseen_Al_Aassaf_2.mp3',
+        'assets/adhan-mp3/abdul_majid_al_surehi_1.mp3',
       ),
 
       AdhanReciterEntity(

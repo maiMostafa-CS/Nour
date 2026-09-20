@@ -1,59 +1,124 @@
+import 'dart:io';
+
 import 'package:azkary/azkary.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:quran_kit/kit.dart';
+import 'package:timezone/data/latest.dart' as tz;
 
 import 'app.dart';
 import 'core/services/prayer_scheduler_split/prayer_scheduler/adhan_scheduler_service.dart';
 import 'core/services/prayer_scheduler_split/prayer_scheduler/notifications/countdown_notification_service.dart';
-import 'core/services/prayer_scheduler_split/prayer_scheduler/scheduler/reminder_scheduler.dart';
+import 'core/services/unlock_card.dart';
+
+import 'features/khatma/domain/useCase/get_current_khatma_ayah.dart';
+import 'features/khatma/domain/useCase/markCurrent_ayahAs_read.dart';
+import 'features/khatma/services/khatma_notification_service.dart';
+import 'features/khatma/services/khatma_unlock_service.dart';
+
 import 'injection_container.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  tz.initializeTimeZones();
 
   await configureDependencies();
 
-  runApp(const IslamicApp());
-  // await Azkary.initialize();
-  await QuranKit.initialize(
-    QuranKitConfig(
-      fontBaseUrl: 'https://YOUR-DOMAIN.com/qfc4',
+  if (Platform.isAndroid) {
+    KhatmaUnlockSyncService.setKhatmaReadHandler(
+      _onNativeKhatmaRead,
+    );
+  }
 
-      enableAudio: true,
-      enableTafsir: true,
-      enableSearch: true,
-      enableWordByWord: true,
-      enableAsbabNuzul: true,
 
-      defaultReciterIndex: 0,
-      defaultTafsirId: 'al-tabari',
-      defaultEditionId: 'ar-uthmani',
-      defaultQiraa: 'hafs',
+  runApp(
+    const IslamicApp(),
+  );
 
-      showTajweed: true,
-    ),
-  );  SchedulerBinding.instance.addPostFrameCallback((_) async {
-    await _backgroundSetup();
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    _initializeKhatmaUnlock();
   });
+}
+
+
+Future<void> _initializeKhatmaUnlock() async {
+  if (!Platform.isAndroid) {
+    return;
+  }
+
+  try {
+    // ============================================================
+    // 1. Sync الآية الحالية للـ Native
+    // ============================================================
+
+    await _syncKhatmaUnlockAyah();
+
+    // ============================================================
+    // 2. استعادة خدمة Unlock Card
+    // ============================================================
+
+    await _restoreUnlockCard();
+
+    debugPrint(
+      '✅ KHATMA UNLOCK: initialization completed',
+    );
+  } catch (e, stackTrace) {
+    debugPrint(
+      '❌ KHATMA UNLOCK INITIALIZATION FAILED: $e',
+    );
+
+    debugPrint('$stackTrace');
+  }
+}
+
+
+Future<void> _restoreUnlockCard() async {
+  if (!Platform.isAndroid) return;
+  if (await UnlockCard.isEnabled() && await UnlockCard.hasOverlayPermission()) {
+    await UnlockCard.start();
+  }
 }
 
 Future<void> _backgroundSetup() async {
   final sw = Stopwatch()..start();
 
   try {
+    // ============================================================
+    // Adhan Scheduler
+    // ============================================================
+
     final adhanScheduler = AdhanSchedulerService();
+
     await adhanScheduler.initialize();
-    debugPrint('⏱️ adhanScheduler.initialize: ${sw.elapsedMilliseconds}ms');
+
+    debugPrint(
+      '⏱️ adhanScheduler.initialize: ${sw.elapsedMilliseconds}ms',
+    );
+
     sw.reset();
+
+    // ============================================================
+    // Exact Alarm Permission
+    // ============================================================
 
     await checkAndroidScheduleExactAlarmPermission();
-    debugPrint('⏱️ permission: ${sw.elapsedMilliseconds}ms');
+
+    debugPrint(
+      '⏱️ permission: ${sw.elapsedMilliseconds}ms',
+    );
+
     sw.reset();
 
+    // ============================================================
+    // Battery Optimization
+    // ============================================================
+
     await adhanScheduler.requestBatteryOptimizationExemption();
-    debugPrint('⏱️ battery: ${sw.elapsedMilliseconds}ms');
+
+    debugPrint(
+      '⏱️ battery: ${sw.elapsedMilliseconds}ms',
+    );
   } catch (e, stackTrace) {
     debugPrint('❌ Background setup failed: $e');
     debugPrint('$stackTrace');
@@ -62,10 +127,92 @@ Future<void> _backgroundSetup() async {
 
 Future<void> checkAndroidScheduleExactAlarmPermission() async {
   final status = await Permission.scheduleExactAlarm.status;
-  prayerSchedulerLog('📋 Schedule exact alarm permission: $status');
+
+  prayerSchedulerLog(
+    '📋 Schedule exact alarm permission: $status',
+  );
 
   if (status.isDenied) {
     final result = await Permission.scheduleExactAlarm.request();
-    prayerSchedulerLog('📋 Schedule exact alarm permission after request: $result');
+
+    prayerSchedulerLog(
+      '📋 Schedule exact alarm permission after request: $result',
+    );
+  }
+}
+
+Future<void> _syncKhatmaUnlockAyah() async {
+  if (!Platform.isAndroid) {
+    return;
+  }
+
+  try {
+    final getCurrentKhatmaAyah =
+    sl<GetCurrentKhatmaAyah>();
+
+    final ayah =
+    await getCurrentKhatmaAyah();
+
+    if (ayah == null) {
+      debugPrint(
+        '🌿 KHATMA UNLOCK: no current ayah',
+      );
+
+      return;
+    }
+
+    await KhatmaUnlockSyncService
+        .saveCurrentAyah(
+      ayah,
+    );
+
+    debugPrint(
+      '✅ KHATMA UNLOCK: synced '
+          'global=${ayah.globalNumber} '
+          'surah=${ayah.surahName} '
+          'ayah=${ayah.ayahNumber} '
+          'page=${ayah.pageNumber}',
+    );
+  } catch (e, stackTrace) {
+    debugPrint(
+      '❌ KHATMA UNLOCK SYNC FAILED: $e',
+    );
+
+    debugPrint(
+      '$stackTrace',
+    );
+  }
+}
+Future<void> _onNativeKhatmaRead() async {
+  try {
+    debugPrint(
+      '📖 KHATMA: Native requested read',
+    );
+
+    final markCurrentAyahAsRead =
+    sl<MarkCurrentAyahAsRead>();
+
+    final progress =
+    await markCurrentAyahAsRead();
+
+    debugPrint(
+      '✅ KHATMA: '
+          'currentAyah=${progress.currentAyah}, '
+          'readAyahs=${progress.readAyahs}',
+    );
+
+    await _syncKhatmaUnlockAyah();
+
+    debugPrint(
+      '✅ KHATMA: New ayah synced',
+    );
+  } catch (e, stackTrace) {
+    debugPrint(
+      '❌ KHATMA READ FAILED: $e',
+    );
+
+    debugPrint(
+      '$stackTrace',
+    );
   }
 }

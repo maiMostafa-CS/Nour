@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart' as widgets;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../../../../core/services/prayer_scheduler_split/prayer_scheduler/scheduler/adhan_scheduler.dart';
+import '../../../../core/services/unlock_card.dart';
 import '../../../locations/presentation/bloc/bloc.dart';
 import '../../../locations/presentation/bloc/blocState.dart';
 import '../../../prayer_times/presentation/widgets/prayer_times_widget.dart';
@@ -117,25 +119,13 @@ class _HomePageState extends State<HomePage> {
               children: [
                 _buildTopBar(context, state),
                 SizedBox(height: 5.h),
-                // ElevatedButton(
-                //   onPressed: () async {
-                //     final alarms = await Alarm.getAlarms();
-                //
-                //     debugPrint('════════════════════════════════════');
-                //     debugPrint('📋 ALL ALARMS (${alarms.length})');
-                //     debugPrint('════════════════════════════════════');
-                //
-                //     for (final alarm in alarms) {
-                //       if (alarm.payload == 'adhan') {
-                //         debugPrint('🕌 ADHAN');
-                //         debugPrint('   id=${alarm.id}');
-                //         debugPrint('   time=${alarm.dateTime}');
-                //         debugPrint('   🎙️ asset=${alarm.assetAudioPath}');  // ← المهم
-                //       }
-                //     }
-                //   },
-                //   child: const Text('Print Adhan Alarms'),
-                // ),
+                UnlockAyahSwitch(),
+                ElevatedButton(
+                  onPressed: () async {
+                    enableUnlockCard(context);
+                  },
+                  child: const Text('Print Adhan Alarms'),
+                ),
                 NextPrayerCard(
                   prayerTimes: prayerTimes,
                   timezoneName: state.timezone,
@@ -184,5 +174,35 @@ class _HomePageState extends State<HomePage> {
         color: const Color(0xFF222222),
       ),
     );
+  }
+}
+Future<void> enableUnlockCard(BuildContext context) async {
+  void say(String m) {
+    debugPrint('UnlockCard: $m');
+    final sm = ScaffoldMessenger.of(context);
+    sm.clearSnackBars();
+    sm.showSnackBar(SnackBar(content: Text(m)));
+  }
+
+  try {
+    say('1) الزرار اشتغل');
+
+    final notif = await Permission.notification.request();
+    say('2) صلاحية الإشعارات: $notif');
+
+    final has = await UnlockCard.hasOverlayPermission();
+    say('3) صلاحية الظهور فوق التطبيقات = $has');
+
+    if (!has) {
+      await UnlockCard.requestOverlayPermission();
+      say('4) فتحت صفحة الإعدادات، فعّلها وارجع دوس تاني');
+      return;
+    }
+
+    await UnlockCard.start();
+    say('5) startService اتنادى بنجاح');
+  } catch (e, s) {
+    debugPrint('UnlockCard ERROR: $e\n$s');
+    say('خطأ: $e');
   }
 }

@@ -41,6 +41,8 @@
     <!-- Required by android_alarm_manager_plus -->
     <uses-permission android:name="android.permission.BIND_JOB_SERVICE"/>
 
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+
     <application
         android:label="islamic_app"
         android:name="${applicationName}"
@@ -51,6 +53,7 @@
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/ic_mosque_notification" />
 
+        <!-- Main Flutter Activity -->
         <!-- Main Flutter Activity -->
         <activity
             android:name=".MainActivity"
@@ -75,6 +78,21 @@
 
         </activity>
 
+        <!-- Unlock card -->
+        <service
+            android:name=".UnlockService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Shows a Quran verse card when the device is unlocked" />
+        </service>
+
+        <receiver android:name=".BootReceiver" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
         <!-- Flutter Plugin Registration -->
         <meta-data
             android:name="flutterEmbedding"

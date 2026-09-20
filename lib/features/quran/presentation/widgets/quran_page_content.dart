@@ -146,9 +146,8 @@ class _QuranPageContentState extends State<QuranPageContent>
 
   @override
   Widget build(BuildContext context) {
-    final double offsetY = _currentPage <= 2 ? -50 : -20.0;
+    final double offsetY = _currentPage <= 2 ? -50 : -8.0;
 
-    // dialog "لا يوجد إنترنت" للصفحة كلها (الصوت + التفسير)
     return NoInternetListener(
       onRetry: () => _lastRetryAction?.call(),
       child: Transform.translate(
@@ -469,7 +468,6 @@ class _QuranPageContentState extends State<QuranPageContent>
       return;
     }
 
-    // لو انقطع النت وأنت جوه الـ BottomSheet، "إعادة المحاولة" تعيد تحميل الآية
     _lastRetryAction = () => bloc.add(
       LoadAyahTafsir(
         surahNumber: surahNumber,

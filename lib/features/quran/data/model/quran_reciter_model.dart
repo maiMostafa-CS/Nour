@@ -10,33 +10,33 @@ class QuranReciterModel extends QuranReciter {
 }
 
 const List<QuranReciterModel> quranReciters = [
-  QuranReciterModel(
-    identifier: 'ar.abdullahbasfar',
-    name: 'عبد الله بصفر',
-    englishName: 'Abdullah Basfar',
-    bitrate: 128,
-  ),
+  // QuranReciterModel(
+  //   identifier: 'ar.abdullahbasfar',
+  //   name: 'عبد الله بصفر',
+  //   englishName: 'Abdullah Basfar',
+  //   bitrate: 128,
+  // ),
 
-  QuranReciterModel(
-    identifier: 'ar.abdurrahmaansudais',
-    name: 'عبدالرحمن السديس',
-    englishName: 'Abdurrahmaan As-Sudais',
-    bitrate: 192,
-  ),
+  // QuranReciterModel(
+  //   identifier: 'ar.abdurrahmaansudais',
+  //   name: 'عبدالرحمن السديس',
+  //   englishName: 'Abdurrahmaan As-Sudais',
+  //   bitrate: 192,
+  // ),
 
-  QuranReciterModel(
-    identifier: 'ar.abdulsamad',
-    name: 'عبدالباسط عبدالصمد',
-    englishName: 'Abdul Samad',
-    bitrate: 128,
-  ),
+  // QuranReciterModel(
+  //   identifier: 'ar.abdulsamad',
+  //   name: 'عبدالباسط عبدالصمد',
+  //   englishName: 'Abdul Samad',
+  //   bitrate: 128,
+  // ),
 
-  QuranReciterModel(
-    identifier: 'ar.shaatree',
-    name: 'أبو بكر الشاطري',
-    englishName: 'Abu Bakr Ash-Shaatree',
-    bitrate: 128,
-  ),
+  // QuranReciterModel(
+  //   identifier: 'ar.shaatree',
+  //   name: 'أبو بكر الشاطري',
+  //   englishName: 'Abu Bakr Ash-Shaatree',
+  //   bitrate: 128,
+  // ),
 
   QuranReciterModel(
     identifier: 'ar.ahmedajamy',
@@ -52,12 +52,12 @@ const List<QuranReciterModel> quranReciters = [
     bitrate: 128,
   ),
 
-  QuranReciterModel(
-    identifier: 'ar.hanirifai',
-    name: 'هاني الرفاعي',
-    englishName: 'Hani Rifai',
-    bitrate: 128,
-  ),
+  // QuranReciterModel(
+  //   identifier: 'ar.hanirifai',
+  //   name: 'هاني الرفاعي',
+  //   englishName: 'Hani Rifai',
+  //   bitrate: 128,
+  // ),
 
   QuranReciterModel(
     identifier: 'ar.husary',
@@ -73,12 +73,12 @@ const List<QuranReciterModel> quranReciters = [
     bitrate: 128,
   ),
 
-  QuranReciterModel(
-    identifier: 'ar.ibrahimakhbar',
-    name: 'إبراهيم الأخضر',
-    englishName: 'Ibrahim Akhdar',
-    bitrate: 128,
-  ),
+  // QuranReciterModel(
+  //   identifier: 'ar.ibrahimakhbar',
+  //   name: 'إبراهيم الأخضر',
+  //   englishName: 'Ibrahim Akhdar',
+  //   bitrate: 128,
+  // ),
 
   QuranReciterModel(
     identifier: 'ar.mahermuaiqly',
@@ -101,24 +101,24 @@ const List<QuranReciterModel> quranReciters = [
     bitrate: 128,
   ),
 
-  QuranReciterModel(
-    identifier: 'ar.saoodshuraym',
-    name: 'سعود الشريم',
-    englishName: 'Saood Ash-Shuraym',
-    bitrate: 128,
-  ),
+  // QuranReciterModel(
+  //   identifier: 'ar.saoodshuraym',
+  //   name: 'سعود الشريم',
+  //   englishName: 'Saood Ash-Shuraym',
+  //   bitrate: 128,
+  // ),
 
-  QuranReciterModel(
-    identifier: 'ar.parhizgar',
-    name: 'شهريار پرهیزگار',
-    englishName: 'Parhizgar',
-    bitrate: 64,
-  ),
-
-  QuranReciterModel(
-    identifier: 'ar.aymanswoaid',
-    name: 'أيمن سويد',
-    englishName: 'Ayman Sowaid',
-    bitrate: 128,
-  ),
+  // QuranReciterModel(
+  //   identifier: 'ar.parhizgar',
+  //   name: 'شهريار پرهیزگار',
+  //   englishName: 'Parhizgar',
+  //   bitrate: 64,
+  // ),
+  //
+  // QuranReciterModel(
+  //   identifier: 'ar.aymanswoaid',
+  //   name: 'أيمن سويد',
+  //   englishName: 'Ayman Sowaid',
+  //   bitrate: 128,
+  // ),
 ];
