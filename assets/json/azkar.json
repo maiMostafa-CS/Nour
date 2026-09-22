@@ -1,0 +1,37 @@
+[
+  {
+    "id": 1,
+    "category": "أذكار الصباح",
+    "type": "sabah",
+    "azkar": [
+      {
+        "id": 1,
+        "text": "أَعُوذُ بِاللَّهِ مِنَ الشَّيطَانِ الرَّجِيمِ",
+        "count": 1,
+        "audio": "https://example.com/audio/1.mp3",
+        "filename": "sabah_1"
+      },
+      {
+        "id": 2,
+        "text": "اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ",
+        "count": 3,
+        "audio": "https://example.com/audio/2.mp3",
+        "filename": "sabah_2"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "category": "أذكار المساء",
+    "type": "masaa",
+    "azkar": [
+      {
+        "id": 1,
+        "text": "أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ",
+        "count": 1,
+        "audio": "https://example.com/audio/3.mp3",
+        "filename": "masaa_1"
+      }
+    ]
+  }
+]

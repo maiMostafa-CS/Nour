@@ -22,6 +22,13 @@ import 'features/adhan_settings/domain/repositories/ adhan_settings_repository.d
 import 'features/adhan_settings/domain/usecases/get_adhan_settings.dart';
 import 'features/adhan_settings/domain/usecases/update_adhan_setting.dart';
 import 'features/adhan_settings/presentation/bloc/adhan_settings_bloc.dart';
+import 'features/azkar/data/datasources/azkar_local_data_source.dart';
+import 'features/azkar/data/repositories/azkar_repository_impl.dart';
+import 'features/azkar/domain/repositories/azkar_repository.dart';
+import 'features/azkar/domain/usecases/get_azkar_categories.dart';
+import 'features/azkar/domain/usecases/get_azkar_chapters.dart';
+import 'features/azkar/domain/usecases/get_azkar_items.dart';
+import 'features/azkar/presentation/bloc/azkar_bloc.dart';
 import 'features/hijri_calendar/data/datasources/hijri_calendar_local_data_source.dart';
 import 'features/hijri_calendar/data/repositories/hijri_calendar_repository_impl.dart';
 import 'features/hijri_calendar/domain/repositories/hijri_calendar_repository.dart';
@@ -125,21 +132,21 @@ Future<void> configureDependencies() async {
   // Adhkar
   // ============================================================
 
-  sl.registerLazySingleton<AdhkarLocalDataSource>(
-    () => AdhkarLocalDataSourceImpl(),
-  );
+  // sl.registerLazySingleton<AdhkarLocalDataSource>(
+  //   () => AdhkarLocalDataSourceImpl(),
+  // );
+  //
+  // sl.registerLazySingleton<AdhkarRepository>(
+  //   () => AdhkarRepositoryImpl(sl()),
+  // );
+  //
+  // sl.registerLazySingleton<GetAdhkar>(
+  //   () => GetAdhkar(sl()),
+  // );
 
-  sl.registerLazySingleton<AdhkarRepository>(
-    () => AdhkarRepositoryImpl(sl()),
-  );
-
-  sl.registerLazySingleton<GetAdhkar>(
-    () => GetAdhkar(sl()),
-  );
-
-  sl.registerFactory<AdhkarBloc>(
-    () => AdhkarBloc(sl()),
-  );
+  // sl.registerFactory<AdhkarBloc>(
+  //   () => AdhkarBloc(sl()),
+  // );
 
   // ============================================================
   // Qibla
@@ -604,4 +611,60 @@ Future<void> configureDependencies() async {
         () => GetKhatmaWeeklyReport(sl()),
   );
   // sl.registerFactory(() => UnlockCardCubit());
+
+  // ============================================================
+  // AZKAR
+  // ============================================================
+
+  // -------------------------
+  // Data Sources
+  // -------------------------
+
+  sl.registerLazySingleton<AzkarLocalDataSource>(
+        () => AzkarLocalDataSource(),
+  );
+
+  // -------------------------
+  // Repository
+  // -------------------------
+
+  sl.registerLazySingleton<AzkarRepository>(
+        () => AzkarRepositoryImpl(
+      sl<AzkarLocalDataSource>(),
+    ),
+  );
+
+  // -------------------------
+  // Use Cases
+  // -------------------------
+
+  sl.registerLazySingleton<GetAzkarCategories>(
+        () => GetAzkarCategories(
+      sl<AzkarRepository>(),
+    ),
+  );
+
+  sl.registerLazySingleton<GetAzkarChapters>(
+        () => GetAzkarChapters(
+      sl<AzkarRepository>(),
+    ),
+  );
+
+  sl.registerLazySingleton<GetAzkarItems>(
+        () => GetAzkarItems(
+      sl<AzkarRepository>(),
+    ),
+  );
+
+  // -------------------------
+  // Bloc
+  // -------------------------
+
+  sl.registerFactory<AzkarBloc>(
+        () => AzkarBloc(
+      getAzkarCategories: sl<GetAzkarCategories>(),
+      getAzkarChapters: sl<GetAzkarChapters>(),
+      getAzkarItems: sl<GetAzkarItems>(),
+    ),
+  );
 }

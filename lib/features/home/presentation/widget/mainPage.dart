@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../azkar/presentation/pages/azkar_page.dart';
 import '../../../home/presentation/pages/home_page.dart';
 import '../../../quran/presentation/pages/quran_page.dart';
 import '../../../adhkar/presentation/pages/adhkar_page.dart';
@@ -19,7 +20,7 @@ class _MainPageState extends State<MainPage> {
   late final List<Widget> pages = [
     const HomePage(),
     const QuranIndexPage(),
-  // const  QuranHomePage(),
+  const  AzkarPage(),
     const PrayerSettingsPage(),
   ];
 

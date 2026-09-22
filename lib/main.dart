@@ -1,23 +1,16 @@
 import 'dart:io';
 
-import 'package:azkary/azkary.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:quran_kit/kit.dart';
 import 'package:timezone/data/latest.dart' as tz;
-
 import 'app.dart';
 import 'core/services/prayer_scheduler_split/prayer_scheduler/adhan_scheduler_service.dart';
 import 'core/services/prayer_scheduler_split/prayer_scheduler/notifications/countdown_notification_service.dart';
 import 'core/services/unlock_card.dart';
-
 import 'features/khatma/domain/useCase/get_current_khatma_ayah.dart';
 import 'features/khatma/domain/useCase/get_khatma_weekly_report.dart';
 import 'features/khatma/domain/useCase/markCurrent_ayahAs_read.dart';
-import 'features/khatma/services/khatma_notification_service.dart';
 import 'features/khatma/services/khatma_unlock_service.dart';
-
 import 'injection_container.dart';
 
 Future<void> main() async {
