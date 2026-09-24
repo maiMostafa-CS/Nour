@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 
-import '../ datasources/adhan_settings_local_data_source.dart';
 import '../../domain/repositories/ adhan_settings_repository.dart';
+import '../datasources/adhan_settings_local_data_source.dart';
 import '../../domain/entities/adhan_settings_entity.dart';
 import '../models/adhan_settings_model.dart';
 

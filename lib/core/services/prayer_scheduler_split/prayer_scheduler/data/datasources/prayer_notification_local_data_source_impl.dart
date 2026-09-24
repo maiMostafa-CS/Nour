@@ -5,18 +5,19 @@ import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-
-import '../../../../../../features/adhan/data/datasources/adhan_local_data_source.dart';
 import '../../../../../../features/adhan_settings/domain/repositories/ adhan_settings_repository.dart';
+import '../../../../../../features/adhan_sound/data/datasources/adhan_local_data_source.dart';
 import '../../../../../../features/iqama_setting/domain/repositories/iqama_settings_repository.dart';
 import '../../../../../../features/prayer_times/data/datasources/prayer_local_data_source.dart';
 import '../../../../../../features/prayer_times/domain/entities/PrayerDayScheduleEntity.dart';
+import '../../../../alarm_cleanup/alarm_id_tracker.dart';
 import '../../adhan_scheduler_service.dart';
 import '../../config/prayer_scheduler_config.dart';
 import '../../notifications/countdown_notification_service.dart';
 import '../../scheduler/adhan_scheduler.dart';
 import '../../scheduler/countdown_scheduler.dart';
 import '../../scheduler/iqama_scheduler.dart';
+import '../../services/adhan_asset_provider.dart';
 import '../../utils/prayer_scheduler_ids.dart';
 import 'prayer_notification_local_data_source.dart';
 
@@ -27,17 +28,22 @@ class PrayerNotificationLocalDataSourceImpl
     required AdhanSettingsRepository adhanSettingsRepository,
     required IqamaSettingsRepository iqamaSettingsRepository,
     required AdhanLocalDataSource adhanLocalDataSource,
+    required AdhanAssetProvider adhanAssetProvider,
+    AlarmIdTracker? alarmIdTracker,
   })  : _prayerCalculator = prayerCalculator,
         _adhanSettingsRepository = adhanSettingsRepository,
         _iqamaSettingsRepository = iqamaSettingsRepository,
-        _adhanLocalDataSource = adhanLocalDataSource;
+        _adhanLocalDataSource = adhanLocalDataSource,
+        _adhanAssetProvider = adhanAssetProvider,
+        _alarmIdTracker = alarmIdTracker;
 
+  final AdhanAssetProvider _adhanAssetProvider;
   final PrayerLocalDataSource _prayerCalculator;
-
   final AdhanSettingsRepository _adhanSettingsRepository;
-
   final IqamaSettingsRepository _iqamaSettingsRepository;
   final AdhanLocalDataSource _adhanLocalDataSource;
+  final AlarmIdTracker? _alarmIdTracker;
+
   // ============================================================
   // BUILD SCHEDULE
   // ============================================================
@@ -95,8 +101,7 @@ class PrayerNotificationLocalDataSourceImpl
     required double latitude,
     required double longitude,
     required int days,
-  })
-  async {
+  }) async {
     prayerSchedulerLog(
       '════════════════════════════════════',
     );
@@ -149,26 +154,17 @@ class PrayerNotificationLocalDataSourceImpl
           'Maghrib=${iqamaSettings.maghrib} min | '
           'Isha=${iqamaSettings.isha} min',
     );
-    // ==========================================================
-// LOAD SELECTED ADHAN RECITER
-// ==========================================================
 
-    final selectedReciterId =
-    await _adhanLocalDataSource.getSelectedReciterId();
+    // ==========================================================
+    // LOAD ALL ADHAN RECITERS ONCE
+    // ==========================================================
 
     final reciters =
     await _adhanLocalDataSource.getReciters();
 
-    final selectedReciter = reciters.firstWhere(
-          (reciter) => reciter.id == selectedReciterId,
-      orElse: () => reciters.first,
-    );
-
-    prayerSchedulerLog(
-      '🎙️ SELECTED RECITER | '
-          'id=${selectedReciter.id} | '
-          'name=${selectedReciter.name}',
-    );
+    if (reciters.isEmpty) {
+      throw Exception('No adhan reciters available');
+    }
 
     final now = DateTime.now();
 
@@ -213,42 +209,74 @@ class PrayerNotificationLocalDataSourceImpl
                 'index=${moment.index}',
           );
 
-          final adhanAssetPath = moment.index == 0
-              ? selectedReciter.fajrAdhanAssetPath
-              : selectedReciter.normalAdhanAssetPath;
+          // ====================================================
+          // DETERMINE PRAYER NAME
+          // ====================================================
 
-          prayerSchedulerLog(
-            '🎙️ ADHAN AUDIO | '
-                'reciter=${selectedReciter.name} | '
-                'prayer=${moment.name} | '
-                'asset=$adhanAssetPath',
-          );
+          final String? prayerName = switch (moment.index) {
+            0 => 'fajr',
+            2 => 'dhuhr',
+            3 => 'asr',
+            4 => 'maghrib',
+            5 => 'isha',
+            _ => null,
+          };
 
-          try {
-            final adhanScheduled =
-            await AdhanScheduler.schedule(
-              dayIndex: dayIndex,
-              moment: moment,
-              adhanAssetPath: adhanAssetPath,
-              enabled: adhanSettings.isEnabled(moment.index),
-            );
+          // ====================================================
+          // GET SELECTED RECITER FOR THIS PRAYER
+          // ====================================================
 
-            if (adhanScheduled) {
-              scheduledAdhans++;
-            }
-          } catch (e, stackTrace) {
+          if (prayerName == null) {
             prayerSchedulerLog(
-              '❌ Adhan FAILED | '
+              '⏭️ No Adhan reciter for '
                   'prayer=${moment.name} | '
-                  'error=$e',
+                  'index=${moment.index}',
             );
+          } else {
+            final selectedAsset = await _adhanAssetProvider
+                .getAssetForPrayer(prayerName);
 
             prayerSchedulerLog(
-              'STACKTRACE: $stackTrace',
+              '🎙️ SELECTED RECITER | '
+                  'prayer=$prayerName | '
+                  'asset=$selectedAsset',
             );
+
+            // ==================================================
+            // SCHEDULE ADHAN
+            // ==================================================
+
+            try {
+              final adhanScheduled = await AdhanScheduler.schedule(
+                dayIndex: dayIndex,
+                moment: moment,
+                adhanAssetPath: selectedAsset,
+                enabled: adhanSettings.isEnabled(moment.index),
+              );
+
+              if (adhanScheduled) {
+                scheduledAdhans++;
+
+                // ─── سجّل معرّف الأذان ───
+                final adhanId = PrayerSchedulerIds.adhan(
+                  moment.time,
+                  moment.index,
+                );
+                await _alarmIdTracker?.track(adhanId);
+              }
+            } catch (e, stackTrace) {
+              prayerSchedulerLog(
+                '❌ Adhan FAILED | '
+                    'prayer=${moment.name} | '
+                    'error=$e',
+              );
+
+              prayerSchedulerLog(
+                'STACKTRACE: $stackTrace',
+              );
+            }
           }
-        }
-        else {
+        } else {
           prayerSchedulerLog(
             '🔇 Adhan DISABLED | '
                 'prayer=${moment.name} | '
@@ -258,21 +286,12 @@ class PrayerNotificationLocalDataSourceImpl
 
         // ======================================================
         // IQAMA
-        //
-        // IQAMA DOES NOT DEPEND ON ADHAN SETTING
         // ======================================================
-
-        // ======================================================
-// IQAMA
-//
-// IQAMA DEPENDS ON ADHAN SETTING
-// If Adhan is disabled → Iqama is also disabled.
-// Saved Iqama minutes are NOT changed.
-// ======================================================
 
         if (adhanEnabled) {
-          final iqamaMinutes =
-          iqamaSettings.getMinutes(moment.index);
+          final iqamaMinutes = iqamaSettings.getMinutes(
+            moment.index,
+          );
 
           final iqamaTime = moment.time.add(
             Duration(
@@ -297,6 +316,13 @@ class PrayerNotificationLocalDataSourceImpl
               );
 
               scheduledIqamas++;
+
+              // ─── سجّل معرّف الإقامة ───
+              final iqamaId = PrayerSchedulerIds.iqama(
+                moment.time,
+                moment.index,
+              );
+              await _alarmIdTracker?.track(iqamaId);
             } catch (e, stackTrace) {
               prayerSchedulerLog(
                 '❌ Iqama FAILED | '
@@ -325,8 +351,6 @@ class PrayerNotificationLocalDataSourceImpl
 
         // ======================================================
         // COUNTDOWN UPDATE
-        //
-        // COUNTDOWN DOES NOT DEPEND ON ADHAN SETTING
         // ======================================================
 
         if (moment.time.isAfter(now)) {
@@ -336,6 +360,13 @@ class PrayerNotificationLocalDataSourceImpl
             );
 
             scheduledCountdowns++;
+
+            // ─── سجّل معرّف العدّاد ───
+            final countdownId = PrayerSchedulerIds.countdownUpdate(
+              moment.time,
+              moment.index,
+            );
+            await _alarmIdTracker?.track(countdownId);
           } catch (e, stackTrace) {
             prayerSchedulerLog(
               '❌ Countdown update FAILED | '
@@ -351,9 +382,6 @@ class PrayerNotificationLocalDataSourceImpl
 
         // ======================================================
         // SAVE WINDOW
-        //
-        // Keep ALL prayer moments, including disabled Adhan.
-        // This is needed for Countdown / Next Prayer.
         // ======================================================
 
         windowEntries.add({
@@ -367,8 +395,7 @@ class PrayerNotificationLocalDataSourceImpl
     // SAVE SCHEDULING DATA
     // ==========================================================
 
-    final prefs =
-    await SharedPreferences.getInstance();
+    final prefs = await SharedPreferences.getInstance();
 
     await prefs.setInt(
       prayerScheduledDaysPrefsKey,
@@ -384,10 +411,6 @@ class PrayerNotificationLocalDataSourceImpl
       ).toIso8601String(),
     );
 
-    // ==========================================================
-    // SCHEDULED LOCATION
-    // ==========================================================
-
     await prefs.setDouble(
       prayerScheduledLatitudePrefsKey,
       latitude,
@@ -398,10 +421,6 @@ class PrayerNotificationLocalDataSourceImpl
       longitude,
     );
 
-    // ==========================================================
-    // LAST LOCATION
-    // ==========================================================
-
     await prefs.setDouble(
       prayerLastLatitudePrefsKey,
       latitude,
@@ -411,10 +430,6 @@ class PrayerNotificationLocalDataSourceImpl
       prayerLastLongitudePrefsKey,
       longitude,
     );
-
-    // ==========================================================
-    // SAVE WINDOW
-    // ==========================================================
 
     await prefs.setString(
       prayerNotificationWindowPrefsKey,
@@ -485,8 +500,7 @@ class PrayerNotificationLocalDataSourceImpl
     required double longitude,
     int days = kPrayerNotificationWindowDays,
   }) async {
-    final prefs =
-    await SharedPreferences.getInstance();
+    final prefs = await SharedPreferences.getInstance();
 
     final scheduledDays = prefs.getInt(
       prayerScheduledDaysPrefsKey,
@@ -498,20 +512,14 @@ class PrayerNotificationLocalDataSourceImpl
 
     bool needsReschedule = false;
 
-    // ==========================================================
-    // NO PREVIOUS SCHEDULE
-    // ==========================================================
-
-    if (scheduledDays == null ||
-        scheduledFromIso == null) {
+    if (scheduledDays == null || scheduledFromIso == null) {
       prayerSchedulerLog(
         '📅 No previous schedule found → RESCHEDULE',
       );
 
       needsReschedule = true;
     } else {
-      final scheduledFrom =
-      DateTime.tryParse(scheduledFromIso);
+      final scheduledFrom = DateTime.tryParse(scheduledFromIso);
 
       if (scheduledFrom == null) {
         prayerSchedulerLog(
@@ -537,18 +545,13 @@ class PrayerNotificationLocalDataSourceImpl
         final daysPassed =
             currentDate.difference(startDate).inDays;
 
-        final daysRemaining =
-            scheduledDays - daysPassed;
+        final daysRemaining = scheduledDays - daysPassed;
 
         prayerSchedulerLog(
           '📅 Scheduled=$scheduledDays | '
               'Passed=$daysPassed | '
               'Remaining=$daysRemaining',
         );
-
-        // ======================================================
-        // WINDOW ALMOST FINISHED
-        // ======================================================
 
         if (daysRemaining <= 1) {
           prayerSchedulerLog(
@@ -559,10 +562,6 @@ class PrayerNotificationLocalDataSourceImpl
         }
       }
     }
-
-    // ==========================================================
-    // CHECK LOCATION
-    // ==========================================================
 
     if (!needsReschedule) {
       final locationChanged =
@@ -580,13 +579,8 @@ class PrayerNotificationLocalDataSourceImpl
       }
     }
 
-    // ==========================================================
-    // CHECK FUTURE ADHANS
-    // ==========================================================
-
     if (!needsReschedule) {
-      final alarmsExist =
-      await _areFutureAdhansScheduled(
+      final alarmsExist = await _areFutureAdhansScheduled(
         latitude: latitude,
         longitude: longitude,
         days: days,
@@ -600,10 +594,6 @@ class PrayerNotificationLocalDataSourceImpl
         needsReschedule = true;
       }
     }
-
-    // ==========================================================
-    // RESCHEDULE
-    // ==========================================================
 
     if (needsReschedule) {
       await forceReschedule(
@@ -626,8 +616,7 @@ class PrayerNotificationLocalDataSourceImpl
     required double latitude,
     required double longitude,
   }) async {
-    final prefs =
-    await SharedPreferences.getInstance();
+    final prefs = await SharedPreferences.getInstance();
 
     final scheduledLatitude = prefs.getDouble(
       prayerScheduledLatitudePrefsKey,
@@ -637,8 +626,7 @@ class PrayerNotificationLocalDataSourceImpl
       prayerScheduledLongitudePrefsKey,
     );
 
-    if (scheduledLatitude == null ||
-        scheduledLongitude == null) {
+    if (scheduledLatitude == null || scheduledLongitude == null) {
       prayerSchedulerLog(
         '📍 No scheduled location found → RESCHEDULE',
       );
@@ -649,15 +637,12 @@ class PrayerNotificationLocalDataSourceImpl
     const tolerance = 0.0001;
 
     final latitudeChanged =
-        (scheduledLatitude - latitude).abs() >
-            tolerance;
+        (scheduledLatitude - latitude).abs() > tolerance;
 
     final longitudeChanged =
-        (scheduledLongitude - longitude).abs() >
-            tolerance;
+        (scheduledLongitude - longitude).abs() > tolerance;
 
-    final changed =
-        latitudeChanged || longitudeChanged;
+    final changed = latitudeChanged || longitudeChanged;
 
     prayerSchedulerLog(
       '📍 SCHEDULED LOCATION CHECK | '
@@ -691,29 +676,26 @@ class PrayerNotificationLocalDataSourceImpl
 
     for (final day in schedule) {
       for (final moment in day.toMoments()) {
-        // 🟢 yield قبل أي continue
         if (!adhanSettings.isEnabled(moment.index)) {
           prayerSchedulerLog(
             '⏭️ Skip disabled Adhan check | '
                 'prayer=${moment.name} | '
                 'index=${moment.index}',
           );
-          await Future.delayed(Duration.zero);   // ← ضيف ده
+          await Future.delayed(Duration.zero);
           continue;
         }
 
         if (!moment.time.isAfter(now)) {
-          await Future.delayed(Duration.zero);   // ← ضيف ده
+          await Future.delayed(Duration.zero);
           continue;
         }
 
         final id = PrayerSchedulerIds.adhan(moment.time, moment.index);
 
-        // 🟢 ده أهم سطر — نداء platform
         final alarm = await Alarm.getAlarm(id);
 
-        // 🟢 yield بعد كل نداء platform
-        await Future.delayed(Duration.zero);   // ← ضيف ده
+        await Future.delayed(Duration.zero);
 
         if (alarm == null) {
           prayerSchedulerLog(
@@ -731,7 +713,8 @@ class PrayerNotificationLocalDataSourceImpl
           await Future.delayed(Duration.zero);
           return false;
         }
-      }    }
+      }
+    }
 
     prayerSchedulerLog(
       '✅ All ENABLED future Adhan alarms are scheduled',
@@ -769,7 +752,6 @@ class PrayerNotificationLocalDataSourceImpl
   // FORCE RESCHEDULE
   // ============================================================
 
-// 🟢 ضيف ده فوق الدالة (مع باقي الـ fields)
   bool _isRescheduling = false;
 
   @override
@@ -777,9 +759,7 @@ class PrayerNotificationLocalDataSourceImpl
     required double latitude,
     required double longitude,
     required int days,
-  })
-  async {
-    // 🟢 حماية من التنفيذ المتزامن
+  }) async {
     if (_isRescheduling) {
       prayerSchedulerLog(
         '⚠️ FORCE RESCHEDULE already running → SKIP',
@@ -802,19 +782,11 @@ class PrayerNotificationLocalDataSourceImpl
     );
 
     try {
-      // ========================================================
-      // CANCEL OLD SCHEDULE
-      // ========================================================
-
       await cancelAll();
 
       prayerSchedulerLog(
         '🛑 OLD SCHEDULE CANCELLED',
       );
-
-      // ========================================================
-      // CREATE NEW SCHEDULE
-      // ========================================================
 
       await scheduleForDays(
         latitude: latitude,
@@ -839,49 +811,39 @@ class PrayerNotificationLocalDataSourceImpl
       _isRescheduling = false;
     }
   }
-// ============================================================
-// CANCEL ALL
-// ============================================================
+
+  // ============================================================
+  // CANCEL ALL
+  // ============================================================
 
   @override
-  Future<void> cancelAll()
-  async {
+  Future<void> cancelAll() async {
     prayerSchedulerLog(
       '🛑 START cancelAll()',
     );
 
-    final prefs =
-    await SharedPreferences.getInstance();
+    final prefs = await SharedPreferences.getInstance();
 
     final previousDays =
-        prefs.getInt(
-          prayerScheduledDaysPrefsKey,
-        ) ??
+        prefs.getInt(prayerScheduledDaysPrefsKey) ??
             kPrayerNotificationWindowDays;
 
-    final scheduledFromIso =
-    prefs.getString(
+    final scheduledFromIso = prefs.getString(
       prayerScheduledFromPrefsKey,
     );
 
-    final scheduledFrom =
-    scheduledFromIso != null
-        ? DateTime.tryParse(
-      scheduledFromIso,
-    )
+    final scheduledFrom = scheduledFromIso != null
+        ? DateTime.tryParse(scheduledFromIso)
         : null;
 
-    final firstDay =
-        scheduledFrom ?? DateTime.now();
+    final firstDay = scheduledFrom ?? DateTime.now();
 
-    final daysToClear =
-    previousDays.clamp(1, 60);
+    final daysToClear = previousDays.clamp(1, 60);
 
     var cancelled = 0;
 
     // ==========================================================
-    // 🔥 SAFETY NET: CANCEL ALL ALARMS VIA Alarm.getAlarms()
-    // Works even if prefs are lost/corrupted
+    // 🔥 SAFETY NET
     // ==========================================================
 
     try {
@@ -906,30 +868,37 @@ class PrayerNotificationLocalDataSourceImpl
     }
 
     // ==========================================================
-    // GET SCHEDULED LOCATION
+    // 🧹 NEW: SWEEP ORPHAN ALARMS
+    //
+    // بيمسح المنبهات اليتيمة من النطاقات المعروفة
+    // (اللي مش مسجلة في Alarm.getAlarms() ولا في AlarmIdTracker)
     // ==========================================================
+
+    try {
+      final swept = await _sweepOrphanAlarms();
+      prayerSchedulerLog('🧹 [Sweep] Cancelled $swept orphan alarms');
+    } catch (e) {
+      prayerSchedulerLog('⚠️ Sweep orphan error: $e');
+    }
 
     // ==========================================================
     // GET SCHEDULED LOCATION
     // ==========================================================
 
-    final latitude =
-    prefs.getDouble(
+    final latitude = prefs.getDouble(
       prayerScheduledLatitudePrefsKey,
     );
 
-    final longitude =
-    prefs.getDouble(
+    final longitude = prefs.getDouble(
       prayerScheduledLongitudePrefsKey,
     );
 
     // ==========================================================
-    // CANCEL PRAYER ALARMS USING REAL PRAYER TIMES
+    // CANCEL PRAYER ALARMS
     // ==========================================================
 
     if (latitude != null && longitude != null) {
-      final schedule =
-      await _buildSchedule(
+      final schedule = await _buildSchedule(
         latitude: latitude,
         longitude: longitude,
         days: daysToClear,
@@ -937,46 +906,31 @@ class PrayerNotificationLocalDataSourceImpl
 
       for (final day in schedule) {
         for (final moment in day.toMoments()) {
-          final adhanId =
-          PrayerSchedulerIds.adhan(
+          final adhanId = PrayerSchedulerIds.adhan(
             moment.time,
             moment.index,
           );
 
-          final reminderId =
-          PrayerSchedulerIds.reminder(
+          final reminderId = PrayerSchedulerIds.reminder(
             moment.time,
             moment.index,
           );
 
-          final iqamaId =
-          PrayerSchedulerIds.iqama(
+          final iqamaId = PrayerSchedulerIds.iqama(
             moment.time,
             moment.index,
           );
 
-          final countdownId =
-          PrayerSchedulerIds.countdownUpdate(
+          final countdownId = PrayerSchedulerIds.countdownUpdate(
             moment.time,
             moment.index,
           );
 
           try {
-            await Alarm.stop(
-              adhanId,
-            );
-
-            await Alarm.stop(
-              reminderId,
-            );
-
-            await Alarm.stop(
-              iqamaId,
-            );
-
-            await AndroidAlarmManager.cancel(
-              countdownId,
-            );
+            await Alarm.stop(adhanId);
+            await Alarm.stop(reminderId);
+            await Alarm.stop(iqamaId);
+            await AndroidAlarmManager.cancel(countdownId);
 
             cancelled++;
 
@@ -1004,10 +958,6 @@ class PrayerNotificationLocalDataSourceImpl
             'lng=$longitude',
       );
 
-      // ========================================================
-      // FALLBACK
-      // ========================================================
-
       for (var d = 0; d < daysToClear; d++) {
         final date = DateTime(
           firstDay.year,
@@ -1017,15 +967,12 @@ class PrayerNotificationLocalDataSourceImpl
 
         for (var p = 0; p < 6; p++) {
           try {
-            final countdownId =
-            PrayerSchedulerIds.countdownUpdate(
+            final countdownId = PrayerSchedulerIds.countdownUpdate(
               date,
               p,
             );
 
-            await AndroidAlarmManager.cancel(
-              countdownId,
-            );
+            await AndroidAlarmManager.cancel(countdownId);
           } catch (e) {
             prayerSchedulerLog(
               '⚠️ Countdown cancel error | '
@@ -1043,8 +990,7 @@ class PrayerNotificationLocalDataSourceImpl
     // ==========================================================
 
     try {
-      final notifications =
-      FlutterLocalNotificationsPlugin();
+      final notifications = FlutterLocalNotificationsPlugin();
 
       await notifications.cancel(
         id: countdownNotificationId,
@@ -1054,38 +1000,23 @@ class PrayerNotificationLocalDataSourceImpl
         '⚠️ Failed to cancel countdown notification',
       );
 
-      prayerSchedulerLog(
-        'ERROR = $e',
-      );
-
-      prayerSchedulerLog(
-        'STACKTRACE = $stackTrace',
-      );
+      prayerSchedulerLog('ERROR = $e');
+      prayerSchedulerLog('STACKTRACE = $stackTrace');
     }
 
     // ==========================================================
     // CLEAR PREFS
     // ==========================================================
 
-    await prefs.remove(
-      prayerScheduledDaysPrefsKey,
-    );
+    await prefs.remove(prayerScheduledDaysPrefsKey);
+    await prefs.remove(prayerScheduledFromPrefsKey);
+    await prefs.remove(prayerNotificationWindowPrefsKey);
 
-    await prefs.remove(
-      prayerScheduledFromPrefsKey,
-    );
+    // ==========================================================
+    // ✅ CLEAR TRACKED ALARM IDs
+    // ==========================================================
 
-    await prefs.remove(
-      prayerNotificationWindowPrefsKey,
-    );
-
-    // await prefs.remove(
-    //   prayerScheduledLatitudePrefsKey,
-    // );
-    //
-    // await prefs.remove(
-    //   prayerScheduledLongitudePrefsKey,
-    // );
+    await _alarmIdTracker?.clear();
 
     prayerSchedulerLog(
       '✅ cancelAll() completed | '
@@ -1093,6 +1024,53 @@ class PrayerNotificationLocalDataSourceImpl
     );
   }
 
+// ============================================================
+// 🧹 SWEEP ORPHAN ALARMS
+// ============================================================
+
+  /// يمسح المنبهات اليتيمة من النطاقات المعروفة
+  ///
+  /// المنبهات اليتيمة هي اللي:
+  /// - مش موجودة في `Alarm.getAlarms()`
+  /// - مش مسجلة في `AlarmIdTracker`
+  /// - لكن لسه مسجلة في نظام أندرويد
+  ///
+  /// الحل: نمر على كل الـ IDs في النطاقات المعروفة
+  /// ونحاول نلغي كل واحد.
+  Future<int> _sweepOrphanAlarms() async {
+    // ⚠️ عدّل الأرقام دي حسب مشروعك
+    const adhanBase = 124570;
+    const iqamaBase = 324570;
+    const countdownBase = 424570;
+    const sweepRange = 200;
+
+    final bases = [adhanBase, iqamaBase, countdownBase];
+
+    var cancelled = 0;
+
+    for (final base in bases) {
+      for (int i = 0; i < sweepRange; i++) {
+        final id = base + i;
+
+        // 1️⃣ إلغاء من إضافة alarm
+        try {
+          await Alarm.stop(id);
+          cancelled++;
+        } catch (_) {
+          // متوقع — المنبه مش موجود
+        }
+
+        // 2️⃣ إلغاء من إضافة android_alarm_manager_plus
+        try {
+          await AndroidAlarmManager.cancel(id);
+        } catch (_) {
+          // متوقع
+        }
+      }
+    }
+
+    return cancelled;
+  }
   Future<(double, double)?> getScheduledLocation() async {
     final prefs = await SharedPreferences.getInstance();
     final lat = prefs.getDouble(prayerScheduledLatitudePrefsKey);
@@ -1100,5 +1078,4 @@ class PrayerNotificationLocalDataSourceImpl
     if (lat == null || lng == null) return null;
     return (lat, lng);
   }
-
 }

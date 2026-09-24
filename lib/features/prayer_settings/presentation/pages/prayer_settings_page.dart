@@ -6,6 +6,7 @@ import '../../../../core/router/app_router.dart';
 import '../../../../core/services/unlock_card.dart';
 import '../../../home/presentation/bloc/bloc.dart';
 import '../../../home/presentation/bloc/home_state.dart';
+import '../widgets/adhan_card.dart';
 import '../widgets/setting_card.dart';
 
 class PrayerSettingsPage extends StatelessWidget {
@@ -65,9 +66,11 @@ class PrayerSettingsPage extends StatelessWidget {
                 title: 'صوت المؤذن',
                 subtitle: 'اختيار المؤذن المفضل لديك',
                 onTap: () async {
-                  await Navigator.pushNamed(
+                  Navigator.push(
                     context,
-                    AppRouter.adhan,
+                    MaterialPageRoute(
+                      builder: (context) => const AdhanCard(),
+                    ),
                   );
                 },
               ),

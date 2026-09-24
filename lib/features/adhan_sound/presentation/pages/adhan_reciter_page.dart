@@ -8,17 +8,20 @@ import '../bloc/adhan_event.dart';
 import '../bloc/adhan_state.dart';
 
 class AdhanReciterPage extends StatefulWidget {
+  final String prayerName;
+  final String prayerTitle;
+
   const AdhanReciterPage({
     super.key,
+    required this.prayerName,
+    required this.prayerTitle,
   });
 
   @override
-  State<AdhanReciterPage> createState() =>
-      _AdhanReciterPageState();
+  State<AdhanReciterPage> createState() => _AdhanReciterPageState();
 }
 
-class _AdhanReciterPageState
-    extends State<AdhanReciterPage> {
+class _AdhanReciterPageState extends State<AdhanReciterPage> {
   final AudioPlayer _audioPlayer = AudioPlayer();
 
   String? _playingId;
@@ -27,61 +30,42 @@ class _AdhanReciterPageState
   void initState() {
     super.initState();
 
-    context.read<AdhanBloc>().add(
-      const LoadAdhanReciters(),
-    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      context.read<AdhanBloc>().add(const LoadAdhanReciters());
+    });
   }
 
-  Future<void> _togglePreview(
-      String id,
-      String assetPath,
-      ) async {
+  Future<void> _togglePreview(String id, String assetPath) async {
     try {
       if (_playingId == id) {
         await _audioPlayer.stop();
-
-        if (mounted) {
-          setState(() {
-            _playingId = null;
-          });
-        }
-
+        if (!mounted) return;
+        setState(() => _playingId = null);
         return;
       }
 
       await _audioPlayer.stop();
-
-      await _audioPlayer.setAsset(
-        assetPath,
-      );
+      await _audioPlayer.setAsset(assetPath);
 
       if (!mounted) return;
-
-      setState(() {
-        _playingId = id;
-      });
+      setState(() => _playingId = id);
 
       await _audioPlayer.play();
 
       if (!mounted) return;
-
-      setState(() {
-        _playingId = null;
-      });
+      setState(() => _playingId = null);
     } catch (e) {
-      if (!mounted) return;
+      debugPrint('❌ Adhan preview error: $e');
 
-      setState(() {
-        _playingId = null;
-      });
+      if (!mounted) return;
+      setState(() => _playingId = null);
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
             'تعذر تشغيل صوت الأذان',
-            style: TextStyle(
-              fontSize: 14.sp,
-            ),
+            style: TextStyle(fontSize: 14.sp),
           ),
         ),
       );
@@ -90,6 +74,7 @@ class _AdhanReciterPageState
 
   @override
   void dispose() {
+    _audioPlayer.stop();
     _audioPlayer.dispose();
     super.dispose();
   }
@@ -104,7 +89,7 @@ class _AdhanReciterPageState
         foregroundColor: Colors.white,
         centerTitle: true,
         title: Text(
-          'صوت الأذان',
+          'صوت أذان ${widget.prayerTitle}',
           style: TextStyle(
             fontSize: 20.sp,
             fontWeight: FontWeight.bold,
@@ -114,18 +99,19 @@ class _AdhanReciterPageState
 
       body: BlocBuilder<AdhanBloc, AdhanState>(
         builder: (context, state) {
-          if (state is AdhanLoading ||
-              state is AdhanInitial) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
+          if (state is AdhanLoading || state is AdhanInitial) {
+            return const Center(child: CircularProgressIndicator());
           }
 
           if (state is AdhanError) {
             return Center(
-              child: Text(
-                state.message,
-                textAlign: TextAlign.center,
+              child: Padding(
+                padding: EdgeInsets.all(24.w),
+                child: Text(
+                  state.message,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 15.sp),
+                ),
               ),
             );
           }
@@ -134,40 +120,38 @@ class _AdhanReciterPageState
             return const SizedBox();
           }
 
+          if (state.reciters.isEmpty) {
+            return Center(
+              child: Text(
+                'لا يوجد مؤذنون متاحون',
+                style: TextStyle(fontSize: 16.sp),
+              ),
+            );
+          }
+
           return ListView.separated(
             padding: EdgeInsets.all(16.w),
             itemCount: state.reciters.length,
-            separatorBuilder: (_, __) =>
-                SizedBox(height: 12.h),
+            separatorBuilder: (_, __) => SizedBox(height: 12.h),
             itemBuilder: (context, index) {
-              final reciter =
-              state.reciters[index];
-
+              final reciter = state.reciters[index];
               final isSelected =
-                  state.selectedReciterId ==
-                      reciter.id;
-
-              final isPlaying =
-                  _playingId == reciter.id;
+                  state.selectedReciterId == reciter.id;
+              final isPlaying = _playingId == reciter.id;
 
               return InkWell(
-                borderRadius:
-                BorderRadius.circular(18.r),
+                borderRadius: BorderRadius.circular(18.r),
                 onTap: () {
                   context.read<AdhanBloc>().add(
-                    SelectAdhanReciter(
-                      reciter.id,
-                    ),
+                    SelectAdhanReciter(reciterId: reciter.id),
                   );
                 },
                 child: AnimatedContainer(
-                  duration:
-                  const Duration(milliseconds: 200),
+                  duration: const Duration(milliseconds: 200),
                   padding: EdgeInsets.all(16.w),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius:
-                    BorderRadius.circular(18.r),
+                    borderRadius: BorderRadius.circular(18.r),
                     border: Border.all(
                       color: isSelected
                           ? const Color(0xFF176B5B)
@@ -178,53 +162,46 @@ class _AdhanReciterPageState
                       BoxShadow(
                         blurRadius: 8,
                         offset: const Offset(0, 3),
-                        color: Colors.black
-                            .withValues(alpha: 0.06),
+                        color: Colors.black.withValues(alpha: 0.06),
                       ),
                     ],
                   ),
                   child: Row(
                     children: [
+                      // MIC ICON
                       Container(
                         width: 52.w,
                         height: 52.w,
-                        decoration: BoxDecoration(
-                          color:
-                          const Color(0xFFE8E8CE),
+                        decoration: const BoxDecoration(
+                          color: Color(0xFFE8E8CE),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
                           Icons.mic,
-                          color:
-                          const Color(0xFF176B5B),
+                          color: const Color(0xFF176B5B),
                           size: 27.sp,
                         ),
                       ),
 
                       SizedBox(width: 14.w),
 
+                      // NAME
                       Expanded(
                         child: Column(
-                          crossAxisAlignment:
-                          CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               reciter.name,
                               style: TextStyle(
                                 fontSize: 17.sp,
-                                fontWeight:
-                                FontWeight.bold,
-                                color: const Color(
-                                  0xFF176B5B,
-                                ),
+                                fontWeight: FontWeight.bold,
+                                color: const Color(0xFF176B5B),
                               ),
                             ),
-
                             SizedBox(height: 5.h),
-
                             Text(
                               isSelected
-                                  ? 'المؤذن الحالي'
+                                  ? 'المؤذن الحالي لـ ${widget.prayerTitle}'
                                   : 'اضغط للاختيار',
                               style: TextStyle(
                                 fontSize: 12.sp,
@@ -235,38 +212,33 @@ class _AdhanReciterPageState
                         ),
                       ),
 
+                      // PLAY
                       IconButton(
-                        onPressed: () {
-                          _togglePreview(
-                            reciter.id,
-                            reciter.normalAdhanAssetPath,
-                          );
-                        },
+                        onPressed: () => _togglePreview(
+                          reciter.id,
+                          reciter.normalAdhanAssetPath,
+                        ),
                         icon: Icon(
                           isPlaying
                               ? Icons.stop_circle
                               : Icons.play_circle_fill,
                           size: 38.sp,
-                          color:
-                          const Color(0xFF176B5B),
+                          color: const Color(0xFF176B5B),
                         ),
                       ),
 
                       SizedBox(width: 4.w),
 
-                      if (isSelected)
-                        Icon(
-                          Icons.check_circle,
-                          color:
-                          const Color(0xFF176B5B),
-                          size: 27.sp,
-                        )
-                      else
-                        Icon(
-                          Icons.radio_button_unchecked,
-                          color: Colors.grey,
-                          size: 27.sp,
-                        ),
+                      // SELECTED
+                      Icon(
+                        isSelected
+                            ? Icons.check_circle
+                            : Icons.radio_button_unchecked,
+                        color: isSelected
+                            ? const Color(0xFF176B5B)
+                            : Colors.grey,
+                        size: 27.sp,
+                      ),
                     ],
                   ),
                 ),

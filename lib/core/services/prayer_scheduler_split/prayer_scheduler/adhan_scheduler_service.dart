@@ -4,27 +4,32 @@ import 'package:alarm/alarm.dart';
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:islamic_app/core/services/prayer_scheduler_split/prayer_scheduler/services/adhan_asset_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
-import '../../../../features/adhan/data/datasources/adhan_local_data_source.dart';
+
 import '../../../../features/adhan_settings/domain/repositories/ adhan_settings_repository.dart';
+import '../../../../features/adhan_sound/data/datasources/adhan_local_data_source.dart';
 import '../../../../features/iqama_setting/domain/repositories/iqama_settings_repository.dart';
 import '../../../../features/prayer_times/data/datasources/prayer_local_data_source.dart';
 import '../../../../features/prayer_times/domain/entities/prayer_times_entity.dart';
 import '../../../../injection_container.dart';
+import '../../alarm_cleanup/alarm_id_tracker.dart';
+import 'background/prayer_background_callbacks.dart';
 import 'config/prayer_scheduler_config.dart';
 import 'data/datasources/prayer_notification_local_data_source_impl.dart';
 import 'notifications/countdown_notification_service.dart';
-import 'background/prayer_background_callbacks.dart';
-
 /// عدد الأيام اللي بنحافظ على جدولتها قدام دايماً (rolling window).
 const int kPrayerNotificationWindowDays = 4;
 const int kPrayerMaintenanceAlarmId = 909001;
 
 class AdhanSchedulerService {
+  // ❌ احذف السطر ده
+  // final AlarmIdTracker _alarmIdTracker;
+
   static final AdhanSchedulerService instance =
   AdhanSchedulerService._internal();
 
@@ -33,19 +38,26 @@ class AdhanSchedulerService {
   factory AdhanSchedulerService() => instance;
 
   bool _ringingListenerRegistered = false;
-  PrayerNotificationLocalDataSourceImpl?
-  _notificationDataSource;
+  PrayerNotificationLocalDataSourceImpl? _notificationDataSource;
   bool _autoRenewRunning = false;
+  AdhanAssetProvider? _adhanAssetProvider;
+
+  AdhanAssetProvider get adhanAssetProvider =>
+      _adhanAssetProvider ??= AdhanAssetProvider(
+        localDataSource: sl<AdhanLocalDataSource>(),
+      );
 
   PrayerNotificationLocalDataSourceImpl get _dataSource {
-    return _notificationDataSource ??=
-        PrayerNotificationLocalDataSourceImpl(
-          prayerCalculator: PrayerLocalDataSourceImpl(),
-          adhanSettingsRepository: sl<AdhanSettingsRepository>(),
-          iqamaSettingsRepository: sl<IqamaSettingsRepository>(),
-          adhanLocalDataSource: sl<AdhanLocalDataSource>(),
-        );
+    return _notificationDataSource ??= PrayerNotificationLocalDataSourceImpl(
+      prayerCalculator: PrayerLocalDataSourceImpl(),
+      adhanSettingsRepository: sl<AdhanSettingsRepository>(),
+      iqamaSettingsRepository: sl<IqamaSettingsRepository>(),
+      adhanLocalDataSource: sl<AdhanLocalDataSource>(),
+      adhanAssetProvider: adhanAssetProvider,
+      alarmIdTracker: sl<AlarmIdTracker>(),  // ← هنا بس
+    );
   }
+
   Future<void> showNextPrayerCountdown(
       PrayerTimesEntity prayerTimes,
       ) async {
@@ -102,31 +114,19 @@ class AdhanSchedulerService {
     await prefs.setDouble(prayerLastLatitudePrefsKey, latitude);
     await prefs.setDouble(prayerLastLongitudePrefsKey, longitude);
 
-    // ❌ احذف السطرين دول:
-    // final calculator = PrayerLocalDataSourceImpl();
-    // final dataSource = PrayerNotificationLocalDataSourceImpl(prayerCalculator: calculator);
-
-    // ✅ واستخدم بدالهم الـ singleton المشترك:
     await _dataSource.ensureWindowScheduled(
-    latitude: latitude,
-    longitude: longitude,
-    days: kPrayerNotificationWindowDays,
+      latitude: latitude,
+      longitude: longitude,
+      days: kPrayerNotificationWindowDays,
     );
-    }
+  }
 
   Future<void> cancelAdhans() async {
-    // ❌ نفس الحاجة هنا
-    // final calculator = PrayerLocalDataSourceImpl();
-    // final dataSource = PrayerNotificationLocalDataSourceImpl(prayerCalculator: calculator);
-
-    // ✅
     await _dataSource.cancelAll();
   }
 
   Future<void> cancelAll() async {
-    // ✅ استخدم _dataSource هنا كمان بدل instance جديدة
     await _dataSource.cancelAll();
-
   }
 
   /// إعادة جدولة كل إشعارات الصلاة بعد تغيير إعدادات الإقامة
@@ -149,11 +149,9 @@ class AdhanSchedulerService {
     try {
       final prefs = await SharedPreferences.getInstance();
 
-      final latitude =
-      prefs.getDouble(prayerLastLatitudePrefsKey);
+      final latitude = prefs.getDouble(prayerLastLatitudePrefsKey);
 
-      final longitude =
-      prefs.getDouble(prayerLastLongitudePrefsKey);
+      final longitude = prefs.getDouble(prayerLastLongitudePrefsKey);
 
       prayerSchedulerLog(
         '📍 Saved location: '
@@ -212,40 +210,13 @@ class AdhanSchedulerService {
     }
   }
 
-  // Future<void> cancelAdhans() async {
-  //   final calculator = PrayerLocalDataSourceImpl();
-  //
-  //   final dataSource =
-  //   PrayerNotificationLocalDataSourceImpl(
-  //     prayerCalculator: calculator,
-  //   );
-  //
-  //   await dataSource.cancelAll();
-  // }
-
   Future<void> cancelCountdown() async {
-    final notifications =
-    FlutterLocalNotificationsPlugin();
+    final notifications = FlutterLocalNotificationsPlugin();
 
     await notifications.cancel(
       id: countdownNotificationId,
     );
   }
-  // Future<void> cancelAll() async {
-  //   final calculator = PrayerLocalDataSourceImpl();
-  //
-  //   final dataSource =
-  //   PrayerNotificationLocalDataSourceImpl(
-  //     prayerCalculator: calculator,
-  //   );
-  //
-  //   await dataSource.cancelAll();
-  //
-  //   final notifications =
-  //   FlutterLocalNotificationsPlugin();
-  //
-  //   await notifications.cancelAll();
-  // }
 
   /// نقطة الدخول الحقيقية لـ "auto-renew": بتتسجل مرة واحدة بس (عادةً
   /// من initialize()) وبتفضل شغالة طول عمر الـ isolate — بما فيه
@@ -269,14 +240,18 @@ class AdhanSchedulerService {
               await Alarm.stop(alarm.id);
               prayerSchedulerLog('🛑 Reminder auto-stopped | id=${alarm.id}');
             } catch (e) {
-              prayerSchedulerLog('⚠️ Reminder auto-stop failed | id=${alarm.id} | $e');
+              prayerSchedulerLog(
+                '⚠️ Reminder auto-stop failed | id=${alarm.id} | $e',
+              );
             }
           });
         }
       }
     });
 
-    prayerSchedulerLog('✅ Alarm listener registered (no auto-reschedule while ringing)');
+    prayerSchedulerLog(
+      '✅ Alarm listener registered (no auto-reschedule while ringing)',
+    );
   }
 
   Future<void> initialize() async {
@@ -289,8 +264,7 @@ class AdhanSchedulerService {
     tz.initializeTimeZones();
 
     try {
-      final timezoneInfo =
-      await FlutterTimezone.getLocalTimezone();
+      final timezoneInfo = await FlutterTimezone.getLocalTimezone();
 
       tz.setLocalLocation(
         tz.getLocation(timezoneInfo.identifier),
@@ -347,16 +321,13 @@ class AdhanSchedulerService {
     // 4️⃣ Local Notifications
     // ============================================================
 
-    final notifications =
-    FlutterLocalNotificationsPlugin();
+    final notifications = FlutterLocalNotificationsPlugin();
 
-    const androidSettings =
-    AndroidInitializationSettings(
+    const androidSettings = AndroidInitializationSettings(
       notificationIcon,
     );
 
-    const initializationSettings =
-    InitializationSettings(
+    const initializationSettings = InitializationSettings(
       android: androidSettings,
     );
 
@@ -374,8 +345,7 @@ class AdhanSchedulerService {
       );
     }
 
-    final androidPlugin =
-    notifications
+    final androidPlugin = notifications
         .resolvePlatformSpecificImplementation<
         AndroidFlutterLocalNotificationsPlugin>();
 
@@ -407,8 +377,7 @@ class AdhanSchedulerService {
     // 7️⃣ Countdown Channel
     // ============================================================
 
-    const countdownChannel =
-    AndroidNotificationChannel(
+    const countdownChannel = AndroidNotificationChannel(
       countdownChannelId,
       countdownChannelName,
       description: countdownChannelDescription,
@@ -440,6 +409,7 @@ class AdhanSchedulerService {
       '🎉 Compatibility initialize() completed',
     );
   }
+
   Future<void> requestBatteryOptimizationExemption() async {
     prayerSchedulerLog(
       '🔋 Requesting battery optimization exemption...',

@@ -4,13 +4,15 @@ import 'package:get_it/get_it.dart';
 import 'package:islamic_app/features/locations/presentation/bloc/blocEvent.dart';
 
 import 'package:islamic_app/splashscreen.dart';
-
-import '../../features/adhan/presentation/bloc/adhan_bloc.dart';
-import '../../features/adhan/presentation/bloc/adhan_event.dart';
-import '../../features/adhan/presentation/pages/adhan_reciter_page.dart';
 import '../../features/adhan_settings/presentation/bloc/adhan_settings_bloc.dart';
 import '../../features/adhan_settings/presentation/bloc/adhan_settings_event.dart';
 import '../../features/adhan_settings/presentation/pages/adhan_settings_page.dart';
+import '../../features/adhan_sound/domain/use_cases/get_adhans_for_prayer.dart';
+import '../../features/adhan_sound/domain/use_cases/get_selected_adhan.dart';
+import '../../features/adhan_sound/domain/use_cases/save_selected_adhan.dart';
+import '../../features/adhan_sound/presentation/bloc/adhan_bloc.dart';
+import '../../features/adhan_sound/presentation/bloc/adhan_event.dart';
+import '../../features/adhan_sound/presentation/pages/adhan_reciter_page.dart';
 import '../../features/hijri_calendar/presentation/bloc/hijri_calendar_bloc.dart';
 import '../../features/hijri_calendar/presentation/bloc/hijri_calendar_event.dart';
 import '../../features/hijri_calendar/presentation/pages/hijri_calendar_page.dart';
@@ -29,6 +31,7 @@ import '../../features/qibla/presentation/pages/qibla_page.dart';
 import '../../features/quran/presentation/pages/quran_page.dart';
 import '../../features/adhkar/presentation/pages/adhkar_page.dart';
 import '../../injection_container.dart';
+import '../services/prayer_scheduler_split/prayer_scheduler/data/datasources/prayer_notification_local_data_source_impl.dart';
 
 final getIt = GetIt.instance;
 
@@ -96,11 +99,40 @@ static const iqamaSettings= "/iqamaSettings";
           ),
         );
       case adhan:
+        final prayerName = settings.arguments as String?;
+
+        if (prayerName == null || prayerName.isEmpty) {
+          return MaterialPageRoute(
+            builder: (_) => const Scaffold(
+              body: Center(
+                child: Text('لم يتم تحديد الصلاة'),
+              ),
+            ),
+          );
+        }
+
+        final prayerTitle = switch (prayerName) {
+          'fajr' => 'الفجر',
+          'dhuhr' => 'الظهر',
+          'asr' => 'العصر',
+          'maghrib' => 'المغرب',
+          'isha' => 'العشاء',
+          _ => 'الأذان',
+        };
+
         return MaterialPageRoute(
           builder: (_) => BlocProvider<AdhanBloc>(
-            create: (_) => sl<AdhanBloc>()
-              ..add(const LoadAdhanReciters()),
-            child: const AdhanReciterPage(),
+            create: (_) => AdhanBloc(
+              prayerName: prayerName,
+              getAdhansForPrayer: sl<GetAdhansForPrayer>(),
+              getSelectedAdhan: sl<GetSelectedAdhan>(),
+              saveSelectedAdhan: sl<SaveSelectedAdhan>(),
+              prayerScheduler: sl<PrayerNotificationLocalDataSourceImpl>(),
+            )..add(const LoadAdhanReciters()),
+            child: AdhanReciterPage(
+              prayerName: prayerName,
+              prayerTitle: prayerTitle,
+            ),
           ),
         );
       case adhanSetting:

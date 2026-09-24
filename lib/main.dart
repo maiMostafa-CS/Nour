@@ -1,9 +1,12 @@
 import 'dart:io';
 
+import 'package:alarm/alarm.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:timezone/data/latest.dart' as tz;
+
 import 'app.dart';
+import 'core/services/alarm_cleanup/orphan_alarm_cleaner.dart';
 import 'core/services/prayer_scheduler_split/prayer_scheduler/adhan_scheduler_service.dart';
 import 'core/services/prayer_scheduler_split/prayer_scheduler/notifications/countdown_notification_service.dart';
 import 'core/services/unlock_card.dart';
@@ -17,24 +20,36 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   tz.initializeTimeZones();
 
+  // 1️⃣ سجّل التبعيات
   await configureDependencies();
+  await Alarm.init();
 
+  // 2️⃣ نظّف المنبهات اليتيمة BEFORE runApp
   if (Platform.isAndroid) {
-    KhatmaUnlockSyncService.setKhatmaReadHandler(
-      _onNativeKhatmaRead,
-    );
+    try {
+      final cleaner = sl<OrphanAlarmCleaner>();
+      await cleaner.cleanOrphans();
+    } catch (e, st) {
+      debugPrint('❌ [main] cleanOrphans failed: $e');
+      debugPrint('$st');
+      // متوقفش التطبيق لو التنظيف فشل
+    }
   }
 
+  // 3️⃣ سجّل Khatma handler
+  if (Platform.isAndroid) {
+    KhatmaUnlockSyncService.setKhatmaReadHandler(_onNativeKhatmaRead);
+  }
 
-  runApp(
-    const IslamicApp(),
-  );
+  // 4️⃣ شغّل التطبيق
+  runApp(const IslamicApp());
 
-  WidgetsBinding.instance.addPostFrameCallback((_) {
-    _initializeKhatmaUnlock();
+  // 5️⃣ بعد ما التطبيق يظهر — نفّذ الـ setup
+  WidgetsBinding.instance.addPostFrameCallback((_) async {
+    await _initializeKhatmaUnlock();
+    await _backgroundSetup();
   });
 }
-
 
 Future<void> _initializeKhatmaUnlock() async {
   if (!Platform.isAndroid) {
@@ -42,30 +57,15 @@ Future<void> _initializeKhatmaUnlock() async {
   }
 
   try {
-    // ============================================================
-    // 1. Sync الآية الحالية للـ Native
-    // ============================================================
-
     await _syncKhatmaUnlockAyah();
-
-    // ============================================================
-    // 2. استعادة خدمة Unlock Card
-    // ============================================================
-
     await _restoreUnlockCard();
 
-    debugPrint(
-      '✅ KHATMA UNLOCK: initialization completed',
-    );
+    debugPrint('✅ KHATMA UNLOCK: initialization completed');
   } catch (e, stackTrace) {
-    debugPrint(
-      '❌ KHATMA UNLOCK INITIALIZATION FAILED: $e',
-    );
-
+    debugPrint('❌ KHATMA UNLOCK INITIALIZATION FAILED: $e');
     debugPrint('$stackTrace');
   }
 }
-
 
 Future<void> _restoreUnlockCard() async {
   if (!Platform.isAndroid) return;
@@ -141,24 +141,16 @@ Future<void> _syncKhatmaUnlockAyah() async {
   }
 
   try {
-    final getCurrentKhatmaAyah =
-    sl<GetCurrentKhatmaAyah>();
+    final getCurrentKhatmaAyah = sl<GetCurrentKhatmaAyah>();
 
-    final ayah =
-    await getCurrentKhatmaAyah();
+    final ayah = await getCurrentKhatmaAyah();
 
     if (ayah == null) {
-      debugPrint(
-        '🌿 KHATMA UNLOCK: no current ayah',
-      );
-
+      debugPrint('🌿 KHATMA UNLOCK: no current ayah');
       return;
     }
 
-    await KhatmaUnlockSyncService
-        .saveCurrentAyah(
-      ayah,
-    );
+    await KhatmaUnlockSyncService.saveCurrentAyah(ayah);
 
     debugPrint(
       '✅ KHATMA UNLOCK: synced '
@@ -168,32 +160,18 @@ Future<void> _syncKhatmaUnlockAyah() async {
           'page=${ayah.pageNumber}',
     );
   } catch (e, stackTrace) {
-    debugPrint(
-      '❌ KHATMA UNLOCK SYNC FAILED: $e',
-    );
-
-    debugPrint(
-      '$stackTrace',
-    );
+    debugPrint('❌ KHATMA UNLOCK SYNC FAILED: $e');
+    debugPrint('$stackTrace');
   }
 }
 
-
 Future<void> _onNativeKhatmaRead() async {
   try {
-    debugPrint(
-      '📖 KHATMA: Native requested read',
-    );
+    debugPrint('📖 KHATMA: Native requested read');
 
-    // ============================================================
     // 1. Mark current ayah as read
-    // ============================================================
-
-    final markCurrentAyahAsRead =
-    sl<MarkCurrentAyahAsRead>();
-
-    final progress =
-    await markCurrentAyahAsRead();
+    final markCurrentAyahAsRead = sl<MarkCurrentAyahAsRead>();
+    final progress = await markCurrentAyahAsRead();
 
     debugPrint(
       '✅ KHATMA: '
@@ -201,15 +179,9 @@ Future<void> _onNativeKhatmaRead() async {
           'readAyahs=${progress.readAyahs}',
     );
 
-    // ============================================================
     // 2. Get weekly report
-    // ============================================================
-
-    final getKhatmaWeeklyReport =
-    sl<GetKhatmaWeeklyReport>();
-
-    final report =
-    await getKhatmaWeeklyReport();
+    final getKhatmaWeeklyReport = sl<GetKhatmaWeeklyReport>();
+    final report = await getKhatmaWeeklyReport();
 
     debugPrint(
       '📊 KHATMA WEEKLY: '
@@ -218,38 +190,21 @@ Future<void> _onNativeKhatmaRead() async {
           'week=${report.weekNumber}',
     );
 
-    // ============================================================
     // 3. Send weekly report to Android
-    // ============================================================
-
-    await KhatmaUnlockSyncService
-        .saveWeeklyReport(
+    await KhatmaUnlockSyncService.saveWeeklyReport(
       totalAyahs: report.totalAyahs,
       currentWeekAyahs: report.currentWeekAyahs,
       weekNumber: report.weekNumber,
     );
 
-    debugPrint(
-      '✅ KHATMA WEEKLY: report synced to Android',
-    );
+    debugPrint('✅ KHATMA WEEKLY: report synced to Android');
 
-    // ============================================================
     // 4. Sync next ayah to Android
-    // ============================================================
-
     await _syncKhatmaUnlockAyah();
 
-    debugPrint(
-      '✅ KHATMA: New ayah synced',
-    );
+    debugPrint('✅ KHATMA: New ayah synced');
   } catch (e, stackTrace) {
-    debugPrint(
-      '❌ KHATMA READ FAILED: $e',
-    );
-
-    debugPrint(
-      '$stackTrace',
-    );
+    debugPrint('❌ KHATMA READ FAILED: $e');
+    debugPrint('$stackTrace');
   }
 }
-

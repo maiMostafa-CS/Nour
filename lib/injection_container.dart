@@ -4,24 +4,30 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'core/router/app_router.dart';
+import 'core/services/alarm_cleanup/alarm_id_tracker.dart';
+import 'core/services/alarm_cleanup/orphan_alarm_cleaner.dart';
 import 'core/services/ayah_audio_service.dart';
 import 'core/services/prayer_scheduler_split/prayer_scheduler/adhan_scheduler_service.dart';
 import 'core/services/prayer_scheduler_split/prayer_scheduler/data/datasources/prayer_notification_local_data_source.dart';
 import 'core/services/prayer_scheduler_split/prayer_scheduler/data/datasources/prayer_notification_local_data_source_impl.dart';
+import 'core/services/prayer_scheduler_split/prayer_scheduler/services/adhan_asset_provider.dart';
 import 'core/services/unlock_card.dart';
-import 'features/adhan/data/datasources/adhan_local_data_source.dart';
-import 'features/adhan/data/repositories/adhan_repository_impl.dart';
-import 'features/adhan/domain/usecases/get_adhans.dart';
-import 'features/adhan/domain/usecases/get_selected_adhan.dart';
-import 'features/adhan/domain/usecases/save_selected_adhan.dart';
-import 'features/adhan/domain/repositories/adhan_repository.dart';
-import 'features/adhan/presentation/bloc/adhan_bloc.dart';
-import 'features/adhan_settings/data/ datasources/adhan_settings_local_data_source.dart';
+// import 'features/adhan_settings/data/ datasources/adhan_settings_local_data_source.dart';
+import 'features/adhan_settings/data/datasources/adhan_settings_local_data_source.dart';
 import 'features/adhan_settings/data/repositories/adhan_settings_repository_impl.dart';
+// import 'features/adhan_settings/domain/repositories/ adhan_settings_repository.dart';
 import 'features/adhan_settings/domain/repositories/ adhan_settings_repository.dart';
 import 'features/adhan_settings/domain/usecases/get_adhan_settings.dart';
 import 'features/adhan_settings/domain/usecases/update_adhan_setting.dart';
 import 'features/adhan_settings/presentation/bloc/adhan_settings_bloc.dart';
+import 'features/adhan_sound/data/datasources/adhan_local_data_source.dart';
+import 'features/adhan_sound/data/repositories/adhan_repository_impl.dart';
+import 'features/adhan_sound/domain/repositories/adhan_repository.dart';
+import 'features/adhan_sound/domain/use_cases/get_adhans.dart';
+import 'features/adhan_sound/domain/use_cases/get_adhans_for_prayer.dart';
+import 'features/adhan_sound/domain/use_cases/get_selected_adhan.dart';
+import 'features/adhan_sound/domain/use_cases/save_selected_adhan.dart';
+import 'features/adhan_sound/presentation/bloc/adhan_bloc.dart';
 import 'features/azkar/data/datasources/azkar_local_data_source.dart';
 import 'features/azkar/data/repositories/azkar_repository_impl.dart';
 import 'features/azkar/domain/repositories/azkar_repository.dart';
@@ -81,7 +87,7 @@ import 'features/qibla/presentation/bloc/bloc.dart';
 
 import 'features/adhkar/data/datasources/adhkar_local_data_source.dart';
 import 'features/adhkar/data/repositories/adhkar_repository_impl.dart';
-import 'features/adhkar/domain/repositories/adhkar_repository.dart';
+// import 'features/adhkar/domain/repositories/adhkar_repository.dart';
 import 'features/adhkar/domain/usecases/get_adhkar.dart';
 import 'features/adhkar/presentation/bloc/adhkar_bloc.dart';
 import 'features/quran/data/datasources/quran_ayah_number_helper.dart';
@@ -212,6 +218,7 @@ Future<void> configureDependencies() async {
       adhanSettingsRepository: sl<AdhanSettingsRepository>(),
       iqamaSettingsRepository: sl<IqamaSettingsRepository>(),
       adhanLocalDataSource: sl<AdhanLocalDataSource>(),
+      adhanAssetProvider: sl<AdhanAssetProvider>(),
     ),
   );
 
@@ -330,33 +337,44 @@ Future<void> configureDependencies() async {
     ),
   );
 
+  sl.registerLazySingleton<AdhanAssetProvider>(
+        () => AdhanAssetProvider(
+          localDataSource: sl<AdhanLocalDataSource>(),
+        ),
+  );
   sl.registerLazySingleton<AdhanRepository>(
-    () => AdhanRepositoryImpl(
+        () => AdhanRepositoryImpl(
       localDataSource: sl<AdhanLocalDataSource>(),
     ),
   );
 
   sl.registerLazySingleton<GetAdhans>(
-    () => GetAdhans(
+        () => GetAdhans(
       sl<AdhanRepository>(),
     ),
   );
 
   sl.registerLazySingleton<GetSelectedAdhan>(
-    () => GetSelectedAdhan(
+        () => GetSelectedAdhan(
       sl<AdhanRepository>(),
     ),
   );
 
   sl.registerLazySingleton<SaveSelectedAdhan>(
-    () => SaveSelectedAdhan(
+        () => SaveSelectedAdhan(
+      sl<AdhanRepository>(),
+    ),
+  );
+  sl.registerLazySingleton<GetAdhansForPrayer>(
+        () => GetAdhansForPrayer(
       sl<AdhanRepository>(),
     ),
   );
 
-  sl.registerFactory<AdhanBloc>(
-    () => AdhanBloc(
-      getAdhans: sl<GetAdhans>(),
+  sl.registerFactoryParam<AdhanBloc, String, void>(
+        (prayerName, _) => AdhanBloc(
+      prayerName: prayerName,
+      getAdhansForPrayer: sl<GetAdhansForPrayer>(),
       getSelectedAdhan: sl<GetSelectedAdhan>(),
       saveSelectedAdhan: sl<SaveSelectedAdhan>(),
       prayerScheduler: sl<PrayerNotificationLocalDataSourceImpl>(),
@@ -665,6 +683,18 @@ Future<void> configureDependencies() async {
       getAzkarCategories: sl<GetAzkarCategories>(),
       getAzkarChapters: sl<GetAzkarChapters>(),
       getAzkarItems: sl<GetAzkarItems>(),
+    ),
+  );
+
+
+  sl.registerLazySingleton<AlarmIdTracker>(
+        () => AlarmIdTracker(prefs),
+  );
+
+  sl.registerLazySingleton<OrphanAlarmCleaner>(
+        () => OrphanAlarmCleaner(
+      sl<AlarmIdTracker>(),
+      prefs,
     ),
   );
 }

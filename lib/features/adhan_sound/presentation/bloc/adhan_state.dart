@@ -27,10 +27,7 @@ class AdhanLoaded extends AdhanState {
   });
 
   @override
-  List<Object?> get props => [
-    reciters,
-    selectedReciterId,
-  ];
+  List<Object?> get props => [reciters, selectedReciterId];
 }
 
 class AdhanError extends AdhanState {
@@ -39,7 +36,5 @@ class AdhanError extends AdhanState {
   const AdhanError(this.message);
 
   @override
-  List<Object?> get props => [
-    message,
-  ];
+  List<Object?> get props => [message];
 }

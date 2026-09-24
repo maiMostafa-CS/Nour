@@ -1,5 +1,6 @@
+import 'package:flutter/widgets.dart';
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
-
+import '../background/countdown_callbacks.dart';
 import '../background/prayer_background_callbacks.dart';
 import '../notifications/countdown_notification_service.dart';
 import '../utils/prayer_scheduler_ids.dart';
@@ -32,7 +33,6 @@ class CountdownScheduler {
     }
 
     try {
-      // نلغي أي Alarm قديم بنفس الـ ID قبل إعادة الجدولة
       await AndroidAlarmManager.cancel(id);
 
       final result = await AndroidAlarmManager.oneShotAt(
@@ -60,9 +60,6 @@ class CountdownScheduler {
       prayerSchedulerLog(
         'STACKTRACE: $stackTrace',
       );
-
-      // لا نرمي الخطأ مرة أخرى حتى لا يفشل جدولة الأذان والتذكير
-      // بسبب Countdown فقط.
     }
   }
 }
