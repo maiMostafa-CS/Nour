@@ -33,9 +33,10 @@ class FeatureCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(15.r),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(.025),
-                blurRadius: 6.r,
-                offset: Offset(0, 2.h),
+                color: const Color(0xFF176B5B).withOpacity(.30),
+                blurRadius: 18.r,
+                spreadRadius: 2.r,
+                offset: Offset(0, 8.h),
               ),
             ],
           ),

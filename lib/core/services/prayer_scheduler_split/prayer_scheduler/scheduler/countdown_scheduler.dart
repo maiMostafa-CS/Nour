@@ -41,6 +41,7 @@ class CountdownScheduler {
         updatePrayerNotificationCountdownCallback,
         exact: true,
         wakeup: true,
+        alarmClock: true,
         rescheduleOnReboot: true,
       );
 

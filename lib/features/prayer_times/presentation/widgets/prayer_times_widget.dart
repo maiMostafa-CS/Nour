@@ -144,6 +144,16 @@ class _PrayerTimesWidgetState extends State<PrayerTimesWidget> {
             ? const Color(0xFF176B5B)
             : const Color(0xFFF5F0E6),
         borderRadius: BorderRadius.circular(14.r),
+        boxShadow: [
+          BoxShadow(
+            color: isActive
+                ? const Color(0xFF176B5B).withOpacity(.35)
+                : Colors.black.withOpacity(.10),
+            blurRadius: isActive ? 10.r : 6.r,
+            spreadRadius: isActive ? 1.r : 0,
+            offset: Offset(0, isActive ? 4.h : 2.h),
+          ),
+        ],
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
