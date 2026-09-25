@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../../azkar/presentation/pages/azkar_page.dart';
 import '../../../home/presentation/pages/home_page.dart';
 import '../../../quran/presentation/pages/quran_page.dart';
-import '../../../adhkar/presentation/pages/adhkar_page.dart';
 import '../../../prayer_settings/presentation/pages/prayer_settings_page.dart';
 import '../../../home/presentation/widget/buildBottomNavigation.dart';
 

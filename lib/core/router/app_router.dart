@@ -29,7 +29,6 @@ import '../../features/locations/presentation/pages/locationPage.dart';
 import '../../features/prayer_settings/presentation/pages/prayer_settings_page.dart';
 import '../../features/qibla/presentation/pages/qibla_page.dart';
 import '../../features/quran/presentation/pages/quran_page.dart';
-import '../../features/adhkar/presentation/pages/adhkar_page.dart';
 import '../../injection_container.dart';
 import '../services/prayer_scheduler_split/prayer_scheduler/data/datasources/prayer_notification_local_data_source_impl.dart';
 

@@ -17,3 +17,13 @@ class LoadAzkarItems extends AzkarEvent {
 
   const LoadAzkarItems(this.chapterId);
 }
+
+// ✅ event الرجوع من الأذكار → الفصول
+class BackToChapters extends AzkarEvent {
+  const BackToChapters();
+}
+
+// ✅ event الرجوع من الفصول → الأقسام
+class BackToCategories extends AzkarEvent {
+  const BackToCategories();
+}

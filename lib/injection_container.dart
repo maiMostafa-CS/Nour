@@ -85,11 +85,6 @@ import 'features/qibla/domain/repositories/qibla_repository.dart';
 import 'features/qibla/domain/usecases/get_qibla_direction.dart';
 import 'features/qibla/presentation/bloc/bloc.dart';
 
-import 'features/adhkar/data/datasources/adhkar_local_data_source.dart';
-import 'features/adhkar/data/repositories/adhkar_repository_impl.dart';
-// import 'features/adhkar/domain/repositories/adhkar_repository.dart';
-import 'features/adhkar/domain/usecases/get_adhkar.dart';
-import 'features/adhkar/presentation/bloc/adhkar_bloc.dart';
 import 'features/quran/data/datasources/quran_ayah_number_helper.dart';
 import 'features/quran/data/datasources/quran_local_data_source.dart';
 import 'features/quran/data/datasources/quranpedia_remote_data_source.dart';
@@ -680,9 +675,9 @@ Future<void> configureDependencies() async {
 
   sl.registerFactory<AzkarBloc>(
         () => AzkarBloc(
-      getAzkarCategories: sl<GetAzkarCategories>(),
-      getAzkarChapters: sl<GetAzkarChapters>(),
-      getAzkarItems: sl<GetAzkarItems>(),
+      getAzkarCategories: sl(),
+      getAzkarChapters: sl(),
+      getAzkarItems: sl(),
     ),
   );
 
