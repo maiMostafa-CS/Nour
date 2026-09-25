@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:timezone/timezone.dart' as tz;
 
+import '../../../../core/theme/app_colors.dart';
 import '../../domain/entities/prayer_times_entity.dart';
 
 class PrayerTimesWidget extends StatefulWidget {
@@ -139,23 +140,32 @@ class _PrayerTimesWidgetState extends State<PrayerTimesWidget> {
     return Container(
       width: 52.w,
       padding: EdgeInsets.symmetric(vertical: 6.h),
+// في _buildPrayerItem، غيّر الـ decoration:
       decoration: BoxDecoration(
-        color: isActive
-            ? const Color(0xFF176B5B)
-            : const Color(0xFFF5F0E6),
-        borderRadius: BorderRadius.circular(14.r),
+        gradient: isActive
+            ? AppColors.primaryGradient
+            : const LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Colors.white, Color(0xFFF5F0E6)],
+        ),
+        borderRadius: BorderRadius.circular(16.r),
+        border: Border.all(
+          color: isActive
+              ? AppColors.softGold.withOpacity(0.4)
+              : AppColors.gold.withOpacity(0.15),
+          width: 1,
+        ),
         boxShadow: [
           BoxShadow(
             color: isActive
-                ? const Color(0xFF176B5B).withOpacity(.35)
-                : Colors.black.withOpacity(.10),
-            blurRadius: isActive ? 10.r : 6.r,
-            spreadRadius: isActive ? 1.r : 0,
-            offset: Offset(0, isActive ? 4.h : 2.h),
+                ? AppColors.deepGreen.withOpacity(0.35)
+                : Colors.black.withOpacity(0.06),
+            blurRadius: isActive ? 14.r : 8.r,
+            offset: Offset(0, isActive ? 6.h : 3.h),
           ),
         ],
-      ),
-      child: Column(
+      ),      child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: [
