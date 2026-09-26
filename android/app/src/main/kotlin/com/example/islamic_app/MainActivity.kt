@@ -67,7 +67,8 @@ class MainActivity : FlutterActivity() {
 
                 Log.e(
                     "KhatmaNative",
-                    "❌ Flutter messenger is null"
+                    "❌ Flutter messenger is null - " +
+                            "pending_read flag will be processed on next app open"
                 )
             }
         }
@@ -292,6 +293,55 @@ class MainActivity : FlutterActivity() {
                                 "total=$totalAyahs, " +
                                 "currentWeek=$currentWeekAyahs, " +
                                 "week=$weekNumber"
+                    )
+
+                    result.success(true)
+                }
+
+                // ====================================================
+                // Has Pending Read
+                // ====================================================
+
+                "hasPendingRead" -> {
+
+                    val hasPending =
+                        getSharedPreferences(
+                            KHATMA_PREFS,
+                            MODE_PRIVATE
+                        )
+                            .getBoolean(
+                                "pending_read",
+                                false
+                            )
+
+                    Log.d(
+                        "KhatmaNative",
+                        "🔍 hasPendingRead = $hasPending"
+                    )
+
+                    result.success(hasPending)
+                }
+
+                // ====================================================
+                // Clear Pending Read
+                // ====================================================
+
+                "clearPendingRead" -> {
+
+                    getSharedPreferences(
+                        KHATMA_PREFS,
+                        MODE_PRIVATE
+                    )
+                        .edit()
+                        .putBoolean(
+                            "pending_read",
+                            false
+                        )
+                        .apply()
+
+                    Log.d(
+                        "KhatmaNative",
+                        "🧹 pending_read cleared"
                     )
 
                     result.success(true)

@@ -50,7 +50,6 @@ class FeatureCard extends StatelessWidget {
             Positioned.fill(
               child: Image.asset(image!, fit: BoxFit.cover),
             ),
-            // Overlay متدرج للقراءة
             Positioned.fill(
               child: Container(
                 decoration: BoxDecoration(

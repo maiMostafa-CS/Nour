@@ -1,3 +1,5 @@
+// lib/features/prayer_times/presentation/widgets/next_prayer_card.dart
+
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -9,19 +11,13 @@ import '../../../prayer_times/domain/entities/prayer_times_entity.dart';
 class NextPrayerCard extends StatefulWidget {
   final PrayerTimesEntity prayerTimes;
   final String timezoneName;
-  final String? cityName;
   final Map<String, String>? muezzins;
-  final bool soundEnabled;
-  final VoidCallback? onToggleSound;
 
   const NextPrayerCard({
     super.key,
     required this.prayerTimes,
     required this.timezoneName,
-    this.cityName,
     this.muezzins,
-    this.soundEnabled = true,
-    this.onToggleSound,
   });
 
   @override
@@ -105,6 +101,23 @@ class _NextPrayerCardState extends State<NextPrayerCard>
     }
   }
 
+  // ✨ خط زخرفي جانبي للآية
+  Widget _ornamentLine() {
+    return Container(
+      width: 35.w,
+      height: 1,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Colors.transparent,
+            AppColors.softGold.withOpacity(0.6),
+            Colors.transparent,
+          ],
+        ),
+      ),
+    );
+  }
+
   // ═══════════════════════════════════════════════════════════
   // BUILD
   // ═══════════════════════════════════════════════════════════
@@ -122,7 +135,6 @@ class _NextPrayerCardState extends State<NextPrayerCard>
       {'name': 'العشاء', 'time': widget.prayerTimes.isha},
     ];
 
-    // ─── تحديد الصلاة القادمة ───
     tz.TZDateTime? nextPrayerTime;
     String nextPrayerName = '';
 
@@ -169,11 +181,6 @@ class _NextPrayerCardState extends State<NextPrayerCard>
         '${minutes.toString().padLeft(2, '0')}:'
         '${seconds.toString().padLeft(2, '0')}';
 
-    // ─── نصوص جاهزة ───
-    final displayCity = widget.cityName?.trim().isNotEmpty == true
-        ? widget.cityName!.trim()
-        : 'موقعك الحالي';
-
     final nowInLocation = _formatTime(now);
     final nextPrayerFormatted = _formatTime(nextPrayerTime);
     final prayerIcon = _getPrayerIcon(nextPrayerName);
@@ -211,7 +218,6 @@ class _NextPrayerCardState extends State<NextPrayerCard>
         clipBehavior: Clip.antiAlias,
         child: Stack(
           children: [
-            // ─── الخلفية: Gradient ───
             Positioned.fill(
               child: Container(
                 decoration: const BoxDecoration(
@@ -228,7 +234,6 @@ class _NextPrayerCardState extends State<NextPrayerCard>
               ),
             ),
 
-            // ─── زخارف إسلامية ───
             Positioned(
               left: -20,
               top: -20,
@@ -250,78 +255,36 @@ class _NextPrayerCardState extends State<NextPrayerCard>
 
             // ─── محتوى ───
             Padding(
-              padding: EdgeInsets.fromLTRB(16.w, 14.h, 16.w, 16.h),
+              padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 16.h),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   // ═══════════════════════════════════════
-                  // السطر العلوي: المدينة + زرار الصوت
+                  // ✨ الآية القرآنية (بدل اسم المدينة وزرار الصوت)
                   // ═══════════════════════════════════════
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // المدينة
-                      Flexible(
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.location_on,
-                              size: 14.sp,
-                              color: AppColors.softGold,
-                            ),
-                            SizedBox(width: 4.w),
-                            Flexible(
-                              child: Text(
-                                displayCity,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 12.sp,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
-                          ],
+                      _ornamentLine(),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 8.w),
+                        child: Text(
+                          '﴿ وَأَقِمِ الصَّلَاةَ لِذِكْرِي ﴾',
+                          style: TextStyle(
+                            color: AppColors.softGold.withOpacity(0.9),
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w500,
+                            fontFamily: 'Amiri',
+                            height: 1.6,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
                       ),
-
-                      // زرار الصوت
-                      GestureDetector(
-                        onTap: widget.onToggleSound,
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 250),
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 10.w,
-                            vertical: 5.h,
-                          ),
-                          decoration: BoxDecoration(
-                            color: widget.soundEnabled
-                                ? AppColors.softGold.withOpacity(.20)
-                                : Colors.white.withOpacity(.10),
-                            borderRadius: BorderRadius.circular(20.r),
-                            border: Border.all(
-                              color: widget.soundEnabled
-                                  ? AppColors.softGold.withOpacity(.5)
-                                  : Colors.white.withOpacity(.15),
-                              width: 1,
-                            ),
-                          ),
-                          child: Icon(
-                            widget.soundEnabled
-                                ? Icons.volume_up_rounded
-                                : Icons.volume_off_rounded,
-                            size: 16.sp,
-                            color: widget.soundEnabled
-                                ? AppColors.softGold
-                                : Colors.white54,
-                          ),
-                        ),
-                      ),
+                      _ornamentLine(),
                     ],
                   ),
 
-                  SizedBox(height: 12.h),
+                  SizedBox(height: 14.h),
 
                   // ═══════════════════════════════════════
                   // اسم الصلاة
@@ -393,7 +356,7 @@ class _NextPrayerCardState extends State<NextPrayerCard>
                     ),
                   ),
 
-                  // ─── اسم المؤذن (لو موجود) ───
+                  // ─── اسم المؤذن (اختياري) ───
                   if (hasMuezzin) ...[
                     SizedBox(height: 8.h),
                     Container(

@@ -122,7 +122,27 @@ object PrayerCardOverlay {
                 )
 
                 // ====================================================
-                // Flutter هو Source of Truth
+                // 1. احفظ pending read flag
+                // ====================================================
+
+                app.getSharedPreferences(
+                    "khatma_unlock",
+                    Context.MODE_PRIVATE
+                )
+                    .edit()
+                    .putBoolean(
+                        "pending_read",
+                        true
+                    )
+                    .apply()
+
+                Log.d(
+                    TAG,
+                    "📝 pending_read = true saved"
+                )
+
+                // ====================================================
+                // 2. بلّغ Flutter (لو شغال)
                 // ====================================================
 
                 MainActivity.notifyKhatmaRead()
@@ -131,6 +151,10 @@ object PrayerCardOverlay {
                     TAG,
                     "🚀 Khatma read sent to Flutter"
                 )
+
+                // ====================================================
+                // 3. اقفل الكارد
+                // ====================================================
 
                 dismiss(app)
             }

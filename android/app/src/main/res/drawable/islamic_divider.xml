@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="20dp"
+    android:viewportWidth="200"
+    android:viewportHeight="20">
+
+    <!-- الخط الأفقي -->
+    <path
+        android:strokeColor="#D4A857"
+        android:strokeWidth="1"
+        android:pathData="M20,10 L80,10" />
+    <path
+        android:strokeColor="#D4A857"
+        android:strokeWidth="1"
+        android:pathData="M120,10 L180,10" />
+
+    <!-- نجمة المنتصف -->
+    <path
+        android:fillColor="#D4A857"
+        android:pathData="M100,4 L103,8 L107,10 L103,12 L100,16 L97,12 L93,10 L97,8 Z" />
+
+    <!-- نقطتين صغيرتين -->
+    <path
+        android:fillColor="#8B5A2B"
+        android:pathData="M86,10 m-1.5,0 a1.5,1.5 0 1,0 3,0 a1.5,1.5 0 1,0 -3,0" />
+    <path
+        android:fillColor="#8B5A2B"
+        android:pathData="M114,10 m-1.5,0 a1.5,1.5 0 1,0 3,0 a1.5,1.5 0 1,0 -3,0" />
+
+</vector>

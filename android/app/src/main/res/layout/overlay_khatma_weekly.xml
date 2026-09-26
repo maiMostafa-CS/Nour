@@ -3,8 +3,8 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#99000000"
-    android:clickable="true"
+    android:background="#00000000"
+    android:clickable="false"
     android:focusable="false">
 
     <LinearLayout
@@ -12,13 +12,25 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
         android:background="@drawable/overlay_card_background"
-        android:elevation="12dp"
+        android:elevation="16dp"
         android:layoutDirection="rtl"
         android:orientation="vertical"
-        android:padding="24dp">
+        android:paddingStart="28dp"
+        android:paddingEnd="28dp"
+        android:paddingTop="32dp"
+        android:paddingBottom="24dp">
+
+        <!-- الزخرفة العلوية -->
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:layout_marginBottom="12dp"
+            android:contentDescription="@null"
+            android:src="@drawable/islamic_divider" />
 
         <!-- العنوان -->
 
@@ -29,7 +41,7 @@
             android:gravity="center"
             android:text="إنجاز الختمة"
             android:textColor="#8B5A2B"
-            android:textSize="18sp"
+            android:textSize="20sp"
             android:textStyle="bold" />
 
         <!-- الرقم -->
@@ -38,10 +50,10 @@
             android:id="@+id/totalAyahs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
+            android:layout_marginTop="20dp"
             android:gravity="center"
-            android:textColor="#3E2B1F"
-            android:textSize="34sp"
+            android:textColor="#2D7A4F"
+            android:textSize="42sp"
             android:textStyle="bold" />
 
         <!-- الوصف -->
@@ -53,21 +65,37 @@
             android:layout_marginTop="8dp"
             android:gravity="center"
             android:textColor="#8B5A2B"
-            android:textSize="15sp" />
+            android:textSize="16sp" />
+
+        <!-- فاصل -->
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="16dp"
+            android:layout_marginTop="20dp"
+            android:contentDescription="@null"
+            android:src="@drawable/islamic_divider" />
 
         <!-- زر الإغلاق -->
 
-        <ImageButton
-            android:id="@+id/closeButton"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginTop="20dp"
-            android:background="@android:color/transparent"
-            android:contentDescription="إغلاق"
-            android:padding="10dp"
-            android:src="@drawable/ic_close"
-            android:tint="#8B5A2B" />
+            android:layout_marginTop="20dp">
+
+            <ImageButton
+                android:id="@+id/closeButton"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:background="@drawable/btn_read_background"
+                android:contentDescription="إغلاق"
+                android:elevation="4dp"
+                android:padding="16dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_close"
+                android:tint="#FFFFFF" />
+        </FrameLayout>
 
     </LinearLayout>
 

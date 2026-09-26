@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart' as widgets;
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -195,12 +196,10 @@ class _HomePageState extends State<HomePage> {
                 NextPrayerCard(
                   prayerTimes: prayerTimes,
                   timezoneName: state.timezone,
-                  cityName: state.cityName,
                 ),
 
                 SizedBox(height: 22.h),
 
-                // ─── مواقيت الصلاة ───
                 _buildSectionTitle('مواقيت الصلاة'),
                 SizedBox(height: 12.h),
                 PrayerTimesWidget(
@@ -245,7 +244,6 @@ class _HomePageState extends State<HomePage> {
       ),
       child: Row(
         children: [
-          // أيقونة الموقع
           Container(
             width: 34.w,
             height: 34.h,
@@ -258,11 +256,8 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
             ),
-            child: Icon(
-              Icons.location_on_rounded,
-              size: 18.sp,
-              color: AppColors.emeraldGreen,
-            ),
+            child:
+            const CurrentLocationButton(),
           ),
 
           SizedBox(width: 8.w),
@@ -298,7 +293,6 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
 
-          const CurrentLocationButton(),
         ],
       ),
     );

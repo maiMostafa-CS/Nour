@@ -14,8 +14,8 @@ class KhatmaUnlockSyncService {
 // ============================================================
 
   static Future<void> saveCurrentAyah(
-    KhatmaUnlockAyah ayah,
-  ) async {
+      KhatmaUnlockAyah ayah,
+      ) async {
     await _channel.invokeMethod(
       'saveCurrentAyah',
       {
@@ -49,14 +49,30 @@ class KhatmaUnlockSyncService {
   }
 
 // ============================================================
+// Pending Read Flag
+// ============================================================
+
+  static Future<bool> hasPendingRead() async {
+    final result = await _channel.invokeMethod<bool>(
+      'hasPendingRead',
+    );
+
+    return result ?? false;
+  }
+
+  static Future<void> clearPendingRead() async {
+    await _channel.invokeMethod('clearPendingRead');
+  }
+
+// ============================================================
 // Native → Flutter
 // ============================================================
 
   static void setKhatmaReadHandler(
-    Future<void> Function() onRead,
-  ) {
+      Future<void> Function() onRead,
+      ) {
     _channel.setMethodCallHandler(
-      (call) async {
+          (call) async {
         if (call.method == 'markCurrentAyahAsRead') {
           await onRead();
         }

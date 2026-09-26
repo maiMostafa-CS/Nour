@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../azkar/presentation/pages/azkar_page.dart';
@@ -27,19 +28,35 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.creamBg,
-      body: IndexedStack(
-        index: selectedIndex,
-        children: pages,
-      ),
-      bottomNavigationBar: SafeArea(
-        top: false,
-        child: CustomBottomNavigation(
-          selectedIndex: selectedIndex,
-          onSelected: (index) {
-            setState(() => selectedIndex = index);
-          },
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+
+        if (selectedIndex != 0) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) {
+              setState(() => selectedIndex = 0);
+            }
+          });
+        } else {
+          SystemNavigator.pop();
+        }
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.creamBg,
+        body: IndexedStack(
+          index: selectedIndex,
+          children: pages,
+        ),
+        bottomNavigationBar: SafeArea(
+          top: false,
+          child: CustomBottomNavigation(
+            selectedIndex: selectedIndex,
+            onSelected: (index) {
+              setState(() => selectedIndex = index);
+            },
+          ),
         ),
       ),
     );

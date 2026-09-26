@@ -136,7 +136,21 @@ Future<void> _initializeKhatmaUnlock() async {
   }
 
   try {
+    // ==========================================================
+    // 1. عالج أي pending read قبل أي حاجة
+    // ==========================================================
+
+    await _processPendingKhatmaRead();
+
+    // ==========================================================
+    // 2. زامن الآية الحالية مع Native
+    // ==========================================================
+
     await _syncKhatmaUnlockAyah();
+
+    // ==========================================================
+    // 3. شغّل الكارد
+    // ==========================================================
 
     await _restoreUnlockCard();
 
@@ -146,6 +160,46 @@ Future<void> _initializeKhatmaUnlock() async {
   } catch (e, stackTrace) {
     debugPrint(
       '❌ KHATMA UNLOCK INITIALIZATION FAILED: $e',
+    );
+
+    debugPrint('$stackTrace');
+  }
+}
+
+// ================================================================
+// Process pending Khatma read
+// ================================================================
+
+Future<void> _processPendingKhatmaRead() async {
+  if (!Platform.isAndroid) {
+    return;
+  }
+
+  try {
+    final hasPending =
+    await KhatmaUnlockSyncService.hasPendingRead();
+
+    debugPrint(
+      '🔍 KHATMA: hasPendingRead = $hasPending',
+    );
+
+    if (!hasPending) {
+      return;
+    }
+
+    debugPrint(
+      '📖 KHATMA: Processing pending read...',
+    );
+
+    // نفس منطق _onNativeKhatmaRead
+    await _onNativeKhatmaRead();
+
+    debugPrint(
+      '✅ KHATMA: Pending read processed',
+    );
+  } catch (e, stackTrace) {
+    debugPrint(
+      '❌ KHATMA: Pending read failed: $e',
     );
 
     debugPrint('$stackTrace');
@@ -216,7 +270,7 @@ Future<void> _backgroundSetup() async {
 
     debugPrint(
       '✅ ADHAN SCHEDULER INITIALIZED '
-      '| ${stopwatch.elapsedMilliseconds}ms',
+          '| ${stopwatch.elapsedMilliseconds}ms',
     );
 
     stopwatch
@@ -231,7 +285,7 @@ Future<void> _backgroundSetup() async {
 
     debugPrint(
       '✅ EXACT ALARM PERMISSION CHECKED '
-      '| ${stopwatch.elapsedMilliseconds}ms',
+          '| ${stopwatch.elapsedMilliseconds}ms',
     );
 
     stopwatch
@@ -246,7 +300,7 @@ Future<void> _backgroundSetup() async {
 
     debugPrint(
       '✅ BATTERY OPTIMIZATION CHECKED '
-      '| ${stopwatch.elapsedMilliseconds}ms',
+          '| ${stopwatch.elapsedMilliseconds}ms',
     );
 
     debugPrint(
@@ -349,10 +403,10 @@ Future<void> _syncKhatmaUnlockAyah() async {
 
     debugPrint(
       '✅ KHATMA UNLOCK: synced '
-      'global=${ayah.globalNumber} '
-      'surah=${ayah.surahName} '
-      'ayah=${ayah.ayahNumber} '
-      'page=${ayah.pageNumber}',
+          'global=${ayah.globalNumber} '
+          'surah=${ayah.surahName} '
+          'ayah=${ayah.ayahNumber} '
+          'page=${ayah.pageNumber}',
     );
   } catch (e, stackTrace) {
     debugPrint(
@@ -383,8 +437,8 @@ Future<void> _onNativeKhatmaRead() async {
 
     debugPrint(
       '✅ KHATMA: '
-      'currentAyah=${progress.currentAyah}, '
-      'readAyahs=${progress.readAyahs}',
+          'currentAyah=${progress.currentAyah}, '
+          'readAyahs=${progress.readAyahs}',
     );
 
 // ------------------------------------------------------------
@@ -397,9 +451,9 @@ Future<void> _onNativeKhatmaRead() async {
 
     debugPrint(
       '📊 KHATMA WEEKLY: '
-      'total=${report.totalAyahs}, '
-      'currentWeek=${report.currentWeekAyahs}, '
-      'week=${report.weekNumber}',
+          'total=${report.totalAyahs}, '
+          'currentWeek=${report.currentWeekAyahs}, '
+          'week=${report.weekNumber}',
     );
 
 // ------------------------------------------------------------
@@ -424,6 +478,16 @@ Future<void> _onNativeKhatmaRead() async {
 
     debugPrint(
       '✅ KHATMA: New ayah synced',
+    );
+
+// ------------------------------------------------------------
+// 5. امسح pending_read flag (مهم عشان متتكررش)
+// ------------------------------------------------------------
+
+    await KhatmaUnlockSyncService.clearPendingRead();
+
+    debugPrint(
+      '🧹 KHATMA: pending_read cleared',
     );
   } catch (e, stackTrace) {
     debugPrint(
