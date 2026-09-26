@@ -162,7 +162,7 @@ class _QuranPageContentState extends State<QuranPageContent>
               pageBackgroundColor: const Color(0xFFFCF5D7),
               controller: _controller,
               physics: const NeverScrollableScrollPhysics(),
-              sp: .9.w,
+              sp: .85.w,
               h: 1.h,
 
               verseBackgroundColor: _verseBackgroundColor,

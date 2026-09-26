@@ -101,6 +101,8 @@ import 'features/quran/domain/usecases/get_surahs.dart';
 import 'features/quran/domain/usecases/get_tafsir_books.dart';
 import 'features/quran/domain/usecases/search_surahs.dart';
 import 'features/quran/presentation/bloc/quran_bloc.dart';
+import 'features/tasbih/presentation/bloc/tasbih_bloc.dart';
+import 'features/tasbih/presentation/widgets/custom_dhikr_storage.dart';
 
 
 final sl = GetIt.instance;
@@ -692,4 +694,9 @@ Future<void> configureDependencies() async {
       prefs,
     ),
   );
+
+  sl.registerFactory<TasbihBloc>(() => TasbihBloc());
+  sl.registerLazySingleton(() => CustomDhikrStorage());
+
+
 }

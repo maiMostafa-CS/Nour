@@ -45,9 +45,15 @@ class _BuildMainGridState extends State<BuildMainGrid> {
 
             Expanded(
               child: FeatureCard(
+                onTap: () async {
+                  await Navigator.pushNamed(
+                    context,
+                    AppRouter.tasbih,
+                  );
+                },
                 image: 'assets/images/mosque_design_no_frame.png',
-                title: 'الأذكار',
-                subtitle: 'حصن المسلم',
+                title: 'المسبحه  ',
+                subtitle: 'الاكترونيه',
               ),
             ),
           ],

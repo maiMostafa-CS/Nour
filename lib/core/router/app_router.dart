@@ -29,6 +29,7 @@ import '../../features/locations/presentation/pages/locationPage.dart';
 import '../../features/prayer_settings/presentation/pages/prayer_settings_page.dart';
 import '../../features/qibla/presentation/pages/qibla_page.dart';
 import '../../features/quran/presentation/pages/quran_page.dart';
+import '../../features/tasbih/presentation/pages/tasbih_screen.dart';
 import '../../injection_container.dart';
 import '../services/prayer_scheduler_split/prayer_scheduler/data/datasources/prayer_notification_local_data_source_impl.dart';
 
@@ -47,6 +48,8 @@ static const adhan= "/adhan";
 static const iqamaSettings= "/iqamaSettings";
   static const prayerSettingsPage= "/prayerSettingsPage";
   static const quranHomePage= "/quranHomePage";
+  static const tasbih= "/tasbih";
+
 
   static Route<dynamic> onGenerateRoute(
       RouteSettings settings,
@@ -58,10 +61,10 @@ static const iqamaSettings= "/iqamaSettings";
         );
 
 
-      // case adhkar:
-      //   return MaterialPageRoute(
-      //     builder: (_) => const AzkarScreen(),
-      //   );
+      case tasbih:
+        return MaterialPageRoute(
+          builder: (_) => const TasbihScreen(),
+        );
 
       case splashScreen:
         return MaterialPageRoute(
@@ -152,16 +155,6 @@ static const iqamaSettings= "/iqamaSettings";
             child: const IqamaSettingsPage(),
           ),
         );
-      // case quranHomePage:
-      //   return MaterialPageRoute(
-      //     builder: (_) => BlocProvider<QuranBloc>(
-      //       create: (_) => sl<QuranBloc>()
-      //         ..add(
-      //           const QuranStarted(),
-      //         ),
-      //       child: const QuranHomePage(),
-      //     ),
-      //   );
 
 
       case home:
