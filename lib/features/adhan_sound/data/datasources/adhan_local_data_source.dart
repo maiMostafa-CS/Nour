@@ -36,99 +36,218 @@ class AdhanLocalDataSourceImpl implements AdhanLocalDataSource {
   static const Map<String, List<AdhanReciterEntity>> _recitersByPrayer = {
     'fajr': [
       AdhanReciterEntity(
-        id: 'fajr_yasser',
-        name: 'ياسر الدوسري',
-        normalAdhanAssetPath: 'assets/adhan-mp3/yaserAldosery.mp3',
+        id: 'fajr_rahiq',
+        name: 'ابراهيم ابو رحيق',
+        normalAdhanAssetPath: 'assets/aliiqama/abo_rahiq_fajr.mp3',
+      ),
+      AdhanReciterEntity(
+        id: 'fajr_ahmed',
+        name: 'احمد الطرابلسي',
+        normalAdhanAssetPath: 'assets/aliiqama/ahmed_trablsy_fajr.mp3',
       ),
       AdhanReciterEntity(
         id: 'fajr_abdulbasit',
-        name: 'عبد الباسط',
-        normalAdhanAssetPath:
-        'assets/adhan-mp3/Abdulbasit_Abdusamad_5.mp3',
+        name: "عبد الباسط",
+        normalAdhanAssetPath: 'assets/aliiqama/Abdulbasit_Abdusamad_fajr.mp3',
       ),
+
       AdhanReciterEntity(
-        id: 'dhuhr_yassin',
-        name: 'ياسين عساف',
-        normalAdhanAssetPath:
-        'assets/adhan-mp3/abdul_majid_al_surehi_1.mp3',
+        id: 'fajr_abdelmoneim',
+        name: "عبد المنعم",
+        normalAdhanAssetPath: 'assets/aliiqama/Abdel_Moneim_Abdel_Mobdi.mp3',
       ),
     ],
     'dhuhr': [
       AdhanReciterEntity(
         id: 'dhuhr_yasser',
         name: 'ياسر الدوسري',
-        normalAdhanAssetPath: 'assets/adhan-mp3/yaserAldosery.mp3',
+        normalAdhanAssetPath: 'assets/aliiqama/Yasser_Al-Dosari_-_Saudi_Arabia.mp3',
       ),
       AdhanReciterEntity(
-        id: 'dhuhr_yassin',
-        name: 'ياسين عساف',
-        normalAdhanAssetPath:
-        'assets/adhan-mp3/abdul_majid_al_surehi_1.mp3',
+        id: 'dhuhr_naser',
+        name: 'ناصر القطامي',
+        normalAdhanAssetPath: 'assets/aliiqama/naser_alqtame.mp3',
       ),
       AdhanReciterEntity(
-        id: 'isha_abdulbasit',
-        name: 'عبد الباسط',
-        normalAdhanAssetPath:
-        'assets/adhan-mp3/Abdulbasit_Abdusamad_5.mp3',
+        id: 'dhuhr_abdulbasit',
+        name: "عبد الباسط",
+        normalAdhanAssetPath: 'assets/aliiqama/Abdulbasit_Abdusamad_3.mp3',
+      ),
+      AdhanReciterEntity(
+        id: 'dhuhr_fares',
+        name: "فارس عباد",
+        normalAdhanAssetPath: 'assets/aliiqama/fars_abad.mp3',
+      ),
+      AdhanReciterEntity(
+        id: 'dhuhr_abdullah_sabaawe',
+        name: "عبد الله الصباوي",
+        normalAdhanAssetPath: 'assets/aliiqama/Abdulah_Al_Sabaawe.mp3',
+      ),
+      AdhanReciterEntity(
+        id: 'dhuhr_abdulrahman_majde',
+        name: "عبد الرحمن ماجد",
+        normalAdhanAssetPath: 'assets/aliiqama/Abdul_Rahman_Majde.mp3',
+      ),
+      AdhanReciterEntity(
+        id: 'dhuhr_abdulrahman_arake',
+        name: "عبد الرحمن العراقي",
+        normalAdhanAssetPath: 'assets/aliiqama/Abdul_Rahman_Al_Arake_3.mp3',
+      ),
+      AdhanReciterEntity(
+        id: 'dhuhr_abdulmajid_surehi',
+        name: "عبد المجيد السريحي",
+        normalAdhanAssetPath: 'assets/aliiqama/Abdul_Majid_Al_Surehi_3.mp3',
+      ),
+      AdhanReciterEntity(
+        id: 'dhuhr_gado',
+        name: "بديع جادو",
+        normalAdhanAssetPath: 'assets/aliiqama/badih_gado.mp3',
       ),
     ],
     'asr': [
       AdhanReciterEntity(
         id: 'asr_yasser',
         name: 'ياسر الدوسري',
-        normalAdhanAssetPath: 'assets/adhan-mp3/yaserAldosery.mp3',
+        normalAdhanAssetPath: 'assets/aliiqama/Yasser_Al-Dosari_-_Saudi_Arabia.mp3',
       ),
       AdhanReciterEntity(
-        id: 'dhuhr_yassin',
-        name: 'ياسين عساف',
-        normalAdhanAssetPath:
-        'assets/adhan-mp3/abdul_majid_al_surehi_1.mp3',
+        id: 'asr_naser',
+        name: 'ناصر القطامي',
+        normalAdhanAssetPath: 'assets/aliiqama/naser_alqtame.mp3',
       ),
       AdhanReciterEntity(
-        id: 'isha_abdulbasit',
-        name: 'عبد الباسط',
-        normalAdhanAssetPath:
-        'assets/adhan-mp3/Abdulbasit_Abdusamad_5.mp3',
+        id: 'asr_abdulbasit',
+        name: "عبد الباسط",
+        normalAdhanAssetPath: 'assets/aliiqama/Abdulbasit_Abdusamad_3.mp3',
+      ),
+      AdhanReciterEntity(
+        id: 'asr_fares',
+        name: "فارس عباد",
+        normalAdhanAssetPath: 'assets/aliiqama/fars_abad.mp3',
+      ),
+      AdhanReciterEntity(
+        id: 'asr_abdullah_sabaawe',
+        name: "عبد الله الصباوي",
+        normalAdhanAssetPath: 'assets/aliiqama/Abdulah_Al_Sabaawe.mp3',
+      ),
+      AdhanReciterEntity(
+        id: 'asr_abdulrahman_majde',
+        name: "عبد الرحمن ماجد",
+        normalAdhanAssetPath: 'assets/aliiqama/Abdul_Rahman_Majde.mp3',
+      ),
+      AdhanReciterEntity(
+        id: 'asr_abdulrahman_arake',
+        name: "عبد الرحمن العراقي",
+        normalAdhanAssetPath: 'assets/aliiqama/Abdul_Rahman_Al_Arake_3.mp3',
+      ),
+      AdhanReciterEntity(
+        id: 'asr_abdulmajid_surehi',
+        name: "عبد المجيد السريحي",
+        normalAdhanAssetPath: 'assets/aliiqama/Abdul_Majid_Al_Surehi_3.mp3',
+      ),
+      AdhanReciterEntity(
+        id: 'asr_gado',
+        name: "بديع جادو",
+        normalAdhanAssetPath: 'assets/aliiqama/badih_gado.mp3',
       ),
     ],
     'maghrib': [
       AdhanReciterEntity(
-        id: 'maghrib_yassin',
-        name: 'ياسين عساف',
-        normalAdhanAssetPath:
-        'assets/adhan-mp3/abdul_majid_al_surehi_1.mp3',
-      ),
-      AdhanReciterEntity(
-        id: 'isha_abdulbasit',
-        name: 'عبد الباسط',
-        normalAdhanAssetPath:
-        'assets/adhan-mp3/Abdulbasit_Abdusamad_5.mp3',
-      ),
-      AdhanReciterEntity(
-        id: 'asr_yasser',
+        id: 'maghrib_yasser',
         name: 'ياسر الدوسري',
-        normalAdhanAssetPath: 'assets/adhan-mp3/yaserAldosery.mp3',
+        normalAdhanAssetPath: 'assets/aliiqama/Yasser_Al-Dosari_-_Saudi_Arabia.mp3',
+      ),
+      AdhanReciterEntity(
+        id: 'maghrib_naser',
+        name: 'ناصر القطامي',
+        normalAdhanAssetPath: 'assets/aliiqama/naser_alqtame.mp3',
+      ),
+      AdhanReciterEntity(
+        id: 'maghrib_abdulbasit',
+        name: "عبد الباسط",
+        normalAdhanAssetPath: 'assets/aliiqama/Abdulbasit_Abdusamad_3.mp3',
+      ),
+      AdhanReciterEntity(
+        id: 'maghrib_fares',
+        name: "فارس عباد",
+        normalAdhanAssetPath: 'assets/aliiqama/fars_abad.mp3',
+      ),
+      AdhanReciterEntity(
+        id: 'maghrib_abdullah_sabaawe',
+        name: "عبد الله الصباوي",
+        normalAdhanAssetPath: 'assets/aliiqama/Abdulah_Al_Sabaawe.mp3',
+      ),
+      AdhanReciterEntity(
+        id: 'maghrib_abdulrahman_majde',
+        name: "عبد الرحمن ماجد",
+        normalAdhanAssetPath: 'assets/aliiqama/Abdul_Rahman_Majde.mp3',
+      ),
+      AdhanReciterEntity(
+        id: 'maghrib_abdulrahman_arake',
+        name: "عبد الرحمن العراقي",
+        normalAdhanAssetPath: 'assets/aliiqama/Abdul_Rahman_Al_Arake_3.mp3',
+      ),
+      AdhanReciterEntity(
+        id: 'maghrib_abdulmajid_surehi',
+        name: "عبد المجيد السريحي",
+        normalAdhanAssetPath: 'assets/aliiqama/Abdul_Majid_Al_Surehi_3.mp3',
+      ),
+      AdhanReciterEntity(
+        id: 'maghrib_gado',
+        name: "بديع جادو",
+        normalAdhanAssetPath: 'assets/aliiqama/badih_gado.mp3',
       ),
     ],
     'isha': [
       AdhanReciterEntity(
-        id: 'isha_abdulbasit',
-        name: 'عبد الباسط',
-        normalAdhanAssetPath:
-        'assets/adhan-mp3/Abdulbasit_Abdusamad_5.mp3',
-      ),
-      AdhanReciterEntity(
-        id: 'dhuhr_yassin',
-        name: 'ياسين عساف',
-        normalAdhanAssetPath:
-        'assets/adhan-mp3/abdul_majid_al_surehi_1.mp3',
-      ),
-      AdhanReciterEntity(
-        id: 'asr_yasser',
+        id: 'isha_yasser',
         name: 'ياسر الدوسري',
-        normalAdhanAssetPath: 'assets/adhan-mp3/yaserAldosery.mp3',
+        normalAdhanAssetPath: 'assets/aliiqama/Yasser_Al-Dosari_-_Saudi_Arabia.mp3',
+      ),
+      AdhanReciterEntity(
+        id: 'isha_naser',
+        name: 'ناصر القطامي',
+        normalAdhanAssetPath: 'assets/aliiqama/naser_alqtame.mp3',
+      ),
+      AdhanReciterEntity(
+        id: 'isha_abdulbasit',
+        name: "عبد الباسط",
+        normalAdhanAssetPath: 'assets/aliiqama/Abdulbasit_Abdusamad_3.mp3',
+      ),
+      AdhanReciterEntity(
+        id: 'isha_fares',
+        name: "فارس عباد",
+        normalAdhanAssetPath: 'assets/aliiqama/fars_abad.mp3',
+      ),
+      AdhanReciterEntity(
+        id: 'isha_abdullah_sabaawe',
+        name: "عبد الله الصباوي",
+        normalAdhanAssetPath: 'assets/aliiqama/Abdulah_Al_Sabaawe.mp3',
+      ),
+      AdhanReciterEntity(
+        id: 'isha_abdulrahman_majde',
+        name: "عبد الرحمن ماجد",
+        normalAdhanAssetPath: 'assets/aliiqama/Abdul_Rahman_Majde.mp3',
+      ),
+      AdhanReciterEntity(
+        id: 'isha_abdulrahman_arake',
+        name: "عبد الرحمن العراقي",
+        normalAdhanAssetPath: 'assets/aliiqama/Abdul_Rahman_Al_Arake_3.mp3',
+      ),
+      AdhanReciterEntity(
+        id: 'isha_abdulmajid_surehi',
+        name: "عبد المجيد السريحي",
+        normalAdhanAssetPath: 'assets/aliiqama/Abdul_Majid_Al_Surehi_3.mp3',
+      ),
+      AdhanReciterEntity(
+        id: 'isha_gado',
+        name: "بديع جادو",
+        normalAdhanAssetPath: 'assets/aliiqama/badih_gado.mp3',
       ),
     ],
+
+
+
   };
 
   // =========================

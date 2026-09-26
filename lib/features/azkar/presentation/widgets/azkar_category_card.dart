@@ -20,20 +20,16 @@ class AzkarCategoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return Card(
       margin: EdgeInsets.only(bottom: 12.h),
-      decoration: BoxDecoration(
-        color: _cardColor,
+      color: _cardColor,
+      elevation: 2,
+      shadowColor: Colors.black.withOpacity(0.05),
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10.r,
-            offset: Offset(0, 4.h),
-          ),
-        ],
-        border: Border.all(color: _accentColor.withOpacity(0.3)),
+        side: BorderSide(color: _accentColor.withOpacity(0.3)),
       ),
+      clipBehavior: Clip.antiAlias, // ✅ عشان الـ splash يبان جوه الحواف
       child: ListTile(
         contentPadding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
         leading: Container(
@@ -53,8 +49,11 @@ class AzkarCategoryCard extends StatelessWidget {
             color: _primaryColor,
           ),
         ),
-        trailing:
-        Icon(Icons.arrow_forward_ios, size: 16.r, color: _accentColor),
+        trailing: Icon(
+          Icons.arrow_forward_ios,
+          size: 16.r,
+          color: _accentColor,
+        ),
         onTap: onTap,
       ),
     );

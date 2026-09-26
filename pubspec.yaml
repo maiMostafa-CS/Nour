@@ -60,11 +60,10 @@ flutter:
   uses-material-design: true
 
   assets:
+    - assets/aliiqama/
     - assets/quran/
-    - assets/adhkar/
     - assets/images/
     - assets/adhan-mp3/
-    - assets/prayer_time_soon/
     - assets/countries_capitals/
   fonts:
     - family: HafsSmart
