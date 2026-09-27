@@ -30,7 +30,7 @@ class _SplashScreenState extends State<SplashScreen> {
     return Scaffold(
       body: SizedBox.expand(
         child: Image.asset(
-          'assets/images/splash.jpeg',
+          'assets/images/splash.png',
           fit: BoxFit.cover,
         ),
       ),
