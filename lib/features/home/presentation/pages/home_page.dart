@@ -26,6 +26,86 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+
+
+  Future<void> _testNotification() async {
+    final plugin = FlutterLocalNotificationsPlugin();
+
+    const android = AndroidInitializationSettings('@mipmap/ic_launcher');
+    await plugin.initialize(
+      settings: const InitializationSettings(android: android),
+    );
+
+    const channelId = 'prayer_countdown_v4';  // ← اسم جديد عشان القناة تتعمل من الأول
+    const channelName = 'الصلاة القادمة';
+
+    // ==========================================================
+    // 1. القناة بنفس إعدادات الإشعار الحقيقي
+    // ==========================================================
+
+    await plugin
+        .resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(
+      const AndroidNotificationChannel(
+        channelId,
+        channelName,
+        description: 'عداد تنازلي للصلاة القادمة',
+        importance: Importance.max,     // ← نفس الإشعار الحقيقي (بعد التعديل)
+        playSound: true,                 // ← نفس الإشعار الحقيقي (بعد التعديل)
+      ),
+    );
+
+    // ==========================================================
+    // 2. تفاصيل الإشعار بنفس إعدادات الإشعار الحقيقي
+    // ==========================================================
+
+    final androidDetails = AndroidNotificationDetails(
+      channelId,
+      channelName,
+
+      channelDescription: 'عداد تنازلي للصلاة القادمة',
+
+      icon: '@mipmap/ic_launcher',     // ← نفس اللي شغال
+
+      importance: Importance.max,      // ← نفس الإشعار الحقيقي
+      priority: Priority.max,           // ← نفس الإشعار الحقيقي
+
+      ongoing: true,
+      autoCancel: false,
+
+      silent: false,                    // ← نفس الإشعار الحقيقي (بعد التعديل)
+      playSound: true,                  // ← نفس الإشعار الحقيقي (بعد التعديل)
+
+      showWhen: true,
+
+      usesChronometer: true,
+      chronometerCountDown: false,
+
+      when: DateTime.now()
+          .add(const Duration(hours: 2))
+          .toUtc()
+          .millisecondsSinceEpoch,
+
+      category: AndroidNotificationCategory.alarm,
+      visibility: NotificationVisibility.public,
+
+      channelShowBadge: false,
+    );
+
+    // ==========================================================
+    // 3. عرض الإشعار
+    // ==========================================================
+
+    await plugin.show(
+      id: 99999,
+      title: '🕌 اختبار الصلاة القادمة',
+      body: 'لو شوفت ده يبقى الإعدادات تمام',
+      notificationDetails: NotificationDetails(
+        android: androidDetails,
+      ),
+    );
+  }
   @override
   Widget build(BuildContext context) {
     return BlocListener<LocationBloc, LocationState>(
@@ -190,6 +270,10 @@ class _HomePageState extends State<HomePage> {
                 // ─── Top Bar: المدينة + زرار الموقع ───
                 _buildTopBar(context, state),
 
+                ElevatedButton(onPressed: () {
+                  _testNotification();
+
+                }, child: Text("data")),
                 SizedBox(height: 14.h),
 
                 // ─── كارت الصلاة القادمة ───

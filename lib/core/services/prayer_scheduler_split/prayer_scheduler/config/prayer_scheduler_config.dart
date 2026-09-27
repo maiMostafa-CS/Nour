@@ -7,9 +7,10 @@ const String prayerScheduledDaysPrefsKey =
 const String prayerScheduledFromPrefsKey =
     'prayer_notifications_scheduled_from';
 
+const String countdownChannelId = 'prayer_countdown_notifications';
+// const String countdownChannelId = 'prayer_countdown_v2';
 
-
-const String countdownChannelId = 'prayer_countdown_channel';
+// const String countdownChannelId = 'prayer_countdown_channel';
 const String countdownChannelName = 'الصلاة القادمة';
 const String countdownChannelDescription = 'عداد تنازلي للصلاة القادمة';
 const int countdownNotificationId = 1000;

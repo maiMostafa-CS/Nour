@@ -14,6 +14,8 @@ class CountdownNotificationService {
   const CountdownNotificationService._();
 
   static Future<void> showNextPrayerCountdown() async {
+    debugPrint('🚀🚀🚀 showNextPrayerCountdown CALLED');
+
     prayerSchedulerLog(
       '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
     );
@@ -214,7 +216,7 @@ class CountdownNotificationService {
 
       const androidSettings =
       AndroidInitializationSettings(
-        notificationIcon,
+        '@mipmap/ic_launcher',
       );
 
       const initializationSettings =
@@ -251,14 +253,12 @@ class CountdownNotificationService {
       // Notification Channel
       // ==========================================================
 
-      const countdownChannel =
-      AndroidNotificationChannel(
+      const countdownChannel = AndroidNotificationChannel(
         countdownChannelId,
         countdownChannelName,
-        description:
-        countdownChannelDescription,
-        importance: Importance.low,
-        playSound: false,
+        description: countdownChannelDescription,
+        importance: Importance.max,    // ← بدل low
+        playSound: true,                // ← بدل false
       );
 
       try {
@@ -288,16 +288,18 @@ class CountdownNotificationService {
         channelDescription:
         countdownChannelDescription,
 
-        icon: notificationIcon,
+        icon: '@mipmap/ic_launcher',
 
-        importance: Importance.low,
-        priority: Priority.low,
+        importance: Importance.max,    // ← بدل low
+        priority: Priority.max,
 
         ongoing: true,
         autoCancel: false,
+        silent: false,                  // ← بدل true
+        playSound: true,                // ← بدل false
+        enableVibration: true,          // ← جديد
+        enableLights: true,
 
-        silent: true,
-        playSound: false,
 
         showWhen: true,
 
@@ -334,7 +336,7 @@ class CountdownNotificationService {
             .millisecondsSinceEpoch,
 
         category:
-        AndroidNotificationCategory.status,
+        AndroidNotificationCategory.alarm,
 
         visibility:
         NotificationVisibility.public,
@@ -360,6 +362,8 @@ class CountdownNotificationService {
 
         payload: 'next_prayer',
       );
+      debugPrint('🎯 SHOW CALLED WITH PRAYER: $nextPrayerName');
+      debugPrint('✅✅✅ NOTIFICATION SHOWED: $nextPrayerName');
 
       // ==========================================================
       // Success Logs
@@ -388,13 +392,9 @@ class CountdownNotificationService {
         '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
       );
     } catch (e, stackTrace) {
-      prayerSchedulerLog(
-        '❌ showNextPrayerCountdown FAILED: $e',
-      );
-
-      prayerSchedulerLog(
-        'STACKTRACE: $stackTrace',
-      );
+      debugPrint('❌❌❌ showNextPrayerCountdown FAILED: $e');
+      prayerSchedulerLog('❌ showNextPrayerCountdown FAILED: $e');
+      prayerSchedulerLog('STACKTRACE: $stackTrace');
     }
   }
 }
