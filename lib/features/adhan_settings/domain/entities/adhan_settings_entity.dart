@@ -65,7 +65,7 @@ class AdhanSettingsEntity extends Equatable {
     );
   }
 
-  /// Helper: يرجع نسخة جديدة مع تغيير صلاة واحدة فقط
+  /// Helper: returns a new copy with only one prayer changed
   AdhanSettingsEntity toggle(int index, bool enabled) {
     final values = <bool>[
       fajr,

@@ -16,8 +16,8 @@ class AdhanSettingsBloc
   final UpdateAdhanSetting updateAdhanSetting;
   final PrayerNotificationLocalDataSourceImpl prayerScheduler;
 
-  /// منع تعارض العمليات اللي في الخلفية
-  /// لو المستخدم ضغط بسرعة على أكتر من صلاة، بنستنى اللي قبلها
+  /// Prevent overlapping background operations
+  /// If the user taps multiple prayers quickly, wait for the previous operation
   Future<void>? _pendingReschedule;
 
   AdhanSettingsBloc({
@@ -76,7 +76,7 @@ class AdhanSettingsBloc
     debugPrint('════════════════════════════════════');
 
     // ═══════════════════════════════════════════════════════
-    // 1) OPTIMISTIC UPDATE — حدّث الـ UI فوراً
+    // 1) OPTIMISTIC UPDATE — update the UI immediately
     // ═══════════════════════════════════════════════════════
 
     final optimisticSettings = previousSettings.toggle(
@@ -93,7 +93,7 @@ class AdhanSettingsBloc
     debugPrint('⚡ [Bloc] UI updated (optimistic)');
 
     // ═══════════════════════════════════════════════════════
-    // 2) BACKGROUND WORK — احفظ + أعد الجدولة
+    // 2) BACKGROUND WORK — save and reschedule
     // ═══════════════════════════════════════════════════════
 
     _pendingReschedule = _persistAndReschedule(

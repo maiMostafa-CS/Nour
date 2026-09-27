@@ -103,7 +103,7 @@
 //         now.day,
 //       );
 //
-//       // حتى نقدر نختبر حالة أن الـ window قريبة من الانتهاء
+//       // So we can test when the window is close to expiring
 //       final fakeScheduledFrom = today.subtract(
 //         const Duration(days: 1),
 //       );
@@ -133,17 +133,17 @@
 //       // 4️⃣ TEST TIMES
 //       // ============================================================
 //
-//       // // Reminder بعد 20 ثانية
+//       // // Reminder after 20 seconds
 //       // final reminderTime = now.add(
 //       //   const Duration(seconds: 10),
 //       // );
 //
-//       // Adhan بعد 50 ثانية
+//       // Adhan after 50 seconds
 //       final adhanTime = now.add(
 //         const Duration(seconds: 10),
 //       );
 //
-//       // Iqama بعد الأذان بـ 30 ثانية
+//       // Iqama 30 seconds after adhan
 //       final iqamaTime = adhanTime.add(
 //         const Duration(seconds: 50),
 //       );
@@ -190,9 +190,9 @@
 // //
 // //           notificationSettings:
 // //           const NotificationSettings(
-// //             title: '🔔 تذكير بالصلاة',
-// //             body: 'اقترب موعد الأذان',
-// //             stopButton: 'إيقاف التذكير',
+// //             title: '🔔 Prayer reminder',
+// //             body: 'Adhan time is approaching',
+// //             stopButton: 'Stop reminder',
 // //             icon: notificationIcon,
 // //             androidStopAlarmOnDismiss: true,
 // //           ),
@@ -251,12 +251,12 @@
 //           vibrate: false,
 //           androidFullScreenIntent: false,
 //           androidStopAlarmOnTermination: false,
-//           allowAlarmOverlap: true, // 👈 ضيفها هنا
+//           allowAlarmOverlap: true, // 👈 add it here
 //           volumeSettings: VolumeSettings.fixed(volume: 1.0, volumeEnforced: false),
 //           notificationSettings: const NotificationSettings(
-//             title: '🕌 اختبار الأذان',
-//             body: 'حان الآن وقت الأذان',
-//             stopButton: 'إيقاف الأذان',
+//             title: '🕌 Adhan test',
+//             body: 'It is time for adhan',
+//             stopButton: 'Stop adhan',
 //             icon: notificationIcon,
 //             androidStopAlarmOnDismiss: false,
 //           ),
@@ -278,12 +278,12 @@
 //           vibrate: false,
 //           androidFullScreenIntent: false,
 //           androidStopAlarmOnTermination: false,
-//           allowAlarmOverlap: true, // 👈 وهنا كمان
+//           allowAlarmOverlap: true, // 👈 here as well
 //           volumeSettings: VolumeSettings.fixed(volume: 1.0, volumeEnforced: false),
 //           notificationSettings: const NotificationSettings(
-//             title: '🕌 اختبار الإقامة',
-//             body: 'حان الآن وقت الإقامة',
-//             stopButton: 'إيقاف الإقامة',
+//             title: '🕌 Iqama test',
+//             body: 'It is time for iqama',
+//             stopButton: 'Stop iqama',
 //             icon: notificationIcon,
 //             androidStopAlarmOnDismiss: true,
 //           ),
@@ -305,15 +305,15 @@
 //       debugPrint('⏳ ========================================');
 //
 //       debugPrint(
-//         '⏳ بعد 20 ثانية  → 🔔 التذكير',
+//         '⏳ After 20 seconds → 🔔 reminder',
 //       );
 //
 //       debugPrint(
-//         '⏳ بعد 50 ثانية  → 🔊 الأذان',
+//         '⏳ After 50 seconds → 🔊 adhan',
 //       );
 //
 //       debugPrint(
-//         '⏳ بعد 80 ثانية  → 🕌 الإقامة',
+//         '⏳ After 80 seconds → 🕌 iqama',
 //       );
 //
 //       debugPrint('');

@@ -1,5 +1,5 @@
 abstract class PrayerNotificationRepository {
-  /// يجدول أول نافذة (أول مرة، أو بعد فتح التطبيق لو فيه فجوة).
+  /// Schedules the first window (first launch, or after opening the app if there is a gap).
   Future<void> scheduleNotifications({
     required double latitude,
     required double longitude,

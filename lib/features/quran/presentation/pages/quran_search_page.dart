@@ -22,7 +22,7 @@ class _QuranSearchPageState extends State<QuranSearchPage> {
   }
 
 // ============================================================
-// البحث
+// Search
 // ============================================================
 
   void _search() {
@@ -87,48 +87,48 @@ class _QuranSearchPageState extends State<QuranSearchPage> {
   }
 
 // ============================================================
-// توحيد النص العربي
+// Normalize Arabic text
 // ============================================================
 
   String _normalizeSearchText(String text) {
     String value = text;
 
-// إزالة التشكيل
+// Remove diacritics
     value = value.replaceAll(
       RegExp(r'[\u064B-\u065F\u0670]'),
       '',
     );
 
-// إزالة علامات القرآن
+// Remove Quran marks
     value = value.replaceAll(
       RegExp(r'[\u0610-\u061A\u06D6-\u06ED]'),
       '',
     );
 
-// توحيد الألف
+// Normalize Alef
     value =
         value.replaceAll('أ', 'ا').replaceAll('إ', 'ا').replaceAll('آ', 'ا');
 
-// توحيد الياء
+// Normalize Ya
     value = value.replaceAll('ى', 'ي').replaceAll('ئ', 'ي');
 
-// توحيد الواو بالهمزة
+// Normalize Waw with Hamza
     value = value.replaceAll('ؤ', 'و');
 
-// التاء المربوطة
+// Ta Marbuta
     value = value.replaceAll('ة', 'ه');
 
-// إزالة التطويل
+// Remove Tatweel
     value = value.replaceAll('ـ', '');
 
-// إزالة المسافات الزائدة
+// Remove extra spaces
     value = value.replaceAll(RegExp(r'\s+'), ' ');
 
     return value.trim().toLowerCase();
   }
 
 // ============================================================
-// فتح الآية
+// Open ayah
 // ============================================================
 
   void _openVerse(

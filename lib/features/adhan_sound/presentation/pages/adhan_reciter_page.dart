@@ -33,7 +33,7 @@ class _AdhanReciterPageState extends State<AdhanReciterPage> {
   void initState() {
     super.initState();
 
-    // لما الصوت يخلص تلقائي → رجّع الأيقونة لـ play
+    // When the audio finishes automatically → restore the icon to Play
     _previewPlayer.onCompleted = () {
       if (!mounted) return;
       setState(() => _playingId = null);
@@ -97,7 +97,7 @@ class _AdhanReciterPageState extends State<AdhanReciterPage> {
       body: SafeArea(
         child: BlocConsumer<AdhanBloc, AdhanState>(
           listenWhen: (prev, curr) {
-            // لو اتغير الاختيار → نوقف أي preview شغال
+            // If the selection changes → stop any active preview
             if (prev is AdhanLoaded && curr is AdhanLoaded) {
               return prev.selectedReciterId != curr.selectedReciterId;
             }

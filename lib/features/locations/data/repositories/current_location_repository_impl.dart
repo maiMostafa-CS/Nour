@@ -33,7 +33,7 @@ class CurrentLocationRepositoryImpl implements CurrentLocationRepository {
     String country = '';
 
     // ═══════════════════════════════════════════════════════
-    // 1️⃣ جرّب Geocoder الأول (لو شغال)
+    // 1️⃣ Try Geocoder first (if available)
     // ═══════════════════════════════════════════════════════
     try {
       final placemarks = await _geocoding.placemarkFromCoordinates(
@@ -57,7 +57,7 @@ class CurrentLocationRepositoryImpl implements CurrentLocationRepository {
       debugPrint('🔄 Falling back to Nominatim...');
 
       // ═══════════════════════════════════════════════════════
-      // 2️⃣ Fallback: استخدم Nominatim (OpenStreetMap)
+      // 2️⃣ Fallback: use Nominatim (OpenStreetMap)
       // ═══════════════════════════════════════════════════════
       try {
         final result = await _getCityFromNominatim(
@@ -75,7 +75,7 @@ class CurrentLocationRepositoryImpl implements CurrentLocationRepository {
     }
 
     // ═══════════════════════════════════════════════════════
-    // 3️⃣ الـ timezone
+    // 3️⃣ The timezone
     // ═══════════════════════════════════════════════════════
     String timezone = '';
 
@@ -98,7 +98,7 @@ class CurrentLocationRepositoryImpl implements CurrentLocationRepository {
   }
 
   // ═══════════════════════════════════════════════════════════
-  // Nominatim API (OpenStreetMap) — مجاني
+  // Nominatim API (OpenStreetMap) — free
   // ═══════════════════════════════════════════════════════════
   Future<Map<String, String>> _getCityFromNominatim(
       double lat,
@@ -118,7 +118,7 @@ class CurrentLocationRepositoryImpl implements CurrentLocationRepository {
     final response = await http.get(
       url,
       headers: {
-        // ⚠️ مهم جداً: Nominatim محتاج User-Agent
+        // ⚠️ Important: Nominatim requires a User-Agent
         'User-Agent': 'IslamicApp/1.0 (contact@example.com)',
       },
     ).timeout(const Duration(seconds: 10));
@@ -130,7 +130,7 @@ class CurrentLocationRepositoryImpl implements CurrentLocationRepository {
     final data = json.decode(response.body) as Map<String, dynamic>;
     final address = data['address'] as Map<String, dynamic>? ?? {};
 
-    // أولوية المدينة: city → town → village → state
+    // City priority: city → town → village → state
     final city = address['city'] ??
         address['town'] ??
         address['village'] ??

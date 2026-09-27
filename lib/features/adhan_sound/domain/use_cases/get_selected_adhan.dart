@@ -6,12 +6,12 @@ class GetSelectedAdhan {
 
   const GetSelectedAdhan(this.repository);
 
-  /// يرجّع id المؤذن المختار لصلاة معيّنة
+  /// Returns the selected reciter ID for a specific prayer
   Future<String?> call(String prayerName) {
     return repository.getSelectedReciterId(prayerName);
   }
 
-  /// يرجّع المؤذن المختار كـ entity كاملة
+  /// Returns the selected reciter as a complete entity
   Future<AdhanReciterEntity?> callEntity(String prayerName) {
     return repository.getSelectedReciter(prayerName);
   }

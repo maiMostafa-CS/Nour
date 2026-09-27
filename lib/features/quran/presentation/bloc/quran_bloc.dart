@@ -13,8 +13,8 @@ import '../../domain/entities/quran_tafsir_book.dart';
 import '../../domain/entities/surah_entity.dart';
 import '../../domain/entities/quran_reciter.dart';
 
-import '../../domain/usecases/ get_ayah_audio_url.dart';
 import '../../domain/usecases/GetAyahTafsir.dart';
+import '../../domain/usecases/get_ayah_audio_url.dart';
 import '../../domain/usecases/get_surahs.dart';
 import '../../domain/usecases/search_surahs.dart';
 import '../../domain/usecases/get_quran_reciters.dart';
@@ -52,7 +52,7 @@ class QuranIndexBloc extends Bloc<QuranIndexEvent, QuranIndexState> {
   final AyahAudioService audioService;
 
   // ==========================================================
-  // No Internet (حدث لمرة واحدة، لا يُخزَّن في الـ State)
+  // No Internet (handled once; not stored in the State)
   // ==========================================================
 
   final StreamController<String> _noInternetController =
@@ -70,7 +70,7 @@ class QuranIndexBloc extends Bloc<QuranIndexEvent, QuranIndexState> {
     if (_noInternetController.hasListener) {
       _noInternetController.add(message);
     } else if (keepPending) {
-      // لا يوجد مستمع بعد، نحتفظ بالرسالة حتى يشترك أحد
+      // No listener yet; keep the message until a listener subscribes
       _pendingNoInternetMessage = message;
     }
   }
@@ -313,7 +313,7 @@ class QuranIndexBloc extends Bloc<QuranIndexEvent, QuranIndexState> {
       final currentState = state as QuranIndexLoaded;
 
       // ------------------------------------------------------
-      // فحص الإنترنت
+      // Check internet connection
       // ------------------------------------------------------
 
       final online = await InternetChecker.hasInternet();
@@ -330,7 +330,7 @@ class QuranIndexBloc extends Bloc<QuranIndexEvent, QuranIndexState> {
       }
 
       // ------------------------------------------------------
-      // القراء
+      // Reciters
       // ------------------------------------------------------
 
       final reciters = currentState.reciters.isNotEmpty
@@ -359,8 +359,8 @@ class QuranIndexBloc extends Bloc<QuranIndexEvent, QuranIndexState> {
       debugPrint('🔊 Audio URL = $audioUrl');
 
       // ======================================================
-      // ⭐ أهم تعديل
-      // نغير حالة الـ UI قبل تشغيل الصوت
+      // ⭐ Most important change
+      // Change the UI state before starting audio
       // ======================================================
 
       emit(
@@ -374,7 +374,7 @@ class QuranIndexBloc extends Bloc<QuranIndexEvent, QuranIndexState> {
       );
 
       // ======================================================
-      // تشغيل الصوت
+      // Start audio
       // ======================================================
 
       await audioService.playUrl(
@@ -387,7 +387,7 @@ class QuranIndexBloc extends Bloc<QuranIndexEvent, QuranIndexState> {
       debugPrint('❌ Play ayah error: $e');
       debugPrint('$st');
 
-      // لو التشغيل فشل نرجع الأيقونة إلى Play
+      // If playback fails, restore the icon to Play
       if (state is QuranIndexLoaded) {
         emit(
           (state as QuranIndexLoaded).copyWith(
@@ -492,7 +492,7 @@ class QuranIndexBloc extends Bloc<QuranIndexEvent, QuranIndexState> {
 
     final startState = state as QuranIndexLoaded;
 
-    // الكتب محملة ومعه كتاب مختار: نحافظ على اختيار المستخدم
+    // Books are loaded and a book is selected: preserve the user's selection
     if (startState.tafsirBooks.isNotEmpty &&
         startState.selectedTafsirBook != null) {
       return;
@@ -507,11 +507,11 @@ class QuranIndexBloc extends Bloc<QuranIndexEvent, QuranIndexState> {
 
       debugPrint('📚 Loaded ${books.length} tafsir books');
 
-      // نقرأ الحالة الأحدث بعد الـ await
+      // Read the latest state after await
       if (state is! QuranIndexLoaded) return;
       final latest = state as QuranIndexLoaded;
 
-      // نحافظ على الكتاب المختار سابقًا لو موجود، وإلا نختار الأول (الافتراضي)
+      // Keep the previously selected book if available; otherwise select the first one (default)
       QuranTafsirBook? selected;
       for (final b in books) {
         if (b.id == latest.selectedTafsirBook?.id) {
@@ -536,7 +536,7 @@ class QuranIndexBloc extends Bloc<QuranIndexEvent, QuranIndexState> {
         _emitNoInternet(e.message);
       }
 
-      // نحافظ على QuranIndexLoaded ولا نحوله إلى QuranIndexError
+      // Keep QuranIndexLoaded and do not change it to QuranIndexError
       if (state is QuranIndexLoaded) {
         emit((state as QuranIndexLoaded).copyWith(isTafsirLoading: false));
       }
@@ -598,7 +598,7 @@ class QuranIndexBloc extends Bloc<QuranIndexEvent, QuranIndexState> {
 
     try {
       // ------------------------------------------------------
-      // لو مفيش كتاب مختار: نحمّل الكتب ونختار الافتراضي
+      // If no book is selected: load the books and select the default
       // ------------------------------------------------------
 
       var selectedBook = currentState.selectedTafsirBook;
@@ -657,7 +657,7 @@ class QuranIndexBloc extends Bloc<QuranIndexEvent, QuranIndexState> {
             : '✅ Tafsir loaded for ${event.surahNumber}:${event.ayahNumber}',
       );
 
-      // الحالة الأحدث بعد الـ await
+      // Latest state after await
       if (state is! QuranIndexLoaded) return;
       final latest = state as QuranIndexLoaded;
 

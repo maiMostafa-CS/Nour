@@ -1,10 +1,10 @@
 import '../entities/adhan_reciter_entity.dart';
 
 abstract class AdhanRepository {
-  /// كل المؤذنين (بدون تكرار)
+  /// All reciters (without duplicates)
   Future<List<AdhanReciterEntity>> getReciters();
 
-  /// مؤذني صلاة معيّنة
+  /// Reciters for a specific prayer
   Future<List<AdhanReciterEntity>> getRecitersForPrayer(String prayerName);
 
   Future<List<AdhanReciterEntity>> getFajrReciters();

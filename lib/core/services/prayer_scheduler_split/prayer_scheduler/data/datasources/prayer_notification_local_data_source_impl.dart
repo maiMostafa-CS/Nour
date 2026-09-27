@@ -5,7 +5,7 @@ import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../../../../features/adhan_settings/domain/repositories/ adhan_settings_repository.dart';
+import '../../../../../../features/adhan_settings/domain/repositories/adhan_settings_repository.dart';
 import '../../../../../../features/adhan_sound/data/datasources/adhan_local_data_source.dart';
 import '../../../../../../features/iqama_setting/domain/repositories/iqama_settings_repository.dart';
 import '../../../../../../features/prayer_times/data/datasources/prayer_local_data_source.dart';
@@ -257,7 +257,7 @@ class PrayerNotificationLocalDataSourceImpl
               if (adhanScheduled) {
                 scheduledAdhans++;
 
-                // ─── سجّل معرّف الأذان ───
+                // ─── Record the adhan ID ───
                 final adhanId = PrayerSchedulerIds.adhan(
                   moment.time,
                   moment.index,
@@ -317,7 +317,7 @@ class PrayerNotificationLocalDataSourceImpl
 
               scheduledIqamas++;
 
-              // ─── سجّل معرّف الإقامة ───
+              // ─── Record the iqama ID ───
               final iqamaId = PrayerSchedulerIds.iqama(
                 moment.time,
                 moment.index,
@@ -361,7 +361,7 @@ class PrayerNotificationLocalDataSourceImpl
 
             scheduledCountdowns++;
 
-            // ─── سجّل معرّف العدّاد ───
+            // ─── Record the countdown ID ───
             final countdownId = PrayerSchedulerIds.countdownUpdate(
               moment.time,
               moment.index,
@@ -870,8 +870,8 @@ class PrayerNotificationLocalDataSourceImpl
     // ==========================================================
     // 🧹 NEW: SWEEP ORPHAN ALARMS
     //
-    // بيمسح المنبهات اليتيمة من النطاقات المعروفة
-    // (اللي مش مسجلة في Alarm.getAlarms() ولا في AlarmIdTracker)
+    // Clears orphan alarms from known ranges
+    // (those not registered in Alarm.getAlarms() or AlarmIdTracker)
     // ==========================================================
 
     try {
@@ -1028,17 +1028,17 @@ class PrayerNotificationLocalDataSourceImpl
 // 🧹 SWEEP ORPHAN ALARMS
 // ============================================================
 
-  /// يمسح المنبهات اليتيمة من النطاقات المعروفة
+  /// Clears orphan alarms from the known ranges
   ///
-  /// المنبهات اليتيمة هي اللي:
-  /// - مش موجودة في `Alarm.getAlarms()`
-  /// - مش مسجلة في `AlarmIdTracker`
-  /// - لكن لسه مسجلة في نظام أندرويد
+  /// Orphan alarms are those that:
+  /// - are not present in `Alarm.getAlarms()`
+  /// - are not registered in `AlarmIdTracker`
+  /// - but are still registered in the Android system
   ///
-  /// الحل: نمر على كل الـ IDs في النطاقات المعروفة
-  /// ونحاول نلغي كل واحد.
+  /// Solution: iterate over all IDs in the known ranges
+  /// and try to cancel each one.
   Future<int> _sweepOrphanAlarms() async {
-    // ⚠️ عدّل الأرقام دي حسب مشروعك
+    // ⚠️ Adjust these numbers for your project
     const adhanBase = 124570;
     const iqamaBase = 324570;
     const countdownBase = 424570;
@@ -1052,19 +1052,19 @@ class PrayerNotificationLocalDataSourceImpl
       for (int i = 0; i < sweepRange; i++) {
         final id = base + i;
 
-        // 1️⃣ إلغاء من إضافة alarm
+        // 1️⃣ Cancel from the alarm plugin
         try {
           await Alarm.stop(id);
           cancelled++;
         } catch (_) {
-          // متوقع — المنبه مش موجود
+          // Expected — alarm does not exist
         }
 
-        // 2️⃣ إلغاء من إضافة android_alarm_manager_plus
+        // 2️⃣ Cancel from android_alarm_manager_plus
         try {
           await AndroidAlarmManager.cancel(id);
         } catch (_) {
-          // متوقع
+          // Expected
         }
       }
     }

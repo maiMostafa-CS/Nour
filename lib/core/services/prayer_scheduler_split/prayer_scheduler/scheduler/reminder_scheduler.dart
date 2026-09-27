@@ -46,9 +46,9 @@
 // //         volumeEnforced: false,
 // //       ),
 // //       notificationSettings: NotificationSettings(
-// //         title: 'اقترب موعد صلاة ${moment.name}',
-// //         body: 'باقي 5 دقائق على أذان ${moment.name}',
-// //         stopButton: 'إيقاف التنبيه',
+// //         title: 'Prayer time is approaching for ${moment.name}',
+// //         body: '5 minutes remaining until adhan for ${moment.name}',
+// //         stopButton: 'Stop reminder',
 // //         icon: notificationIcon,
 // //         androidStopAlarmOnDismiss: false,
 // //       ),
@@ -115,9 +115,9 @@
 //         volumeEnforced: true,
 //       ),
 //       notificationSettings: NotificationSettings(
-//         title: 'اقترب موعد صلاة ${moment.name}',
-//         body: 'باقي 5 دقائق على أذان ${moment.name}',
-//         stopButton: 'إيقاف التنبيه',
+//         title: 'Prayer time is approaching for ${moment.name}',
+//         body: '5 minutes remaining until adhan for ${moment.name}',
+//         stopButton: 'Stop reminder',
 //         icon: notificationIcon,
 //         androidStopAlarmOnDismiss: false,
 //       ),
@@ -134,8 +134,8 @@
 //       final stillRinging = await Alarm.isRinging(id);
 //       prayerSchedulerLog(
 //         stillRinging
-//             ? '⚠️ REMINDER STILL RINGING (لسه متقفلش) | id=$id → هيتقفل يدويًا دلوقتي'
-//             : '🛑 REMINDER ALREADY STOPPED (اتقفل عادي) | id=$id',
+//             ? '⚠️ REMINDER STILL RINGING (not stopped yet) | id=$id → will be stopped manually now'
+//             : '🛑 REMINDER ALREADY STOPPED (stopped normally) | id=$id',
 //       );
 //
 //       if (stillRinging) {
@@ -149,7 +149,7 @@
 // class ReminderAutoStop {
 //   static bool _attached = false;
 //
-//   /// نادِ الدالة دي مرة واحدة بس في main() بعد Alarm.init()
+//   /// Call this function only once in main() after Alarm.init()
 //   static void attachOnce() {
 //     if (_attached) return;
 //     _attached = true;
@@ -159,12 +159,12 @@
 //         if (alarm.payload == reminderPayload) {
 //           debugPrint('🔔 REMINDER RINGING NOW | id=${alarm.id}');
 //
-//           // اديله وقت كافي إن الصوت يخلص (عدّل الرقم حسب طول ملف الصوت بتاعك)
+//           // Give it enough time for the audio to finish (adjust the value to the audio length)
 //           Timer(const Duration(seconds: 5), () async {
 //             final stillRinging = await Alarm.isRinging(alarm.id);
 //             debugPrint(
 //               stillRinging
-//                   ? '⚠️ REMINDER STILL RINGING → قافله دلوقتي'
+//                   ? '⚠️ REMINDER STILL RINGING → stopping it now'
 //                   : '🛑 REMINDER ALREADY STOPPED',
 //             );
 //             if (stillRinging) {

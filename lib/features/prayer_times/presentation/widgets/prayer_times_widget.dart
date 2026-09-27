@@ -140,7 +140,7 @@ class _PrayerTimesWidgetState extends State<PrayerTimesWidget> {
     return Container(
       width: 52.w,
       padding: EdgeInsets.symmetric(vertical: 6.h),
-// في _buildPrayerItem، غيّر الـ decoration:
+// In _buildPrayerItem, change the decoration:
       decoration: BoxDecoration(
         gradient: isActive
             ? AppColors.primaryGradient

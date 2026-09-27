@@ -12,28 +12,28 @@ class QuranReciterModel extends QuranReciter {
 const List<QuranReciterModel> quranReciters = [
   // QuranReciterModel(
   //   identifier: 'ar.abdullahbasfar',
-  //   name: 'عبد الله بصفر',
+  //   name: 'Abdullah Basfar',
   //   englishName: 'Abdullah Basfar',
   //   bitrate: 128,
   // ),
 
   // QuranReciterModel(
   //   identifier: 'ar.abdurrahmaansudais',
-  //   name: 'عبدالرحمن السديس',
+  //   name: 'Abdulrahman Al-Sudais',
   //   englishName: 'Abdurrahmaan As-Sudais',
   //   bitrate: 192,
   // ),
 
   // QuranReciterModel(
   //   identifier: 'ar.abdulsamad',
-  //   name: 'عبدالباسط عبدالصمد',
+  //   name: 'Abdul Basit Abdul Samad',
   //   englishName: 'Abdul Samad',
   //   bitrate: 128,
   // ),
 
   // QuranReciterModel(
   //   identifier: 'ar.shaatree',
-  //   name: 'أبو بكر الشاطري',
+  //   name: 'Abu Bakr Al-Shatri',
   //   englishName: 'Abu Bakr Ash-Shaatree',
   //   bitrate: 128,
   // ),
@@ -54,7 +54,7 @@ const List<QuranReciterModel> quranReciters = [
 
   // QuranReciterModel(
   //   identifier: 'ar.hanirifai',
-  //   name: 'هاني الرفاعي',
+  //   name: 'Hani Al-Rifai',
   //   englishName: 'Hani Rifai',
   //   bitrate: 128,
   // ),
@@ -75,7 +75,7 @@ const List<QuranReciterModel> quranReciters = [
 
   // QuranReciterModel(
   //   identifier: 'ar.ibrahimakhbar',
-  //   name: 'إبراهيم الأخضر',
+  //   name: 'Ibrahim Al-Akhdar',
   //   englishName: 'Ibrahim Akhdar',
   //   bitrate: 128,
   // ),
@@ -103,21 +103,21 @@ const List<QuranReciterModel> quranReciters = [
 
   // QuranReciterModel(
   //   identifier: 'ar.saoodshuraym',
-  //   name: 'سعود الشريم',
+  //   name: 'Saud Al-Shuraim',
   //   englishName: 'Saood Ash-Shuraym',
   //   bitrate: 128,
   // ),
 
   // QuranReciterModel(
   //   identifier: 'ar.parhizgar',
-  //   name: 'شهريار پرهیزگار',
+  //   name: 'Shahriar Parhizgar',
   //   englishName: 'Parhizgar',
   //   bitrate: 64,
   // ),
   //
   // QuranReciterModel(
   //   identifier: 'ar.aymanswoaid',
-  //   name: 'أيمن سويد',
+  //   name: 'Ayman Suwayd',
   //   englishName: 'Ayman Sowaid',
   //   bitrate: 128,
   // ),

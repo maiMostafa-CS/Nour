@@ -63,7 +63,7 @@ class TasbihCustomDhikrDeleted extends TasbihEvent {
   List<Object?> get props => [dhikrId];
 }
 
-// ✨ جديد: تغيير العدد المستهدف للذكر الحالي
+// ✨ New: change the target count for the current dhikr
 class TasbihTargetCountChanged extends TasbihEvent {
   final int newTarget;
   const TasbihTargetCountChanged(this.newTarget);

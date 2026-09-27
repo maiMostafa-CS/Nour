@@ -121,7 +121,7 @@ class _TasbihView extends StatelessWidget {
                         text: state.currentDhikrText,
                         virtue: state.currentDhikrVirtue,
                       ),
-                      // ✨ زر تعديل العدد
+                      // ✨ Edit count button
                       Positioned(
                         top: 4,
                         right: 4,

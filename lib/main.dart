@@ -137,19 +137,19 @@ Future<void> _initializeKhatmaUnlock() async {
 
   try {
     // ==========================================================
-    // 1. عالج أي pending read قبل أي حاجة
+    // 1. Handle any pending read before anything else
     // ==========================================================
 
     await _processPendingKhatmaRead();
 
     // ==========================================================
-    // 2. زامن الآية الحالية مع Native
+    // 2. Sync the current ayah with native
     // ==========================================================
 
     await _syncKhatmaUnlockAyah();
 
     // ==========================================================
-    // 3. شغّل الكارد
+    // 3. Start the card
     // ==========================================================
 
     await _restoreUnlockCard();
@@ -191,7 +191,7 @@ Future<void> _processPendingKhatmaRead() async {
       '📖 KHATMA: Processing pending read...',
     );
 
-    // نفس منطق _onNativeKhatmaRead
+    // Same logic as _onNativeKhatmaRead
     await _onNativeKhatmaRead();
 
     debugPrint(
@@ -481,7 +481,7 @@ Future<void> _onNativeKhatmaRead() async {
     );
 
 // ------------------------------------------------------------
-// 5. امسح pending_read flag (مهم عشان متتكررش)
+// 5. Clear the pending_read flag (important to avoid duplicates)
 // ------------------------------------------------------------
 
     await KhatmaUnlockSyncService.clearPendingRead();

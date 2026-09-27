@@ -48,7 +48,7 @@ class AdhanReciterTile extends StatelessWidget {
         ),
         child: Row(
           children: [
-            // ── أيقونة الميكروفون
+            // ── Microphone icon
             Container(
               width: 52.w,
               height: 52.w,
@@ -65,7 +65,7 @@ class AdhanReciterTile extends StatelessWidget {
 
             SizedBox(width: 14.w),
 
-            // ── الاسم + الحالة
+            // ── Name + status
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -90,7 +90,7 @@ class AdhanReciterTile extends StatelessWidget {
               ),
             ),
 
-            // ── زر التشغيل / الإيقاف
+            // ── Play / stop button
             IconButton(
               onPressed: onTogglePreview,
               icon: Icon(
@@ -102,7 +102,7 @@ class AdhanReciterTile extends StatelessWidget {
 
             SizedBox(width: 4.w),
 
-            // ── علامة الصح
+            // ── Checkmark
             Icon(
               isSelected
                   ? Icons.check_circle

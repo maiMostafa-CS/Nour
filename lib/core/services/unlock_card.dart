@@ -89,7 +89,7 @@ class UnlockCard {
 //     try {
 //       if (value) {
 // // ==================================================
-// // 1. التأكد من صلاحية الظهور فوق التطبيقات
+// // 1. Check overlay permission
 // // ==================================================
 //
 //         final hasPermission = await UnlockCard.hasOverlayPermission();
@@ -107,7 +107,7 @@ class UnlockCard {
 //         }
 //
 // // ==================================================
-// // 2. تشغيل خدمة كارد الآية
+// // 2. Start the ayah card service
 // // ==================================================
 //
 //         final started = await UnlockCard.start();
@@ -119,7 +119,7 @@ class UnlockCard {
 //         });
 //       } else {
 // // ==================================================
-// // إيقاف الخدمة
+// // Stop the service
 // // ==================================================
 //
 //         final stopped = await UnlockCard.stop();
@@ -164,14 +164,14 @@ class UnlockCard {
 //   Widget build(BuildContext context) {
 //     return SwitchListTile(
 //       title: const Text(
-//         'آية عند فتح الهاتف',
+//         'Ayah when unlocking the phone',
 //       ),
 //       subtitle: Text(
 //         loading
-//             ? 'جاري التحديث...'
+//             ? 'Updating...'
 //             : enabled
-//                 ? 'مفعلة'
-//                 : 'متوقفة',
+//                 ? 'Enabled'
+//                 : 'Disabled',
 //       ),
 //       value: enabled,
 //       onChanged: loading ? null : _toggle,
@@ -220,7 +220,7 @@ class _UnlockAyahSwitchState extends State<UnlockAyahSwitch> {
 
     try {
       if (value) {
-        // 1. التأكد من صلاحية الظهور فوق التطبيقات
+        // 1. Check overlay permission
         final hasPermission =
         await UnlockCard.hasOverlayPermission();
 
@@ -229,7 +229,7 @@ class _UnlockAyahSwitchState extends State<UnlockAyahSwitch> {
 
           if (!mounted) return;
 
-          // بعد الرجوع من الإعدادات نتحقق مرة أخرى
+          // After returning from settings, check again
           final permissionGranted =
           await UnlockCard.hasOverlayPermission();
 
@@ -243,7 +243,7 @@ class _UnlockAyahSwitchState extends State<UnlockAyahSwitch> {
           }
         }
 
-        // 2. تشغيل خدمة كارد الآية
+        // 2. Start the ayah card service
         final started = await UnlockCard.start();
 
         if (!mounted) return;
@@ -252,7 +252,7 @@ class _UnlockAyahSwitchState extends State<UnlockAyahSwitch> {
           enabled = started;
         });
       } else {
-        // إيقاف الخدمة
+        // Stop the service
         final stopped = await UnlockCard.stop();
 
         if (!mounted) return;

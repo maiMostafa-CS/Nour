@@ -61,7 +61,7 @@ class CountdownNotificationService {
       }
 
       // ==========================================================
-      // الوقت الحالي UTC
+      // Current time in UTC
       // ==========================================================
 
       final nowUtc = DateTime.now().toUtc();
@@ -75,7 +75,7 @@ class CountdownNotificationService {
       );
 
       // ==========================================================
-      // تحويل Entries إلى Map
+      // Convert entries to Map
       // ==========================================================
 
       final sortedEntries =
@@ -88,7 +88,7 @@ class CountdownNotificationService {
       );
 
       // ==========================================================
-      // ترتيب الصلوات حسب الوقت
+      // Sort prayers by time
       // ==========================================================
 
       sortedEntries.sort(
@@ -116,7 +116,7 @@ class CountdownNotificationService {
       );
 
       // ==========================================================
-      // البحث عن الصلاة القادمة
+      // Find the next prayer
       // ==========================================================
 
       Map<String, dynamic>? next;
@@ -150,7 +150,7 @@ class CountdownNotificationService {
       }
 
       // ==========================================================
-      // لا توجد صلاة قادمة
+      // No upcoming prayer
       // ==========================================================
 
       if (next == null) {
@@ -161,7 +161,7 @@ class CountdownNotificationService {
       }
 
       // ==========================================================
-      // بيانات الصلاة القادمة
+      // Next prayer data
       // ==========================================================
 
       final nextPrayerName =
@@ -173,7 +173,7 @@ class CountdownNotificationService {
       ).toUtc();
 
       // ==========================================================
-      // حساب الفرق
+      // Calculate the difference
       // ==========================================================
 
       final remaining =
@@ -310,24 +310,24 @@ class CountdownNotificationService {
         usesChronometer: true,
 
         // ========================================================
-        // مهم جدًا
+        // Very important
         //
         // false = elapsed time
         //
-        // وبالتالي Android يبدأ من وقت الصلاة
-        // ويعرض الزمن بالنسبة إلى الوقت الحالي.
+        // Therefore Android starts from the prayer time
+        // and displays the time relative to the current time.
         //
-        // لو الصلاة بعد ساعتين:
+        // If the prayer is two hours away:
         //
         // -02:00:00
         //
-        // حسب طريقة عرض Android للـ Chronometer.
+        // Depending on how Android displays the Chronometer.
         // ========================================================
 
         chronometerCountDown: false,
 
         // ========================================================
-        // وقت الصلاة الحقيقي كـ absolute timestamp
+        // Actual prayer time as an absolute timestamp
         // ========================================================
 
         when:

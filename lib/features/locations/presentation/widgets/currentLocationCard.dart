@@ -20,10 +20,10 @@ class CurrentLocationCard extends StatelessWidget {
   });
 
   // ═══════════════════════════════════════════════════════════
-  // التحقق من النت + GPS
+  // Check internet + GPS
   // ═══════════════════════════════════════════════════════════
   Future<bool> _checkRequirements(BuildContext context) async {
-    // 1️⃣ تحقق من الإنترنت
+    // 1️⃣ Check internet connection
     final hasInternet = await NetworkHelper.hasInternet();
     if (!hasInternet) {
       if (!context.mounted) return false;
@@ -38,14 +38,14 @@ class CurrentLocationCard extends StatelessWidget {
       );
 
       if (openSettings == true) {
-        // ⚠️ افتح إعدادات الشبكة
+        // ⚠️ Open network settings
         await Geolocator.openLocationSettings();
       }
 
       return false;
     }
 
-    // 2️⃣ تحقق من GPS
+    // 2️⃣ Check GPS
     final gpsEnabled = await Geolocator.isLocationServiceEnabled();
     if (!gpsEnabled) {
       if (!context.mounted) return false;
@@ -69,7 +69,7 @@ class CurrentLocationCard extends StatelessWidget {
   }
 
   // ═══════════════════════════════════════════════════════════
-  // Dialog موحد
+  // Unified dialog
   // ═══════════════════════════════════════════════════════════
   Future<bool?> _showDialog({
     required BuildContext context,
@@ -105,20 +105,20 @@ class CurrentLocationCard extends StatelessWidget {
   Future<void> _onTap(BuildContext context, bool isLoading) async {
     if (isLoading) return;
 
-    // 1️⃣ تحقق من النت + GPS
+    // 1️⃣ Check internet + GPS
     final ready = await _checkRequirements(context);
     if (!ready || !context.mounted) return;
 
-    // 2️⃣ اسأل المستخدم
+    // 2️⃣ Ask the user
     final shouldUpdate = await showCurrentLocationDialog(context);
     if (!shouldUpdate || !context.mounted) return;
 
-    // 3️⃣ تحقق من الصلاحيات
+    // 3️⃣ Check permissions
     final hasPermission =
     await CurrentLocationHelper.checkAndRequestPermission(context);
     if (!hasPermission || !context.mounted) return;
 
-    // 4️⃣ حدّث الموقع
+    // 4️⃣ Update the location
     context.read<LocationBloc>().add(
       const GetCurrentLocation(),
     );

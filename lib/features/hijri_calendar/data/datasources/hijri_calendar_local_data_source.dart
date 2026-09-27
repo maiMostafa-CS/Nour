@@ -178,7 +178,7 @@ class HijriCalendarLocalDataSourceImpl
         'Starting Search Date: $startDate',
       );
 
-      // نبحث في سنة كاملة + هامش
+      // Search one full year + buffer
       for (int i = 0; i < 450; i++) {
         final date = startDate.add(
           Duration(days: i),
@@ -192,7 +192,7 @@ class HijriCalendarLocalDataSourceImpl
             '🎯 Found Hijri month at: $date',
           );
 
-          // نرجع للخلف لحد أول يوم في الشهر
+          // Go backward to the first day of the month
           DateTime firstDay = date;
 
           while (true) {

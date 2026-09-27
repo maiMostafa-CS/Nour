@@ -64,7 +64,7 @@ class FeatureCard extends StatelessWidget {
                 ),
               ),
             ),
-            // إطار ذهبي رقيق
+            // Thin gold border
             Positioned.fill(
               child: Container(
                 margin: EdgeInsets.all(6.w),

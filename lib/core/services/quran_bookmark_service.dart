@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class QuranBookmarkService {
   static const String _savedPageKey = 'saved_quran_page';
 
-  /// حفظ الصفحة
+  /// Save page
   static Future<bool> savePage(int pageNumber) async {
     final prefs = await SharedPreferences.getInstance();
 
@@ -13,21 +13,21 @@ class QuranBookmarkService {
     );
   }
 
-  /// جلب الصفحة المحفوظة
+  /// Get saved page
   static Future<int?> getSavedPage() async {
     final prefs = await SharedPreferences.getInstance();
 
     return prefs.getInt(_savedPageKey);
   }
 
-  /// حذف الصفحة المحفوظة
+  /// Delete saved page
   static Future<bool> removeSavedPage() async {
     final prefs = await SharedPreferences.getInstance();
 
     return prefs.remove(_savedPageKey);
   }
 
-  /// هل توجد صفحة محفوظة؟
+  /// Is a saved page available?
   static Future<bool> hasSavedPage() async {
     final prefs = await SharedPreferences.getInstance();
 

@@ -5,7 +5,7 @@ class PrayerSchedulerIds {
 
   static final DateTime _epoch = DateTime(2020, 1, 1);
 
-  /// رقم اليوم منذ تاريخ ثابت
+  /// Day number since a fixed date
   static int _dayNumber(DateTime date) {
     final normalizedDate = DateTime(
       date.year,
@@ -16,7 +16,7 @@ class PrayerSchedulerIds {
     return normalizedDate.difference(_epoch).inDays;
   }
 
-  /// إنشاء ID فريد لكل صلاة
+  /// Create a unique ID for each prayer
   static int _prayerId(
       DateTime date,
       int prayerIndex,

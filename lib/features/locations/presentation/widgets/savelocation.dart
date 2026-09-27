@@ -21,15 +21,15 @@ async {
     isCurrentLocation ? 'auto' : 'manual',
   );
 
-  // 🟢 المفاتيح اللي _onLoadHome بتقرأ منها — استخدم نفس الأسماء بالظبط
+  // 🟢 Keys read by _onLoadHome — use exactly the same names
   await prefs.setDouble('prayer_manual_latitude', latitude);
   await prefs.setDouble('prayer_manual_longitude', longitude);
 
-  // 🟢 الموقع المجدول
+  // 🟢 Scheduled location
   await prefs.setDouble(prayerScheduledLatitudePrefsKey, latitude);
   await prefs.setDouble(prayerScheduledLongitudePrefsKey, longitude);
 
-  // 🟢 آخر موقع
+  // 🟢 Last location
   await prefs.setDouble(prayerLastLatitudePrefsKey, latitude);
   await prefs.setDouble(prayerLastLongitudePrefsKey, longitude);
 

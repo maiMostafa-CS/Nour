@@ -11,7 +11,7 @@ import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
-import '../../../../features/adhan_settings/domain/repositories/ adhan_settings_repository.dart';
+import '../../../../features/adhan_settings/domain/repositories/adhan_settings_repository.dart';
 import '../../../../features/adhan_sound/data/datasources/adhan_local_data_source.dart';
 import '../../../../features/iqama_setting/domain/repositories/iqama_settings_repository.dart';
 import '../../../../features/prayer_times/data/datasources/prayer_local_data_source.dart';
@@ -22,12 +22,12 @@ import 'background/prayer_background_callbacks.dart';
 import 'config/prayer_scheduler_config.dart';
 import 'data/datasources/prayer_notification_local_data_source_impl.dart';
 import 'notifications/countdown_notification_service.dart';
-/// عدد الأيام اللي بنحافظ على جدولتها قدام دايماً (rolling window).
+/// Number of days always kept scheduled ahead (rolling window).
 const int kPrayerNotificationWindowDays = 4;
 const int kPrayerMaintenanceAlarmId = 909001;
 
 class AdhanSchedulerService {
-  // ❌ احذف السطر ده
+  // ❌ Delete this line
   // final AlarmIdTracker _alarmIdTracker;
 
   static final AdhanSchedulerService instance =
@@ -102,9 +102,9 @@ class AdhanSchedulerService {
     await CountdownNotificationService.showNextPrayerCountdown();
   }
 
-  /// يجدول نافذة [kPrayerNotificationWindowDays] يوم (بدل 30 يوم زي الأول).
-  /// نافذة قصيرة + auto-renew أحسن من نافذة طويلة، لأنها بتحدّث نفسها
-  /// من إحداثيات جديدة أول بأول من غير ما تحمل جدولة قديمة لشهر كامل.
+  /// Schedules a [kPrayerNotificationWindowDays]-day window (instead of 30 days as before).
+  /// A short window + auto-renew is better than a long window because it updates itself
+  /// from fresh coordinates without carrying an outdated month-long schedule.
   Future<void> schedulePrayerAdhan(
       PrayerTimesEntity prayerTimes, {
         required double latitude,
@@ -129,10 +129,10 @@ class AdhanSchedulerService {
     await _dataSource.cancelAll();
   }
 
-  /// إعادة جدولة كل إشعارات الصلاة بعد تغيير إعدادات الإقامة
-  /// أو أي إعداد يؤثر على الجدولة.
+  /// Reschedule all prayer notifications after changing Iqama settings
+  /// or any setting that affects scheduling.
   ///
-  /// تعتمد على آخر إحداثيات محفوظة في SharedPreferences.
+  /// Uses the latest coordinates saved in SharedPreferences.
   Future<void> reschedulePrayerNotifications() async {
     prayerSchedulerLog(
       '════════════════════════════════════',
@@ -166,17 +166,17 @@ class AdhanSchedulerService {
         return;
       }
 
-      // 1️⃣ إلغاء الجدول القديم بالكامل
+      // 1️⃣ Cancel the entire old schedule
       await _dataSource.cancelAll();
 
       prayerSchedulerLog(
         '🛑 OLD PRAYER SCHEDULE CANCELLED',
       );
 
-      // 2️⃣ إعادة بناء جدول الـ 4 أيام
-      // _dataSource يستخدم repositories الحالية،
-      // ومنها IqamaSettingsRepository، وبالتالي
-      // سيقرأ القيمة الجديدة التي تم حفظها للتو.
+      // 2️⃣ Rebuild the 4-day schedule
+      // _dataSource uses the current repositories,
+      // including IqamaSettingsRepository, so
+      // it will read the new value that was just saved.
       await _dataSource.ensureWindowScheduled(
         latitude: latitude,
         longitude: longitude,
@@ -218,13 +218,13 @@ class AdhanSchedulerService {
     );
   }
 
-  /// نقطة الدخول الحقيقية لـ "auto-renew": بتتسجل مرة واحدة بس (عادةً
-  /// من initialize()) وبتفضل شغالة طول عمر الـ isolate — بما فيه
-  /// الـ isolate اللي بيفتحه Foreground Service بتاع الـ alarm package
-  /// وقت ما أي Alarm يرن، حتى لو التطبيق نفسه مقفول من وجهة نظر المستخدم.
+  /// The actual "auto-renew" entry point: registered only once (usually
+  /// from initialize()) and remains active for the lifetime of the isolate — including
+  /// the isolate started by the alarm package Foreground Service
+  /// when any Alarm rings, even if the app appears closed to the user.
   ///
-  /// كل ما أي أذان/تنبيه/إقامة يرن، بتقرا آخر إحداثيات محفوظة وتنادي
-  /// onAlarmFired عشان تمد النافذة يوم زيادة لو محتاجة.
+  /// Whenever an adhan/reminder/iqama rings, it reads the latest saved coordinates and calls
+  /// onAlarmFired to extend the window by one day when needed.
   /// Registers the ringing listener once. It only handles reminder cleanup.
   /// Scheduling is intentionally NOT renewed while an alarm is firing, because
   /// cancelling/rebuilding alarms during playback can cancel upcoming prayers.
@@ -398,9 +398,9 @@ class AdhanSchedulerService {
     // ============================================================
     // 8️⃣ Auto-Renew Listener
     //
-    // مهم جدًا:
-    // لازم يتسجل بعد Alarm.init()
-    // وقبل أي جدولة فعلية.
+    // Very important:
+    // It must be registered after Alarm.init()
+    // and before any actual scheduling.
     // ============================================================
 
     registerAutoRenewListener();

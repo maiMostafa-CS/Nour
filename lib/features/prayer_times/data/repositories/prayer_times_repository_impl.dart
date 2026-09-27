@@ -19,7 +19,7 @@ class PrayerNotificationRepositoryImpl
     required double longitude,
     int days = _windowDays,
   }) {
-    // أول مرة (أو بعد تغيير الموقع): تأكد إن النافذة مجدولة من الصفر.
+    // First time (or after a location change): ensure the window is scheduled from scratch.
     return _localDataSource.ensureWindowScheduled(
       latitude: latitude,
       longitude: longitude,
@@ -36,9 +36,9 @@ class PrayerNotificationRepositoryImpl
     required double longitude,
     int days = _windowDays,
   }) async {
-    // إعادة جدولة كاملة (مثلاً بعد تغيير الموقع): امسح كل حاجة قديمة
-    // الأول عشان محدش يفضل مجدول بإحداثيات غلط، وبعدين ابني النافذة
-    // من جديد بالإحداثيات الجديدة.
+    // Full reschedule (for example, after a location change): clear everything old
+    // first so nothing remains scheduled with incorrect coordinates, then rebuild the window
+    // again using the new coordinates.
     await _localDataSource.cancelAll();
     return _localDataSource.ensureWindowScheduled(
       latitude: latitude,
@@ -53,9 +53,9 @@ class PrayerNotificationRepositoryImpl
     required double longitude,
     int days = _windowDays,
   }) {
-    // بينده من الـ Alarm.ringing listener في main.dart كل ما أذان/تنبيه/
-    // إقامة يرن. بيكمّل النافذة يوم زيادة تلقائياً (auto-renew) من غير
-    // ما نمسح حاجة، عكس reschedule اللي بتمسح وتبني من الأول.
+    // Called by the Alarm.ringing listener in main.dart whenever an adhan/reminder/
+    // iqama rings. It automatically extends the window by one day (auto-renew) without
+    // clearing anything, unlike reschedule which clears and rebuilds from scratch.
     return _localDataSource.onAlarmFired(
       latitude: latitude,
       longitude: longitude,

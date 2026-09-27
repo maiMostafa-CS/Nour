@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:islamic_app/features/quran/presentation/widgets/reciter_selection/%20reciter_selection_sheet.dart';
+import 'package:islamic_app/features/quran/presentation/widgets/reciter_selection/reciter_selection_sheet.dart';
 import 'package:qcf_quran/qcf_quran.dart';
 
 import '../../../../core/data/quran/quran_helpers.dart';
@@ -53,20 +53,20 @@ class _QuranPageContentState extends State<QuranPageContent>
   int? _currentJuz;
 
   // ============================================================
-  // الآية المحددة
+  // Selected ayah
   // ============================================================
 
   int? _selectedSurahNumber;
   int? _selectedVerseNumber;
 
   // ============================================================
-  // آخر عملية تحتاج إنترنت (لزر "إعادة المحاولة")
+  // Last operation requiring internet (for the "Retry" button)
   // ============================================================
 
   VoidCallback? _lastRetryAction;
 
   // ============================================================
-  // فلاش الآية
+  // Ayah flash
   // ============================================================
 
   AnimationController? _flashController;
@@ -83,7 +83,7 @@ class _QuranPageContentState extends State<QuranPageContent>
     );
 
     // ==========================================================
-    // أنيميشن الفلاش
+    // Flash animation
     // ==========================================================
 
     final controller = AnimationController(
@@ -155,7 +155,7 @@ class _QuranPageContentState extends State<QuranPageContent>
         child: Stack(
           children: [
             // ====================================================
-            // المصحف
+            // Mushaf
             // ====================================================
 
             PageviewQuran(
@@ -196,7 +196,7 @@ class _QuranPageContentState extends State<QuranPageContent>
               },
 
               // ==================================================
-              // تغيير الصفحة
+              // Change page
               // ==================================================
 
               onPageChanged: (pageNumber) {
@@ -256,7 +256,7 @@ class _QuranPageContentState extends State<QuranPageContent>
           reciterName: selectedReciter?.name,
 
           // ======================================================
-          // تشغيل الآية
+          // Play ayah
           // ======================================================
 
           onListen: () {
@@ -283,7 +283,7 @@ class _QuranPageContentState extends State<QuranPageContent>
               globalAyahNumber: globalAyahNumber,
             );
 
-            // لو مفيش نت، زر "إعادة المحاولة" يعيد التشغيل
+            // If there is no internet, the "Retry" button runs the operation again
             _lastRetryAction = () => bloc.add(playEvent);
 
             bloc.add(playEvent);
@@ -310,7 +310,7 @@ class _QuranPageContentState extends State<QuranPageContent>
           },
 
           // ======================================================
-          // اختيار القارئ
+          // Select reciter
           // ======================================================
 
           onReciter: () {
@@ -318,7 +318,7 @@ class _QuranPageContentState extends State<QuranPageContent>
           },
 
           // ======================================================
-          // التفسير
+          // Tafsir
           // ======================================================
 
           onTafsir: () {
@@ -326,7 +326,7 @@ class _QuranPageContentState extends State<QuranPageContent>
           },
 
           // ======================================================
-          // إغلاق
+          // Close
           // ======================================================
 
           onClose: () {
@@ -349,7 +349,7 @@ class _QuranPageContentState extends State<QuranPageContent>
   }
 
   // ============================================================
-  // بيانات الصفحة
+  // Page data
   // ============================================================
 
   void _reportPageInfo(int pageNumber) {
@@ -455,7 +455,7 @@ class _QuranPageContentState extends State<QuranPageContent>
 
     final bloc = context.read<QuranIndexBloc>();
 
-    // فحص الإنترنت قبل فتح الـ BottomSheet
+    // Check internet connection before opening the BottomSheet
     final online = await _hasInternet();
 
     if (!context.mounted) return;
@@ -600,7 +600,7 @@ class _QuranPageContentState extends State<QuranPageContent>
                             // ==================================================
 
                             else ...[
-                                // اختيار كتاب التفسير
+                                // Select tafsir book
                                 Text(
                                   'كتاب التفسير',
                                   style: TextStyle(
@@ -657,7 +657,7 @@ class _QuranPageContentState extends State<QuranPageContent>
 
                                 SizedBox(height: 20.h),
 
-                                // اسم الكتاب الحالي
+                                // Current book name
                                 if (selectedBook != null)
                                   Container(
                                     padding: EdgeInsets.all(12.w),
@@ -687,7 +687,7 @@ class _QuranPageContentState extends State<QuranPageContent>
 
                                 SizedBox(height: 16.h),
 
-                                // التفسير
+                                // Tafsir
                                 Expanded(
                                   child: isLoading
                                       ? const Center(

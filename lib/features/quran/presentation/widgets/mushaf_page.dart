@@ -96,7 +96,7 @@ class MushafPageState extends State<MushafPage> {
   }
 
   // ============================================================
-  // تحديث معلومات الصفحة
+  // Update page information
   // ============================================================
 
   void _updatePageInfo({

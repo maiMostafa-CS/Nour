@@ -70,12 +70,12 @@ class AdhanBloc extends Bloc<AdhanEvent, AdhanState> {
       return;
     }
 
-    // ← تشخيص: نطبع اللي الـ UI بعته بالظبط
+    // ← Diagnostic: print exactly what the UI sent
     debugPrint(
       '🎙️ [AdhanBloc:$prayerName] SELECT EVENT | reciterId=${event.reciterId} | prev=${currentState.selectedReciterId}',
     );
 
-    // ← لو نفس القيمة، متعملش حاجة (يمنع الـ emits المتكررة)
+    // ← If the value is the same, do nothing (prevents repeated emits)
     if (currentState.selectedReciterId == event.reciterId) {
       debugPrint(
         '🎙️ [AdhanBloc:$prayerName] SKIP — same value (${event.reciterId})',
@@ -84,10 +84,10 @@ class AdhanBloc extends Bloc<AdhanEvent, AdhanState> {
     }
 
     try {
-      // 1. احفظ الاختيار
+      // 1. Save the selection
       await saveSelectedAdhan(prayerName, event.reciterId);
 
-      // ← تشخيص: نأكد إن اللي اتحفظ فعلاً هو ده
+      // ← Diagnostic: confirm that this is what was actually saved
       final verified = await getSelectedAdhan(prayerName);
       debugPrint(
         '🎙️ [AdhanBloc:$prayerName] SAVED | requested=${event.reciterId} | verified=$verified',
@@ -99,7 +99,7 @@ class AdhanBloc extends Bloc<AdhanEvent, AdhanState> {
         );
       }
 
-      // 2. حدّث الـ state الأول
+      // 2. Update the state first
       emit(
         AdhanLoaded(
           reciters: currentState.reciters,
@@ -107,7 +107,7 @@ class AdhanBloc extends Bloc<AdhanEvent, AdhanState> {
         ),
       );
 
-      // 3. بعدين ابدأ إعادة الجدولة (بعد ما الحفظ خلص والـ state اتحدّث)
+      // 3. Then start rescheduling (after saving and updating the state)
       unawaited(_rescheduleAdhansWithNewReciter(event.reciterId));
     } catch (e, st) {
       debugPrint('❌ [AdhanBloc:$prayerName] save failed: $e');

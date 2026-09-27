@@ -9,7 +9,7 @@ class CustomDhikrStorage {
   static const String _customKey = 'custom_adhkar';
   static const String _overridesKey = 'adhkar_overrides'; // ✨ جديد
 
-  // ===== الأذكار المخصصة =====
+  // ===== Custom adhkar =====
   Future<List<TasbihDhikr>> loadCustomAdhkar() async {
     final prefs = await SharedPreferences.getInstance();
     final raw = prefs.getStringList(_customKey) ?? [];
@@ -27,14 +27,14 @@ class CustomDhikrStorage {
     await prefs.setStringList(_customKey, raw);
   }
 
-  // ===== تعديلات الأذكار الافتراضية =====
-  /// يحفظ فقط الأذكار الافتراضية التي تم تعديل targetCount الخاص بها
+  // ===== Default adhkar modifications =====
+  /// Saves only default adhkar whose targetCount was modified
   Future<void> saveModifiedDefaults(List<TasbihDhikr> allAdhkar) async {
     final prefs = await SharedPreferences.getInstance();
     final modified = <Map<String, dynamic>>[];
 
-    // الأذكار الافتراضية المعرّفة في التطبيق
-    // نمررها كنطاق للتحقق
+    // Default adhkar defined in the app
+    // Pass them as a range for validation
     for (final dhikr in allAdhkar.where((d) => !d.isCustom)) {
       modified.add({
         'id': dhikr.id,
@@ -46,7 +46,7 @@ class CustomDhikrStorage {
     await prefs.setStringList(_overridesKey, raw);
   }
 
-  /// يُرجع خريطة: id → targetCount للأذكار الافتراضية المعدّلة
+  /// Returns a map: id → targetCount for modified default adhkar
   Future<Map<int, int>> loadOverrides() async {
     final prefs = await SharedPreferences.getInstance();
     final raw = prefs.getStringList(_overridesKey) ?? [];

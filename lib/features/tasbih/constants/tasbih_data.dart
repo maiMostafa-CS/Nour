@@ -48,6 +48,6 @@ class TasbihData {
 
   static const List<TasbihDhikr> adhkar = defaultAdhkar;
 
-  // ✨ خيارات سريعة للعدد المستهدف
+  // ✨ Quick target count options
   static const List<int> targetPresets = [10, 33, 50, 100, 500, 1000];
 }

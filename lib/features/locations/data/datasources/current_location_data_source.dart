@@ -11,7 +11,7 @@ class CurrentLocationDataSourceImpl implements CurrentLocationDataSource {
   Future<Position> getCurrentLocation() async {
     try {
       // ═══════════════════════════════════════════════════════
-      // 1. التحقق من الـ service
+      // 1. Check the service
       // ═══════════════════════════════════════════════════════
       final serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
@@ -20,7 +20,7 @@ class CurrentLocationDataSourceImpl implements CurrentLocationDataSource {
       debugPrint('📍 Location service enabled ✅');
 
       // ═══════════════════════════════════════════════════════
-      // 2. التحقق من الصلاحيات
+      // 2. Check permissions
       // ═══════════════════════════════════════════════════════
       LocationPermission permission = await Geolocator.checkPermission();
       debugPrint('📍 Permission: $permission');
@@ -36,7 +36,7 @@ class CurrentLocationDataSourceImpl implements CurrentLocationDataSource {
       }
 
       // ═══════════════════════════════════════════════════════
-      // 3. جرّب آخر موقع معروف (سريع جداً)
+      // 3. Try the last known location (very fast)
       // ═══════════════════════════════════════════════════════
       debugPrint('📍 Trying last known position...');
       Position? position = await Geolocator.getLastKnownPosition();
@@ -52,7 +52,7 @@ class CurrentLocationDataSourceImpl implements CurrentLocationDataSource {
       debugPrint('⚠️ No last known position → using stream');
 
       // ═══════════════════════════════════════════════════════
-      // 4. استخدم Stream بدل getCurrentPosition (أكثر استقرار)
+      // 4. Use Stream instead of getCurrentPosition (more stable)
       // ═══════════════════════════════════════════════════════
       debugPrint('📍 GETTING CURRENT GPS LOCATION via stream...');
 

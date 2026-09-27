@@ -8,7 +8,7 @@
 //     minutes: 15,
 //   );
 //
-//   /// جدولة إقامة الصلاة بعد الأذان بـ 15 دقيقة
+//   /// Schedule iqama 15 minutes after adhan
 //   static Future<void> scheduleIqama({
 //     required int id,
 //     required String prayerName,
@@ -26,7 +26,7 @@
 //           'isAfter: ${iqamaTime.isAfter(now)}',
 //     );
 //
-//     // لو وقت الإقامة عدى
+//     // If the iqama time has passed
 //     if (!iqamaTime.isAfter(now)) {
 //       debugPrint(
 //         '⏭️ Iqama $id skipped because time has passed',
@@ -39,7 +39,7 @@
 //
 //       dateTime: iqamaTime,
 //
-//       // صوت الإقامة
+//       // Iqama audio
 //       assetAudioPath: 'assets/adhan-mp3/Iqama.mp3',
 //
 //       loopAudio: false,
@@ -57,9 +57,9 @@
 //       ),
 //
 //       notificationSettings: NotificationSettings(
-//         title: 'حان الآن وقت إقامة صلاة $prayerName',
-//         body: 'حان وقت الإقامة',
-//         stopButton: 'إيقاف الإقامة',
+//         title: 'It is now time for iqama of $prayerName',
+//         body: 'It is time for iqama',
+//         stopButton: 'Stop iqama',
 //         icon: 'ic_mosque_notification',
 //         androidStopAlarmOnDismiss: true,
 //       ),
@@ -88,7 +88,7 @@
 //     );
 //   }
 //
-//   /// إلغاء إقامة صلاة معينة
+//   /// Cancel a specific iqama
 //   static Future<void> cancelIqama(int prayerNumber) async {
 //     final id = prayerNumber + iqamaIdOffset;
 //
@@ -99,7 +99,7 @@
 //     );
 //   }
 //
-//   /// إلغاء جميع الإقامات
+//   /// Cancel all iqamas
 //   static Future<void> cancelAllIqamas() async {
 //     for (int prayerNumber = 1; prayerNumber <= 5; prayerNumber++) {
 //       await cancelIqama(prayerNumber);

@@ -59,7 +59,7 @@ class AyahActions extends StatelessWidget {
         child: Row(
           children: [
 // ==================================================
-// رقم الآية
+// Ayah number
 // ==================================================
 
             Container(
@@ -115,7 +115,7 @@ class AyahActions extends StatelessWidget {
             SizedBox(width: 4.w),
 
 // ==================================================
-// استماع / إيقاف مؤقت / استكمال
+// Play / Pause / Resume
 // ==================================================
 
             AyahActionButton(
@@ -138,7 +138,7 @@ class AyahActions extends StatelessWidget {
             ),
 
 // ==================================================
-// اختيار القارئ
+// Select reciter
 // ==================================================
 
             AyahActionButton(
@@ -149,7 +149,7 @@ class AyahActions extends StatelessWidget {
             ),
 
 // ==================================================
-// التفسير
+// Tafsir
 // ==================================================
 
             AyahActionButton(
@@ -160,7 +160,7 @@ class AyahActions extends StatelessWidget {
             ),
 
 // ==================================================
-// إغلاق
+// Close
 // ==================================================
 
             AyahActionButton(

@@ -65,8 +65,8 @@ class CurrentLocationHelper {
         }
 
 // ========================================================
-// 3. المستخدم رجع من Settings
-//    نتحقق مرة أخرى
+// 3. User returned from Settings
+//    Check again
 // ========================================================
 
         serviceEnabled = await Geolocator.isLocationServiceEnabled();

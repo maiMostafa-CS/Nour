@@ -206,7 +206,7 @@ class _HomePageState extends State<HomePage> {
 
                 SizedBox(height: 22.h),
 
-                // ─── Grid الميزات ───
+                // ─── Feature grid ───
                 BuildMainGrid(),
 
                 SizedBox(height: 14.h),
@@ -219,7 +219,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   // ═══════════════════════════════════════════════════════════
-  // Top Bar (المدينة + زرار الموقع)
+  // Top Bar (city + location button)
   // ═══════════════════════════════════════════════════════════
   Widget _buildTopBar(BuildContext context, HomeState state) {
     return Container(
@@ -259,7 +259,7 @@ class _HomePageState extends State<HomePage> {
 
           SizedBox(width: 8.w),
 
-          // اسم المدينة
+          // City name
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -301,7 +301,7 @@ class _HomePageState extends State<HomePage> {
   Widget _buildSectionTitle(String title) {
     return Row(
       children: [
-        // خط ذهبي رفيع
+        // Thin gold line
         Container(
           width: 4.w,
           height: 22.h,

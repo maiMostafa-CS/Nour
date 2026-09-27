@@ -153,14 +153,14 @@ class TasbihBloc extends Bloc<TasbihEvent, TasbihState> {
     updatedAdhkar[state.currentDhikrIndex] =
         current.copyWith(targetCount: event.newTarget);
 
-    // حفظ التعديلات
+    // Save changes
     if (current.isCustom) {
       await _storage.saveCustomAdhkar(updatedAdhkar);
     } else {
       await _storage.saveModifiedDefaults(updatedAdhkar);
     }
 
-    // إذا العدد الجديد أقل من الحالي → نضبط الحالي
+    // If the new count is lower than the current count, adjust the current count
     final newCurrentCount = state.currentCount > event.newTarget
         ? event.newTarget
         : state.currentCount;

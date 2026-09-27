@@ -1,13 +1,13 @@
-/// خدمة تنظيف المنبهات اليتيمة
+/// Orphan alarm cleanup service
 ///
-/// الاستخدام:
+/// Usage:
 /// ```dart
 /// final cleaner = getIt<OrphanAlarmCleaner>();
 /// await cleaner.cleanOrphans();
 /// ```
 ///
-/// ⚠️ نادِ `cleanOrphans()` في `main()` قبل `runApp` مباشرة،
-///    وقبل أي `forceReschedule`.
+/// ⚠️ Call `cleanOrphans()` in `main()` immediately before `runApp`,
+///    and before any `forceReschedule`.
 library alarm_cleanup_service;
 
 export 'alarm_id_tracker.dart';

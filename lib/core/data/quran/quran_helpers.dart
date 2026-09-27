@@ -19,7 +19,7 @@ int getGlobalAyahNumber(
     int surahNumber,
     int verseNumber,
     ) {
-  // عدد الآيات في كل سورة بالترتيب
+  // Number of ayahs in each surah in order
   const ayahCounts = <int>[
     7,
     286,

@@ -5,17 +5,17 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:just_audio/just_audio.dart';
 
-/// Service مسؤول عن تشغيل preview للمذنين.
-/// بيعزل الـ AudioPlayer عن الـ Widget عشان الكود يبقى أنضف.
+/// Service responsible for playing reciter previews.
+/// Keeps the AudioPlayer separate from the Widget for cleaner code.
 class AdhanPreviewPlayer {
   final AudioPlayer _player = AudioPlayer();
 
   StreamSubscription<PlayerState>? _stateSub;
 
-  /// الـ callback بيتنادى لما الصوت يخلص
+  /// The callback is called when the audio finishes
   VoidCallback? onCompleted;
 
-  /// الـ ID اللي شغال حالياً (أو null)
+  /// The currently playing ID (or null)
   String? _currentId;
   String? get currentId => _currentId;
   bool get isPlaying => _player.playing;
@@ -35,13 +35,13 @@ class AdhanPreviewPlayer {
     );
   }
 
-  /// شغّل معرّف معين، أو وقّف اللي شغال.
-  /// بيرجّع true لو بدأ تشغيل جديد، false لو وقف.
+  /// Play a specific ID, or stop the currently playing one.
+  /// Returns true if new playback started, false if it stopped.
   Future<bool> toggle({
     required String id,
     required String assetPath,
   }) async {
-    // لو نفس اللي شغال → وقّف
+    // If the same item is playing → stop it
     if (_currentId == id) {
       await stop();
       return false;
@@ -52,7 +52,7 @@ class AdhanPreviewPlayer {
       await _player.setAsset(assetPath);
 
       _currentId = id;
-      // 🚨 مهم: unawaited عشان play() بتستنى لحد ما الصوت يخلص
+      // 🚨 Important: use unawaited because play() waits until the audio finishes
       unawaited(_player.play());
 
       return true;

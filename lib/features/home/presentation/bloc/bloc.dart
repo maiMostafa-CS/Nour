@@ -54,7 +54,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
     try {
       // ═══════════════════════════════════════════════════════
-      // 1. اقرأ كل القيم المحفوظة
+      // 1. Read all saved values
       // ═══════════════════════════════════════════════════════
       final city = _prefs.getString(_cityKey) ?? state.cityName;
       final timezone = _prefs.getString(_timezoneKey) ?? state.timezone;
@@ -76,7 +76,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       String resolvedTimezone = timezone;
 
       // ═══════════════════════════════════════════════════════
-      // 2. جرّب الموقع المحفوظ الأول (سواء manual أو auto)
+      // 2. Try the saved location first (manual or auto)
       // ═══════════════════════════════════════════════════════
       final savedLat = _prefs.getDouble(_manualLatKey) ??
           _prefs.getDouble(prayerLastLatitudePrefsKey);
@@ -84,7 +84,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           _prefs.getDouble(prayerLastLongitudePrefsKey);
 
       if (savedLat != null && savedLng != null) {
-        // ✅ فيه موقع محفوظ → استخدمه فوراً
+        // ✅ A saved location exists → use it immediately
         latitude = savedLat;
         longitude = savedLng;
 
@@ -95,7 +95,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         debugPrint('   timezone:  "$resolvedTimezone"');
         debugPrint('   (NO GPS NEEDED)');
       } else {
-        // ⚠️ أول مرة → محتاج GPS
+        // ⚠️ First time → GPS is required
         debugPrint('📡 NO SAVED LOCATION → fetching GPS...');
 
         CurrentLocationEntity location;
@@ -129,7 +129,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           debugPrint('❌ GPS FAILED: $e');
           debugPrint('$stackTrace');
 
-          // Fallback للـ default
+          // Fallback to the default
           latitude = state.latitude;
           longitude = state.longitude;
 
@@ -138,7 +138,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       }
 
       // ═══════════════════════════════════════════════════════
-      // 3. جدول الأذان
+      // 3. Schedule adhan
       // ═══════════════════════════════════════════════════════
       debugPrint('🚀 CALLING _loadAndSchedule:');
       debugPrint('   latitude:  $latitude');
@@ -290,15 +290,15 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     await _prefs.setDouble(_manualLatKey, location.latitude);
     await _prefs.setDouble(_manualLngKey, location.longitude);
 
-    // ✅ المفتاح اللي cancelAll بتقرأ منه
+    // ✅ The key read by cancelAll
     await _prefs.setDouble(prayerScheduledLatitudePrefsKey, location.latitude);
     await _prefs.setDouble(prayerScheduledLongitudePrefsKey, location.longitude);
 
-    // (اختياري) سيبهم لو محتاجينهم في مكان تاني
+    // (Optional) Keep them if they are needed elsewhere
     await _prefs.setDouble(prayerLastLatitudePrefsKey, location.latitude);
     await _prefs.setDouble(prayerLastLongitudePrefsKey, location.longitude);
 
-    // ✅ VERIFY من نفس المفاتيح
+    // ✅ VERIFY using the same keys
     final checkLat = _prefs.getDouble(prayerScheduledLatitudePrefsKey);
     final checkLng = _prefs.getDouble(prayerScheduledLongitudePrefsKey);
 
@@ -338,10 +338,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       debugPrint('   city:      "${location.city}"');
       debugPrint('   timezone:  "${location.timezone}"');
 
-      // احفظ الموقع الجديد
+      // Save the new location
       await _saveAutoLocation(location);
 
-      // جدول الأذان من جديد
+      // Schedule adhan again
       await _loadAndSchedule(
         emit,
         latitude: location.latitude,

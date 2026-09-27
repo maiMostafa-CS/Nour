@@ -15,7 +15,7 @@ abstract class AdhanLocalDataSource {
 
   Future<String?> getSelectedReciterId(String prayerName);
 
-  /// يرجّع المؤذن المختار كـ entity كاملة (أو null لو مفيش اختيار)
+  /// Returns the selected reciter as a complete entity (or null if none is selected)
   Future<AdhanReciterEntity?> getSelectedReciter(String prayerName);
 
   Future<void> saveSelectedReciter(

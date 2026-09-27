@@ -62,13 +62,13 @@ class KhatmaLocalDataSourceImpl implements KhatmaLocalDataSource {
   Future<KhatmaProgressModel> markCurrentAyahAsRead() async {
     final progress = await getProgress();
 
-    // الختمة انتهت
+    // Khatma completed
     if (progress.currentAyah > totalAyahs) {
       return progress;
     }
 
     // ========================================================
-    // بداية الختمة
+    // Khatma start
     // ========================================================
 
     if (!prefs.containsKey(_startedAtKey)) {
@@ -79,7 +79,7 @@ class KhatmaLocalDataSourceImpl implements KhatmaLocalDataSource {
     }
 
     // ========================================================
-    // تحديث التقدم
+    // Update progress
     // ========================================================
 
     final newCurrentAyah =
@@ -99,7 +99,7 @@ class KhatmaLocalDataSourceImpl implements KhatmaLocalDataSource {
     );
 
     // ========================================================
-    // حفظ إجمالي القراءة في الأسبوع الحالي
+    // Save total reading for the current week
     // ========================================================
 
     await _saveCurrentWeekSnapshot(
@@ -187,7 +187,7 @@ class KhatmaLocalDataSourceImpl implements KhatmaLocalDataSource {
       date.day,
     );
 
-    // الاثنين = بداية الأسبوع
+    // Monday = start of week
     final daysFromMonday =
         dateOnly.weekday - DateTime.monday;
 
@@ -245,7 +245,7 @@ class KhatmaLocalDataSourceImpl implements KhatmaLocalDataSource {
     final progress =
     await getProgress();
 
-    // لم تبدأ الختمة بعد
+    // Khatma has not started yet
     if (progress.readAyahs == 0) {
       return const KhatmaWeeklyReportModel(
         totalAyahs: 0,
@@ -265,7 +265,7 @@ class KhatmaLocalDataSourceImpl implements KhatmaLocalDataSource {
             progress.readAyahs;
 
     // ========================================================
-    // حساب قراءة هذا الأسبوع فقط
+    // Calculate this week's reading only
     // ========================================================
 
     int previousWeekTotal = 0;
@@ -288,23 +288,23 @@ class KhatmaLocalDataSourceImpl implements KhatmaLocalDataSource {
     currentWeekTotal - previousWeekTotal;
 
     // ========================================================
-    // رقم الأسبوع منذ بداية الختمة
+    // Week number since Khatma started
     // ========================================================
 
     final weekNumber =
     _getKhatmaWeekNumber();
 
     return KhatmaWeeklyReportModel(
-    // إجمالي الآيات منذ بداية الختمة
+    // Total ayahs since Khatma started
     totalAyahs: progress.readAyahs,
 
-    // عدد الآيات الجديدة في الأسبوع الحالي
+    // Number of new ayahs in the current week
     currentWeekAyahs:
     currentWeekAyahs < 0
     ? 0
         : currentWeekAyahs,
 
-    // رقم الأسبوع
+    // Week number
     weekNumber: weekNumber,
     );
   }

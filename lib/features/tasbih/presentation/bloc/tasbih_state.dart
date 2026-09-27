@@ -25,7 +25,7 @@ class TasbihState extends Equatable {
     this.justCompletedRound = false,
   });
 
-  // ✨ الآن targetCount يأتي من الذكر الحالي نفسه
+  // ✨ targetCount now comes from the current dhikr itself
   int get targetCount {
     if (adhkar.isEmpty) return 100;
     return adhkar[currentDhikrIndex].targetCount;

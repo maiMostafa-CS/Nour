@@ -34,7 +34,7 @@ class _NextPrayerCardState extends State<NextPrayerCard>
   void initState() {
     super.initState();
 
-    // ─── Timer للـ countdown ───
+    // ─── Countdown timer ───
     _timer = Timer.periodic(
       const Duration(seconds: 1),
           (_) {
@@ -101,7 +101,7 @@ class _NextPrayerCardState extends State<NextPrayerCard>
     }
   }
 
-  // ✨ خط زخرفي جانبي للآية
+  // ✨ Decorative side line for the ayah
   Widget _ornamentLine() {
     return Container(
       width: 35.w,
@@ -165,11 +165,11 @@ class _NextPrayerCardState extends State<NextPrayerCard>
       nextPrayerName = 'الفجر';
     }
 
-    // ─── المؤذن ───
+    // ─── Reciter ───
     final nextMuezzin = widget.muezzins?[nextPrayerName]?.trim();
     final hasMuezzin = nextMuezzin != null && nextMuezzin.isNotEmpty;
 
-    // ─── العد التنازلي ───
+    // ─── Countdown ───
     final difference = nextPrayerTime.difference(now);
     final totalSeconds = difference.inSeconds.clamp(0, 86399);
     final hours = totalSeconds ~/ 3600;
@@ -253,14 +253,14 @@ class _NextPrayerCardState extends State<NextPrayerCard>
               ),
             ),
 
-            // ─── محتوى ───
+            // ─── Content ───
             Padding(
               padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 16.h),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   // ═══════════════════════════════════════
-                  // ✨ الآية القرآنية (بدل اسم المدينة وزرار الصوت)
+                  // ✨ Quranic ayah (instead of the city name and audio button)
                   // ═══════════════════════════════════════
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -287,7 +287,7 @@ class _NextPrayerCardState extends State<NextPrayerCard>
                   SizedBox(height: 14.h),
 
                   // ═══════════════════════════════════════
-                  // اسم الصلاة
+                  // Prayer name
                   // ═══════════════════════════════════════
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -310,7 +310,7 @@ class _NextPrayerCardState extends State<NextPrayerCard>
                     ],
                   ),
 
-                  // ─── فاصل ذهبي ───
+                  // ─── Gold divider ───
                   Container(
                     margin: EdgeInsets.symmetric(vertical: 10.h),
                     height: 1,
@@ -327,7 +327,7 @@ class _NextPrayerCardState extends State<NextPrayerCard>
                   ),
 
                   // ═══════════════════════════════════════
-                  // العد التنازلي
+                  // Countdown
                   // ═══════════════════════════════════════
                   Text(
                     remainingTime,
@@ -356,7 +356,7 @@ class _NextPrayerCardState extends State<NextPrayerCard>
                     ),
                   ),
 
-                  // ─── اسم المؤذن (اختياري) ───
+                  // ─── Reciter name (optional) ───
                   if (hasMuezzin) ...[
                     SizedBox(height: 8.h),
                     Container(
@@ -397,7 +397,7 @@ class _NextPrayerCardState extends State<NextPrayerCard>
                   SizedBox(height: 14.h),
 
                   // ═══════════════════════════════════════
-                  // السطر السفلي: الوقت الحالي + وقت الأذان
+                  // Bottom row: current time + adhan time
                   // ═══════════════════════════════════════
                   Container(
                     padding: EdgeInsets.symmetric(
@@ -415,7 +415,7 @@ class _NextPrayerCardState extends State<NextPrayerCard>
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        // الوقت الحالي
+                        // Current time
                         Row(
                           children: [
                             Icon(
@@ -435,14 +435,14 @@ class _NextPrayerCardState extends State<NextPrayerCard>
                           ],
                         ),
 
-                        // فاصل رفيع
+                        // Thin divider
                         Container(
                           width: 1,
                           height: 14.h,
                           color: Colors.white.withOpacity(.15),
                         ),
 
-                        // وقت الأذان
+                        // Adhan time
                         Row(
                           children: [
                             Text(

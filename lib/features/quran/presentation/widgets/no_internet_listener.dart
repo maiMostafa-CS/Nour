@@ -5,8 +5,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../bloc/quran_bloc.dart';
 
-/// يعرض dialog "لا يوجد إنترنت".
-/// ترجع true لو ضغط المستخدم "إعادة المحاولة".
+/// Shows the "No Internet" dialog.
+/// Returns true if the user taps "Retry".
 Future<bool> showNoInternetDialog(
     BuildContext context, {
       String message = 'لا يوجد اتصال بالإنترنت',
@@ -74,7 +74,7 @@ class _NoInternetListenerState extends State<NoInternetListener> {
 
     _subscription = bloc.noInternetStream.listen(_show);
 
-    // لو الخطأ حصل قبل ما الودجت تشتغل
+    // If the error occurred before the widget started
     final pending = bloc.takePendingNoInternet();
     if (pending != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -84,7 +84,7 @@ class _NoInternetListenerState extends State<NoInternetListener> {
   }
 
   Future<void> _show(String message) async {
-    // لا نفتح أكثر من dialog في نفس الوقت
+    // Do not open more than one dialog at the same time
     if (!mounted || _isDialogShowing) return;
 
     _isDialogShowing = true;

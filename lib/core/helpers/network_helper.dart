@@ -3,13 +3,13 @@ import 'package:flutter/foundation.dart';
 
 class NetworkHelper {
   // ═══════════════════════════════════════════════════════════
-  // تحقق لو فيه إنترنت
+  // Check whether there is an internet connection
   // ═══════════════════════════════════════════════════════════
   static Future<bool> hasInternet() async {
     try {
       final connectivityResult = await Connectivity().checkConnectivity();
 
-      // connectivity_plus 6.x بيرجع List
+      // connectivity_plus 6.x returns a List
       if (connectivityResult.contains(ConnectivityResult.none)) {
         debugPrint('❌ No internet connection');
         return false;
@@ -30,7 +30,7 @@ class NetworkHelper {
   }
 
   // ═══════════════════════════════════════════════════════════
-  // اسم نوع الاتصال
+  // Connection type name
   // ═══════════════════════════════════════════════════════════
   static Future<String> getConnectionType() async {
     final result = await Connectivity().checkConnectivity();

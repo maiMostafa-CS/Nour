@@ -24,8 +24,8 @@ abstract class QuranpediaRemoteDataSource {
 class QuranpediaRemoteDataSourceImpl implements QuranpediaRemoteDataSource {
   static const String _baseUrl = 'https://api.quran.com/api/v4';
 
-  // أسماء عربية للتفاسير (المفتاح: معرّف التفسير في Quran.com).
-  // راجع المعرّفات من اللوج (🔎) وصحّحها لو اختلفت.
+  // Arabic names for tafsirs (key: tafsir identifier in Quran.com).
+  // Check the identifiers from the log (🔎) and correct them if they differ.
   static const Map<int, Map<String, String>> _arabicMeta = {
     14: {'name': 'تفسير ابن كثير', 'author': 'ابن كثير'},
     15: {'name': 'تفسير الطبري', 'author': 'ابن جرير الطبري'},
@@ -86,7 +86,7 @@ class QuranpediaRemoteDataSourceImpl implements QuranpediaRemoteDataSource {
 
       final raw = Map<String, dynamic>.from(item);
 
-      // نأخذ التفاسير العربية فقط
+      // Take Arabic tafsirs only
       final language = raw['language_name']?.toString().toLowerCase();
       if (language != 'arabic') {
         debugPrint('⏭️ Skipping non-Arabic tafsir: ${raw['name']} ($language)');
@@ -95,12 +95,12 @@ class QuranpediaRemoteDataSourceImpl implements QuranpediaRemoteDataSource {
 
       final id = (raw['id'] as num?)?.toInt() ?? 0;
 
-      // اطبع البيانات الحقيقية لتصحيح الخريطة
+      // Print the actual data to fix the mapping
       debugPrint('🔎 id=$id slug=${raw['slug']} name=${raw['name']}');
 
       final meta = _arabicMeta[id];
 
-      // لو مفيش اسم عربي، لا نعرض الكتاب (حتى لا يظهر اسم إنجليزي)
+      // If there is no Arabic name, do not show the book (to avoid displaying an English name)
       if (meta == null) {
         debugPrint('⏭️ No Arabic meta for id=$id, skipping');
         continue;
@@ -154,7 +154,7 @@ class QuranpediaRemoteDataSourceImpl implements QuranpediaRemoteDataSource {
     final text = _cleanArabicText(tafsir['text']?.toString() ?? '');
     if (text.trim().isEmpty) return null;
 
-    // اسم المؤلف غير موجود في هذه الاستجابة، فنأخذه من القائمة المخزنة إن وجدت
+    // The author name is not present in this response, so use it from the stored list if available
     QuranTafsirBookModel? cachedBook;
     for (final b in _cachedBooks ?? const <QuranTafsirBookModel>[]) {
       if (b.id == bookId) {
@@ -165,7 +165,7 @@ class QuranpediaRemoteDataSourceImpl implements QuranpediaRemoteDataSource {
 
     final meta = _arabicMeta[bookId];
 
-    // نبني نفس الشكل الذي يتوقعه QuranTafsirModel.fromJson
+    // Build the same shape expected by QuranTafsirModel.fromJson
     return QuranTafsirModel.fromJson({
       'book': {
         'id': bookId,
@@ -178,7 +178,7 @@ class QuranpediaRemoteDataSourceImpl implements QuranpediaRemoteDataSource {
     });
   }
 
-  /// تنظيف نص التفسير: إزالة HTML وحذف الأسطر الإنجليزية فقط
+  /// Clean tafsir text: remove HTML and English-only lines
   String _cleanArabicText(String input) {
     final noHtml = input
         .replaceAll(RegExp(r'<br\s*/?>', caseSensitive: false), '\n')
@@ -193,7 +193,7 @@ class QuranpediaRemoteDataSourceImpl implements QuranpediaRemoteDataSource {
     final lines = noHtml.split('\n').where((line) {
       final l = line.trim();
       if (l.isEmpty) return true;
-      // احذف السطر لو فيه حروف لاتينية ومفيهوش عربي
+      // Remove the line if it contains Latin letters and no Arabic
       return !(hasLatin.hasMatch(l) && !hasArabic.hasMatch(l));
     });
 
