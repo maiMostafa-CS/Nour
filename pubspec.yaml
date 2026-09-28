@@ -65,6 +65,7 @@ flutter:
     - assets/images/
     - assets/adhan-mp3/
     - assets/countries_capitals/
+    - assets/google_fonts/
   fonts:
     - family: HafsSmart
       fonts:
