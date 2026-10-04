@@ -20,16 +20,16 @@ class QuranPageContent extends StatefulWidget {
   final PageController? controller;
 
   final void Function({
-  required int pageNumber,
-  required String surahName,
-  required int? juz,
-  required int? hizb,
-  int? rub,
+    required int pageNumber,
+    required String surahName,
+    required int? juz,
+    required int? hizb,
+    int? rub,
   })? onPageInfoLoaded;
 
   final void Function({
-  required int surahNumber,
-  required int verseNumber,
+    required int surahNumber,
+    required int verseNumber,
   })? onAyahTap;
 
   const QuranPageContent({
@@ -101,7 +101,7 @@ class _QuranPageContentState extends State<QuranPageContent>
       ),
       TweenSequenceItem(
         tween:
-        Tween(begin: 1.0, end: 0.0).chain(CurveTween(curve: Curves.easeIn)),
+            Tween(begin: 1.0, end: 0.0).chain(CurveTween(curve: Curves.easeIn)),
         weight: 70,
       ),
     ]).animate(controller);
@@ -162,16 +162,16 @@ class _QuranPageContentState extends State<QuranPageContent>
               pageBackgroundColor: const Color(0xFFFCF5D7),
               controller: _controller,
               physics: const NeverScrollableScrollPhysics(),
-              sp: .85.w,
-              h: 1.h,
+              sp: .855,
+              h: 1,
 
               verseBackgroundColor: _verseBackgroundColor,
 
               onTap: (surahNumber, verseNumber) {
                 debugPrint(
                   '📖 AYAH TAP → '
-                      'surah=$surahNumber, '
-                      'ayah=$verseNumber',
+                  'surah=$surahNumber, '
+                  'ayah=$verseNumber',
                 );
 
                 if (!mounted) return;
@@ -183,8 +183,8 @@ class _QuranPageContentState extends State<QuranPageContent>
 
                 debugPrint(
                   '📌 SELECTED → '
-                      'surah=$_selectedSurahNumber, '
-                      'ayah=$_selectedVerseNumber',
+                  'surah=$_selectedSurahNumber, '
+                  'ayah=$_selectedVerseNumber',
                 );
 
                 _triggerAyahFlash();
@@ -295,8 +295,8 @@ class _QuranPageContentState extends State<QuranPageContent>
 
           onPause: () {
             context.read<QuranIndexBloc>().add(
-              const PauseAyah(),
-            );
+                  const PauseAyah(),
+                );
           },
 
           // ======================================================
@@ -305,8 +305,8 @@ class _QuranPageContentState extends State<QuranPageContent>
 
           onResume: () {
             context.read<QuranIndexBloc>().add(
-              const ResumeAyah(),
-            );
+                  const ResumeAyah(),
+                );
           },
 
           // ======================================================
@@ -331,8 +331,8 @@ class _QuranPageContentState extends State<QuranPageContent>
 
           onClose: () {
             context.read<QuranIndexBloc>().add(
-              const StopAyah(),
-            );
+                  const StopAyah(),
+                );
 
             if (!mounted) return;
 
@@ -375,9 +375,9 @@ class _QuranPageContentState extends State<QuranPageContent>
     if (surahNumber == null || verseNumber == null) {
       debugPrint(
         '⚠️ بيانات الصفحة غير مكتملة: '
-            'page=$pageNumber, '
-            'surah=$surahNumber, '
-            'start=$verseNumber',
+        'page=$pageNumber, '
+        'surah=$surahNumber, '
+        'start=$verseNumber',
       );
 
       return;
@@ -420,8 +420,8 @@ class _QuranPageContentState extends State<QuranPageContent>
 
     if (state.reciters.isEmpty) {
       context.read<QuranIndexBloc>().add(
-        const LoadReciters(),
-      );
+            const LoadReciters(),
+          );
       return;
     }
 
@@ -435,10 +435,10 @@ class _QuranPageContentState extends State<QuranPageContent>
           selectedReciter: state.selectedReciter,
           onSelected: (reciter) {
             context.read<QuranIndexBloc>().add(
-              SelectReciter(
-                reciter.identifier,
-              ),
-            );
+                  SelectReciter(
+                    reciter.identifier,
+                  ),
+                );
           },
         );
       },
@@ -469,11 +469,11 @@ class _QuranPageContentState extends State<QuranPageContent>
     }
 
     _lastRetryAction = () => bloc.add(
-      LoadAyahTafsir(
-        surahNumber: surahNumber,
-        ayahNumber: verseNumber,
-      ),
-    );
+          LoadAyahTafsir(
+            surahNumber: surahNumber,
+            ayahNumber: verseNumber,
+          ),
+        );
 
     bloc.add(
       LoadAyahTafsir(
@@ -600,152 +600,151 @@ class _QuranPageContentState extends State<QuranPageContent>
                             // ==================================================
 
                             else ...[
-                                // Select tafsir book
-                                Text(
-                                  'كتاب التفسير',
-                                  style: TextStyle(
-                                    fontSize: 14.sp,
-                                    fontWeight: FontWeight.bold,
+                              // Select tafsir book
+                              Text(
+                                'كتاب التفسير',
+                                style: TextStyle(
+                                  fontSize: 14.sp,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+
+                              SizedBox(height: 8.h),
+
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 12.w,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.65),
+                                  borderRadius: BorderRadius.circular(14.r),
+                                  border: Border.all(
+                                    color: Colors.black12,
                                   ),
                                 ),
-
-                                SizedBox(height: 8.h),
-
-                                Container(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 12.w,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.65),
+                                child: DropdownButtonHideUnderline(
+                                  child: DropdownButton<int>(
+                                    value: selectedBook?.id,
+                                    isExpanded: true,
                                     borderRadius: BorderRadius.circular(14.r),
-                                    border: Border.all(
-                                      color: Colors.black12,
-                                    ),
+                                    items: books.map((book) {
+                                      return DropdownMenuItem<int>(
+                                        value: book.id,
+                                        child: Text(
+                                          book.name,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      );
+                                    }).toList(),
+                                    onChanged: (bookId) {
+                                      if (bookId == null) return;
+
+                                      bloc.add(
+                                        SelectTafsirBook(bookId),
+                                      );
+
+                                      bloc.add(
+                                        LoadAyahTafsir(
+                                          surahNumber: surahNumber,
+                                          ayahNumber: verseNumber,
+                                        ),
+                                      );
+                                    },
                                   ),
-                                  child: DropdownButtonHideUnderline(
-                                    child: DropdownButton<int>(
-                                      value: selectedBook?.id,
-                                      isExpanded: true,
-                                      borderRadius: BorderRadius.circular(14.r),
-                                      items: books.map((book) {
-                                        return DropdownMenuItem<int>(
-                                          value: book.id,
-                                          child: Text(
-                                            book.name,
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        );
-                                      }).toList(),
-                                      onChanged: (bookId) {
-                                        if (bookId == null) return;
+                                ),
+                              ),
 
-                                        bloc.add(
-                                          SelectTafsirBook(bookId),
-                                        );
+                              SizedBox(height: 20.h),
 
-                                        bloc.add(
-                                          LoadAyahTafsir(
-                                            surahNumber: surahNumber,
-                                            ayahNumber: verseNumber,
+                              // Current book name
+                              if (selectedBook != null)
+                                Container(
+                                  padding: EdgeInsets.all(12.w),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.45),
+                                    borderRadius: BorderRadius.circular(12.r),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.menu_book,
+                                        size: 20.sp,
+                                      ),
+                                      SizedBox(width: 8.w),
+                                      Expanded(
+                                        child: Text(
+                                          selectedBook.name,
+                                          style: TextStyle(
+                                            fontSize: 14.sp,
+                                            fontWeight: FontWeight.w600,
                                           ),
-                                        );
-                                      },
-                                    ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
 
-                                SizedBox(height: 20.h),
+                              SizedBox(height: 16.h),
 
-                                // Current book name
-                                if (selectedBook != null)
-                                  Container(
-                                    padding: EdgeInsets.all(12.w),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withOpacity(0.45),
-                                      borderRadius: BorderRadius.circular(12.r),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Icon(
-                                          Icons.menu_book,
-                                          size: 20.sp,
-                                        ),
-                                        SizedBox(width: 8.w),
-                                        Expanded(
-                                          child: Text(
-                                            selectedBook.name,
-                                            style: TextStyle(
-                                              fontSize: 14.sp,
-                                              fontWeight: FontWeight.w600,
+                              // Tafsir
+                              Expanded(
+                                child: isLoading
+                                    ? const Center(
+                                        child: CircularProgressIndicator(),
+                                      )
+                                    : tafsir == null
+                                        ? Center(
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Icon(
+                                                  Icons.info_outline,
+                                                  size: 42.sp,
+                                                  color: Colors.black38,
+                                                ),
+                                                SizedBox(height: 10.h),
+                                                Text(
+                                                  'لا يوجد تفسير لهذه الآية',
+                                                  textAlign: TextAlign.center,
+                                                  style: TextStyle(
+                                                    fontSize: 15.sp,
+                                                    color: Colors.black54,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          )
+                                        : SingleChildScrollView(
+                                            physics:
+                                                const BouncingScrollPhysics(),
+                                            child: Container(
+                                              width: double.infinity,
+                                              padding: EdgeInsets.all(16.w),
+                                              decoration: BoxDecoration(
+                                                color: Colors.white
+                                                    .withOpacity(0.55),
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                  16.r,
+                                                ),
+                                              ),
+                                              child: Directionality(
+                                                textDirection:
+                                                    TextDirection.rtl,
+                                                child: Text(
+                                                  tafsir.text,
+                                                  textAlign: TextAlign.justify,
+                                                  style: TextStyle(
+                                                    fontSize: 16.sp,
+                                                    height: 1.9,
+                                                  ),
+                                                ),
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-
-                                SizedBox(height: 16.h),
-
-                                // Tafsir
-                                Expanded(
-                                  child: isLoading
-                                      ? const Center(
-                                    child: CircularProgressIndicator(),
-                                  )
-                                      : tafsir == null
-                                      ? Center(
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Icon(
-                                          Icons.info_outline,
-                                          size: 42.sp,
-                                          color: Colors.black38,
-                                        ),
-                                        SizedBox(height: 10.h),
-                                        Text(
-                                          'لا يوجد تفسير لهذه الآية',
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            fontSize: 15.sp,
-                                            color: Colors.black54,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                      : SingleChildScrollView(
-                                    physics:
-                                    const BouncingScrollPhysics(),
-                                    child: Container(
-                                      width: double.infinity,
-                                      padding: EdgeInsets.all(16.w),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white
-                                            .withOpacity(0.55),
-                                        borderRadius:
-                                        BorderRadius.circular(
-                                          16.r,
-                                        ),
-                                      ),
-                                      child: Directionality(
-                                        textDirection:
-                                        TextDirection.rtl,
-                                        child: Text(
-                                          tafsir.text,
-                                          textAlign:
-                                          TextAlign.justify,
-                                          style: TextStyle(
-                                            fontSize: 16.sp,
-                                            height: 1.9,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
+                              ),
+                            ],
                           ],
                         ),
                       ),

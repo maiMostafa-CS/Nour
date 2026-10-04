@@ -290,19 +290,17 @@ class CountdownNotificationService {
 
         icon: '@mipmap/ic_launcher',
 
-        importance: Importance.max,    // ← بدل low
+        importance: Importance.max,
         priority: Priority.max,
 
-        ongoing: true,
+        ongoing: false,
         autoCancel: false,
-        silent: false,                  // ← بدل true
-        playSound: true,                // ← بدل false
-        enableVibration: true,          // ← جديد
+        silent: false,
+        playSound: true,
+        enableVibration: true,
         enableLights: true,
 
-
         showWhen: true,
-
         // ========================================================
         // Android Chronometer
         // ========================================================
@@ -342,6 +340,7 @@ class CountdownNotificationService {
         NotificationVisibility.public,
 
         channelShowBadge: false,
+        timeoutAfter: 30000,
       );
 
       // ==========================================================

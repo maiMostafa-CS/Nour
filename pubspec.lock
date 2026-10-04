@@ -137,6 +137,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.2"
+  call_state_handler:
+    dependency: "direct main"
+    description:
+      name: call_state_handler
+      sha256: "56488abe15b77490a358900eaf24e10b5166e8fc2958419b177aa8a1524f03b5"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.0"
   characters:
     dependency: transitive
     description:

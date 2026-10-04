@@ -1,8 +1,11 @@
 import 'dart:io';
 
+import 'package:alarm/alarm.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest.dart' as tz;
 
 import 'app.dart';
@@ -10,63 +13,147 @@ import 'core/services/alarm_cleanup/orphan_alarm_cleaner.dart';
 import 'core/services/prayer_scheduler_split/prayer_scheduler/adhan_scheduler_service.dart';
 import 'core/services/prayer_scheduler_split/prayer_scheduler/notifications/countdown_notification_service.dart';
 import 'core/services/unlock_card.dart';
+import 'features/khatma/data/datasources/khatma_local_data_source.dart';
+import 'features/khatma/domain/entities/khatma_progress.dart';
 import 'features/khatma/domain/useCase/get_current_khatma_ayah.dart';
 import 'features/khatma/domain/useCase/get_khatma_weekly_report.dart';
 import 'features/khatma/domain/useCase/markCurrent_ayahAs_read.dart';
+import 'features/khatma/services/khatma_ayah_resolver.dart';
+import 'features/khatma/services/khatma_controller.dart';
 import 'features/khatma/services/khatma_unlock_service.dart';
 import 'injection_container.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   GoogleFonts.config.allowRuntimeFetching = false;
-// ============================================================
-// Timezone
-// ============================================================
-
   tz.initializeTimeZones();
-
-// ============================================================
-// Dependency Injection
-// ============================================================
-
   await configureDependencies();
-
-// ============================================================
-// Android-only initialization
-// ============================================================
 
   if (Platform.isAndroid) {
     await _initializeAndroid();
+    KhatmaUnlockSyncService.setKhatmaReadHandler(_onNativeKhatmaRead);
+    await _processPendingKhatmaRead();
+
+    _setupAdhanStopHandler();
+    await _processPendingAdhanStop();
   }
-
-// ============================================================
-// Khatma native callback
-// ============================================================
-
-  if (Platform.isAndroid) {
-    KhatmaUnlockSyncService.setKhatmaReadHandler(
-      _onNativeKhatmaRead,
-    );
-  }
-
-// ============================================================
-// Start Flutter application
-// ============================================================
 
   runApp(const IslamicApp());
-
-// ============================================================
-// Background setup after first frame
-// ============================================================
 
   WidgetsBinding.instance.addPostFrameCallback((_) {
     _runPostFrameSetup();
   });
 }
 
+@pragma('vm:entry-point')
+void backgroundMain() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  debugPrint('🚀 KHATMA BACKGROUND: engine started');
+  _setupAdhanStopHandler();
+ await _processPendingAdhanStop();
+
+  KhatmaUnlockSyncService.setKhatmaReadHandler(() async {
+    debugPrint('📖 KHATMA BACKGROUND: read requested');
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final dataSource = KhatmaLocalDataSourceImpl(prefs);
+
+      // ============================================================
+      // 1. علّم الآية كمقروءة
+      // ============================================================
+      final progress = await dataSource.markCurrentAyahAsRead();
+
+      debugPrint(
+        '✅ KHATMA BACKGROUND: '
+            'currentAyah=${progress.currentAyah}, '
+            'readAyahs=${progress.readAyahs}',
+      );
+
+      // ============================================================
+      // 2. اجلب التقرير الأسبوعي وزامنه مع Native
+      // ============================================================
+      final report = await dataSource.getWeeklyReport();
+
+      await KhatmaUnlockSyncService.saveWeeklyReport(
+        totalAyahs: report.totalAyahs,
+        currentWeekAyahs: report.currentWeekAyahs,
+        weekNumber: report.weekNumber,
+      );
+
+      debugPrint('📊 KHATMA BACKGROUND: weekly report synced');
+
+      // ============================================================
+      // 3. ✅ زامن الآية الجديدة مع Native
+      // ============================================================
+      final nextAyahNumber = progress.currentAyah;
+      debugPrint('📖 KHATMA BACKGROUND: resolving ayah $nextAyahNumber');
+
+      final ayah = KhatmaAyahResolver.resolve(nextAyahNumber);
+
+      await KhatmaUnlockSyncService.saveCurrentAyah(
+        KhatmaUnlockAyah(
+          globalNumber: ayah.globalNumber,
+          surahNumber: ayah.surahNumber,
+          ayahNumber: ayah.ayahNumber,
+          surahName: ayah.surahName,
+          text: ayah.text,
+          pageNumber: ayah.pageNumber,
+        ),
+      );
+
+      debugPrint(
+        '✅ KHATMA BACKGROUND: new ayah synced '
+            '(global=${ayah.globalNumber}, '
+            'surah=${ayah.surahName}, '
+            'ayah=${ayah.ayahNumber})',
+      );
+
+    } catch (e, stackTrace) {
+      debugPrint('❌ KHATMA BACKGROUND FAILED: $e');
+      debugPrint('$stackTrace');
+    } finally {
+      await KhatmaUnlockSyncService.clearPendingRead();
+    }
+  });
+}
+
+Future<void> _stopAdhanForCall() async {
+  try {
+    final alarms = await Alarm.getAlarms();
+    var stopped = 0;
+
+    for (final alarm in alarms) {
+      if (alarm.payload == 'adhan' || alarm.payload == 'iqama') {
+        await Alarm.stop(alarm.id);
+        stopped++;
+        debugPrint('🔇 Stopped alarm id=${alarm.id} payload=${alarm.payload}');
+      }
+    }
+
+    debugPrint('✅ ADHAN: $stopped alarm(s) stopped');
+  } catch (e, stackTrace) {
+    debugPrint('❌ ADHAN: stop failed: $e');
+    debugPrint('$stackTrace');
+  }
+}
+
+
+void _setupAdhanStopHandler() {
+  const adhanChannel = MethodChannel('com.example.islamic_app/adhan');
+
+  adhanChannel.setMethodCallHandler((call) async {
+    if (call.method == 'stopAdhan') {
+      debugPrint('📞 KHATMA: stopAdhan requested');
+      await _stopAdhanForCall();
+    }
+  });
+}
 // ================================================================
 // Android initialization
 // ================================================================
+
+
 
 Future<void> _initializeAndroid() async {
   try {
@@ -137,15 +224,7 @@ Future<void> _initializeKhatmaUnlock() async {
   }
 
   try {
-    // ==========================================================
-    // 1. Handle any pending read before anything else
-    // ==========================================================
 
-    await _processPendingKhatmaRead();
-
-    // ==========================================================
-    // 2. Sync the current ayah with native
-    // ==========================================================
 
     await _syncKhatmaUnlockAyah();
 
@@ -435,7 +514,7 @@ Future<void> _onNativeKhatmaRead() async {
     final markCurrentAyahAsRead = sl<MarkCurrentAyahAsRead>();
 
     final progress = await markCurrentAyahAsRead();
-
+    KhatmaController.update(progress);
     debugPrint(
       '✅ KHATMA: '
           'currentAyah=${progress.currentAyah}, '
@@ -484,17 +563,31 @@ Future<void> _onNativeKhatmaRead() async {
 // ------------------------------------------------------------
 // 5. Clear the pending_read flag (important to avoid duplicates)
 // ------------------------------------------------------------
-
-    await KhatmaUnlockSyncService.clearPendingRead();
-
-    debugPrint(
-      '🧹 KHATMA: pending_read cleared',
-    );
   } catch (e, stackTrace) {
     debugPrint(
       '❌ KHATMA READ FAILED: $e',
     );
 
+    debugPrint('$stackTrace');
+  }finally {
+    await KhatmaUnlockSyncService.clearPendingRead();
+    debugPrint('🧹 KHATMA: pending_read cleared');
+  }
+}
+Future<void> _processPendingAdhanStop() async {
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    final requested = prefs.getBool('stop_adhan_requested') ?? false;
+
+    if (!requested) return;
+
+    debugPrint('📞 ADHAN: processing pending stop');
+
+    await _stopAdhanForCall();
+
+    await prefs.setBool('stop_adhan_requested', false);
+  } catch (e, stackTrace) {
+    debugPrint('❌ ADHAN: pending stop failed: $e');
     debugPrint('$stackTrace');
   }
 }

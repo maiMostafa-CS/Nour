@@ -19,8 +19,7 @@ object PrayerCardOverlay {
 
     private var view: View? = null
 
-    private val handler =
-        Handler(Looper.getMainLooper())
+    private val handler = Handler(Looper.getMainLooper())
 
     // ================================================================
     // Show Card
@@ -32,32 +31,20 @@ object PrayerCardOverlay {
         subtitle: String
     ) {
 
-        val app =
-            context.applicationContext
+        val app = context.applicationContext
 
-        Log.d(
-            TAG,
-            "🔥 PrayerCardOverlay.show()"
-        )
+        Log.d(TAG, "🔥 PrayerCardOverlay.show()")
 
         // ============================================================
         // Check Overlay Permission
         // ============================================================
 
         if (!Settings.canDrawOverlays(app)) {
-
-            Log.e(
-                TAG,
-                "❌ Overlay permission NOT granted"
-            )
-
+            Log.e(TAG, "❌ Overlay permission NOT granted")
             return
         }
 
-        Log.d(
-            TAG,
-            "✅ Overlay permission granted"
-        )
+        Log.d(TAG, "✅ Overlay permission granted")
 
         // ============================================================
         // Remove Old Card
@@ -70,9 +57,7 @@ object PrayerCardOverlay {
         // ============================================================
 
         val windowManager =
-            app.getSystemService(
-                Context.WINDOW_SERVICE
-            ) as WindowManager
+            app.getSystemService(Context.WINDOW_SERVICE) as WindowManager
 
         // ============================================================
         // Inflate Card
@@ -81,19 +66,14 @@ object PrayerCardOverlay {
         val cardView =
             LayoutInflater
                 .from(app)
-                .inflate(
-                    R.layout.overlay_prayer_card,
-                    null
-                )
+                .inflate(R.layout.overlay_prayer_card, null)
 
         // ============================================================
         // Ayah Text
         // ============================================================
 
         cardView
-            .findViewById<TextView>(
-                R.id.title
-            )
+            .findViewById<TextView>(R.id.title)
             .text = title
 
         // ============================================================
@@ -101,9 +81,7 @@ object PrayerCardOverlay {
         // ============================================================
 
         cardView
-            .findViewById<TextView>(
-                R.id.subtitle
-            )
+            .findViewById<TextView>(R.id.subtitle)
             .text = subtitle
 
         // ============================================================
@@ -111,15 +89,10 @@ object PrayerCardOverlay {
         // ============================================================
 
         cardView
-            .findViewById<ImageButton>(
-                R.id.readButton
-            )
+            .findViewById<ImageButton>(R.id.readButton)
             .setOnClickListener {
 
-                Log.d(
-                    TAG,
-                    "✅ Read icon clicked"
-                )
+                Log.d(TAG, "✅ Read icon clicked")
 
                 // ====================================================
                 // 1. احفظ pending read flag
@@ -130,27 +103,19 @@ object PrayerCardOverlay {
                     Context.MODE_PRIVATE
                 )
                     .edit()
-                    .putBoolean(
-                        "pending_read",
-                        true
-                    )
+                    .putBoolean("pending_read", true)
                     .apply()
 
-                Log.d(
-                    TAG,
-                    "📝 pending_read = true saved"
-                )
+                Log.d(TAG, "📝 pending_read = true saved")
 
                 // ====================================================
                 // 2. بلّغ Flutter (لو شغال)
+                //    ✅ الآن عبر MyApplication (static)
                 // ====================================================
 
-                MainActivity.notifyKhatmaRead()
+                MyApplication.notifyKhatmaRead()
 
-                Log.d(
-                    TAG,
-                    "🚀 Khatma read sent to Flutter"
-                )
+                Log.d(TAG, "🚀 Khatma read sent to Flutter")
 
                 // ====================================================
                 // 3. اقفل الكارد
@@ -164,15 +129,10 @@ object PrayerCardOverlay {
         // ============================================================
 
         cardView
-            .findViewById<ImageButton>(
-                R.id.laterButton
-            )
+            .findViewById<ImageButton>(R.id.laterButton)
             .setOnClickListener {
 
-                Log.d(
-                    TAG,
-                    "⏳ Later icon clicked"
-                )
+                Log.d(TAG, "⏳ Later icon clicked")
 
                 // لا نغير حالة الختمة.
                 // نفس الآية ستظهر في الفتح القادم.
@@ -194,7 +154,6 @@ object PrayerCardOverlay {
                 PixelFormat.TRANSLUCENT
             )
                 .apply {
-
                     // الكارد في منتصف الشاشة
                     gravity = Gravity.CENTER
                 }
@@ -204,26 +163,11 @@ object PrayerCardOverlay {
         // ============================================================
 
         try {
-
-            windowManager.addView(
-                cardView,
-                params
-            )
-
+            windowManager.addView(cardView, params)
             view = cardView
-
-            Log.d(
-                TAG,
-                "🔥🔥 Overlay added successfully"
-            )
-
+            Log.d(TAG, "🔥🔥 Overlay added successfully")
         } catch (e: Exception) {
-
-            Log.e(
-                TAG,
-                "❌ Overlay addView FAILED",
-                e
-            )
+            Log.e(TAG, "❌ Overlay addView FAILED", e)
         }
     }
 
@@ -231,40 +175,24 @@ object PrayerCardOverlay {
     // Dismiss
     // ================================================================
 
-    fun dismiss(
-        context: Context
-    ) {
+    fun dismiss(context: Context) {
 
         handler.removeCallbacksAndMessages(null)
 
         view?.let { currentView ->
 
             val windowManager =
-                context.getSystemService(
-                    Context.WINDOW_SERVICE
-                ) as WindowManager
+                context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
 
             runCatching {
-
-                windowManager.removeView(
-                    currentView
-                )
-
+                windowManager.removeView(currentView)
             }.onFailure { error ->
-
-                Log.e(
-                    TAG,
-                    "❌ Failed to remove overlay",
-                    error
-                )
+                Log.e(TAG, "❌ Failed to remove overlay", error)
             }
         }
 
         view = null
 
-        Log.d(
-            TAG,
-            "Overlay dismissed"
-        )
+        Log.d(TAG, "Overlay dismissed")
     }
 }

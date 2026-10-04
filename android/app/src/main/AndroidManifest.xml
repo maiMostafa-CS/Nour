@@ -42,10 +42,11 @@
     <uses-permission android:name="android.permission.BIND_JOB_SERVICE"/>
 
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application
         android:label="Nour"
-        android:name="${applicationName}"
+        android:name=".MyApplication"
         android:icon="@mipmap/ic_launcher"
         android:usesCleartextTraffic="true">
 
