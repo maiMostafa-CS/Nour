@@ -65,7 +65,9 @@ class AdhanScheduler {
         loopAudio: false,
         vibrate: false,
 
-        androidFullScreenIntent: false,
+
+        // ======================================================
+        androidFullScreenIntent: true,
 
         androidStopAlarmOnTermination: false,
         allowAlarmOverlap: true,

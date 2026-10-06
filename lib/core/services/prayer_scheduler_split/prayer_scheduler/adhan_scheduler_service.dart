@@ -374,6 +374,26 @@ class AdhanSchedulerService {
     }
 
     // ============================================================
+    // 6b️⃣ Full Screen Intent Permission (Android 14+)
+    //
+    // Android 14 (API 34) يطلب الإذن صراحةً لاستخدام
+    // USE_FULL_SCREEN_INTENT — بدونه لن يُعرض الأذان
+    // على الشاشة المقفولة.
+    // ============================================================
+
+    try {
+      await androidPlugin?.requestFullScreenIntentPermission();
+      prayerSchedulerLog(
+        '✅ Full screen intent permission requested',
+      );
+    } catch (e) {
+      // لو الميثود مش موجودة في الإصدار القديم من المكتبة، نتجاهل
+      prayerSchedulerLog(
+        '⚠️ Full screen intent permission: $e',
+      );
+    }
+
+    // ============================================================
     // 7️⃣ Countdown Channel
     // ============================================================
 

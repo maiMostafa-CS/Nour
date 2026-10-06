@@ -15,8 +15,10 @@ class MyApplication : Application() {
 
         const val KHATMA_CHANNEL = "com.example.islamic_app/khatma"
         const val ADHAN_CHANNEL = "com.example.islamic_app/adhan"
+        const val UNLOCK_CARD_CHANNEL = "prayer_app/unlock_card"   // ← ✅ تمت الإضافة
         const val KHATMA_PREFS = "khatma_unlock"
         const val KHATMA_WEEKLY_PREFS = "khatma_weekly"
+        const val PRAYER_CARD_PREFS = "prayer_card"
 
         var flutterMessenger: BinaryMessenger? = null
             private set

@@ -73,7 +73,8 @@ class KhatmaUnlockSyncService {
       ) {
     _channel.setMethodCallHandler(
           (call) async {
-        if (call.method == 'markCurrentAyahAsRead') {
+        if (call.method == 'notifyKhatmaRead' ||
+            call.method == 'markCurrentAyahAsRead') {
           await onRead();
         }
       },

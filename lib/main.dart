@@ -38,6 +38,8 @@ Future<void> main() async {
     await _processPendingAdhanStop();
   }
 
+  WidgetsBinding.instance.addObserver(_AppLifecycleObserver());
+
   runApp(const IslamicApp());
 
   WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -45,93 +47,126 @@ Future<void> main() async {
   });
 }
 
+class _AppLifecycleObserver with WidgetsBindingObserver {
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _processPendingKhatmaRead();
+      _syncKhatmaUnlockAyah();
+    }
+  }
+}
+
+bool _isProcessingKhatmaRead = false;
+
+Future<void> _processKhatmaReadBackground() async {
+  if (_isProcessingKhatmaRead) {
+    debugPrint('⏳ KHATMA BACKGROUND: already processing, skipping duplicate');
+    return;
+  }
+  _isProcessingKhatmaRead = true;
+  debugPrint('📖 KHATMA BACKGROUND: read requested');
+
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.reload();
+    final dataSource = KhatmaLocalDataSourceImpl(prefs);
+
+    // ============================================================
+    // 1. علّم الآية كمقروءة
+    // ============================================================
+    final progress = await dataSource.markCurrentAyahAsRead();
+
+    debugPrint(
+      '✅ KHATMA BACKGROUND: '
+      'currentAyah=${progress.currentAyah}, '
+      'readAyahs=${progress.readAyahs}',
+    );
+
+    // ============================================================
+    // 2. اجلب التقرير الأسبوعي وزامنه مع Native
+    // ============================================================
+    final report = await dataSource.getWeeklyReport();
+
+    await KhatmaUnlockSyncService.saveWeeklyReport(
+      totalAyahs: report.totalAyahs,
+      currentWeekAyahs: report.currentWeekAyahs,
+      weekNumber: report.weekNumber,
+    );
+
+    debugPrint('📊 KHATMA BACKGROUND: weekly report synced');
+
+    // ============================================================
+    // 3. ✅ زامن الآية الجديدة مع Native
+    // ============================================================
+    final nextAyahNumber = progress.currentAyah;
+    debugPrint('📖 KHATMA BACKGROUND: resolving ayah $nextAyahNumber');
+
+    final ayah = KhatmaAyahResolver.resolve(nextAyahNumber);
+
+    await KhatmaUnlockSyncService.saveCurrentAyah(
+      KhatmaUnlockAyah(
+        globalNumber: ayah.globalNumber,
+        surahNumber: ayah.surahNumber,
+        ayahNumber: ayah.ayahNumber,
+        surahName: ayah.surahName,
+        text: ayah.text,
+        pageNumber: ayah.pageNumber,
+      ),
+    );
+
+    debugPrint(
+      '✅ KHATMA BACKGROUND: new ayah synced '
+      '(global=${ayah.globalNumber}, '
+      'surah=${ayah.surahName}, '
+      'ayah=${ayah.ayahNumber})',
+    );
+  } catch (e, stackTrace) {
+    debugPrint('❌ KHATMA BACKGROUND FAILED: $e');
+    debugPrint('$stackTrace');
+  } finally {
+    await KhatmaUnlockSyncService.clearPendingRead();
+    _isProcessingKhatmaRead = false;
+  }
+}
+
 @pragma('vm:entry-point')
 void backgroundMain() async {
   WidgetsFlutterBinding.ensureInitialized();
   debugPrint('🚀 KHATMA BACKGROUND: engine started');
   _setupAdhanStopHandler();
- await _processPendingAdhanStop();
+  await _processPendingAdhanStop();
 
-  KhatmaUnlockSyncService.setKhatmaReadHandler(() async {
-    debugPrint('📖 KHATMA BACKGROUND: read requested');
+  KhatmaUnlockSyncService.setKhatmaReadHandler(_processKhatmaReadBackground);
 
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final dataSource = KhatmaLocalDataSourceImpl(prefs);
-
-      // ============================================================
-      // 1. علّم الآية كمقروءة
-      // ============================================================
-      final progress = await dataSource.markCurrentAyahAsRead();
-
-      debugPrint(
-        '✅ KHATMA BACKGROUND: '
-            'currentAyah=${progress.currentAyah}, '
-            'readAyahs=${progress.readAyahs}',
-      );
-
-      // ============================================================
-      // 2. اجلب التقرير الأسبوعي وزامنه مع Native
-      // ============================================================
-      final report = await dataSource.getWeeklyReport();
-
-      await KhatmaUnlockSyncService.saveWeeklyReport(
-        totalAyahs: report.totalAyahs,
-        currentWeekAyahs: report.currentWeekAyahs,
-        weekNumber: report.weekNumber,
-      );
-
-      debugPrint('📊 KHATMA BACKGROUND: weekly report synced');
-
-      // ============================================================
-      // 3. ✅ زامن الآية الجديدة مع Native
-      // ============================================================
-      final nextAyahNumber = progress.currentAyah;
-      debugPrint('📖 KHATMA BACKGROUND: resolving ayah $nextAyahNumber');
-
-      final ayah = KhatmaAyahResolver.resolve(nextAyahNumber);
-
-      await KhatmaUnlockSyncService.saveCurrentAyah(
-        KhatmaUnlockAyah(
-          globalNumber: ayah.globalNumber,
-          surahNumber: ayah.surahNumber,
-          ayahNumber: ayah.ayahNumber,
-          surahName: ayah.surahName,
-          text: ayah.text,
-          pageNumber: ayah.pageNumber,
-        ),
-      );
-
-      debugPrint(
-        '✅ KHATMA BACKGROUND: new ayah synced '
-            '(global=${ayah.globalNumber}, '
-            'surah=${ayah.surahName}, '
-            'ayah=${ayah.ayahNumber})',
-      );
-
-    } catch (e, stackTrace) {
-      debugPrint('❌ KHATMA BACKGROUND FAILED: $e');
-      debugPrint('$stackTrace');
-    } finally {
-      await KhatmaUnlockSyncService.clearPendingRead();
+  try {
+    final hasPending = await KhatmaUnlockSyncService.hasPendingRead();
+    if (hasPending) {
+      debugPrint('📖 KHATMA BACKGROUND: processing pending read on startup');
+      await _processKhatmaReadBackground();
     }
-  });
+  } catch (e) {
+    debugPrint('⚠️ KHATMA BACKGROUND: pending read check error: $e');
+  }
 }
 
+/// يُوقف الأذان فقط عند الاتصال.
+/// الإقامة لا تتأثر بالاتصال وتُشغَّل في وقتها عادي.
 Future<void> _stopAdhanForCall() async {
   try {
     final alarms = await Alarm.getAlarms();
     var stopped = 0;
 
     for (final alarm in alarms) {
-      if (alarm.payload == 'adhan' || alarm.payload == 'iqama') {
+      // توقف الأذان فقط — الإقامة تُشغَّل حتى لو فيه اتصال
+      if (alarm.payload == 'adhan') {
         await Alarm.stop(alarm.id);
         stopped++;
-        debugPrint('🔇 Stopped alarm id=${alarm.id} payload=${alarm.payload}');
+        debugPrint('🔇 Stopped adhan alarm id=${alarm.id}');
       }
     }
 
-    debugPrint('✅ ADHAN: $stopped alarm(s) stopped');
+    debugPrint('✅ ADHAN: $stopped adhan alarm(s) stopped (iqama untouched)');
   } catch (e, stackTrace) {
     debugPrint('❌ ADHAN: stop failed: $e');
     debugPrint('$stackTrace');

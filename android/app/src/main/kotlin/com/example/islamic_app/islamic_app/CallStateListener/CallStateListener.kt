@@ -45,13 +45,16 @@ object CallStateListener {
                         Log.d(TAG, "📞 Call ended (IDLE)")
                     }
                     TelephonyManager.CALL_STATE_RINGING -> {
+                        // لا نوقف الأذان عند الرنين فقط —
+                        // ننتظر حتى يتم الرد على الاتصال فعلياً (OFFHOOK).
                         isCallActive = true
-                        Log.d(TAG, "📞 Call ringing → stopping adhan")
-                        stopAdhan()
+                        Log.d(TAG, "📞 Incoming call ringing — waiting for answer before stopping adhan")
                     }
                     TelephonyManager.CALL_STATE_OFFHOOK -> {
+                        // اتصال نشط (تم الرد) → نوقف الأذان فقط.
+                        // الإقامة لا تتأثر، Flutter يتولى ذلك بتوقيف 'adhan' payload فقط.
                         isCallActive = true
-                        Log.d(TAG, "📞 Call active → stopping adhan")
+                        Log.d(TAG, "📞 Call active (OFFHOOK) → stopping adhan only")
                         stopAdhan()
                     }
                 }
