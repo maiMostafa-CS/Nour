@@ -276,25 +276,28 @@ class MainActivity : FlutterActivity() {
     // ============================================================
 
     private fun stopAdhan() {
-        val messenger = MyApplication.flutterMessenger
-
-        if (messenger == null) {
-            Log.e(MyApplication.TAG, "❌ messenger null - saving flag")
-            MyApplication.instance?.let { app ->
-                app.getSharedPreferences("adhan_control", Context.MODE_PRIVATE)
-                    .edit()
-                    .putBoolean("stop_adhan_requested", true)
-                    .apply()
+        try {
+            val alarmService = com.gdelataillade.alarm.alarm.AlarmService.instance
+            if (alarmService != null) {
+                val ringingIds = com.gdelataillade.alarm.alarm.AlarmService.ringingAlarmIds.toList()
+                for (id in ringingIds) {
+                    Log.d(MyApplication.TAG, "🛑 Native stopping ringing alarm id=$id")
+                    alarmService.handleStopAlarmCommand(id)
+                }
             }
-            return
+        } catch (e: Exception) {
+            Log.e(MyApplication.TAG, "⚠️ Error in native AlarmService stop: $e")
         }
 
-        try {
-            MethodChannel(messenger, MyApplication.ADHAN_CHANNEL)
-                .invokeMethod("stopAdhan", null)
-            Log.d(MyApplication.TAG, "🚀 stopAdhan sent to background")
-        } catch (e: Exception) {
-            Log.e(MyApplication.TAG, "❌ Failed to send stopAdhan", e)
+        val messenger = MyApplication.flutterMessenger
+        if (messenger != null) {
+            try {
+                MethodChannel(messenger, MyApplication.ADHAN_CHANNEL)
+                    .invokeMethod("stopAdhan", null)
+                Log.d(MyApplication.TAG, "🚀 stopAdhan forwarded to Flutter")
+            } catch (e: Exception) {
+                Log.e(MyApplication.TAG, "❌ Failed to forward stopAdhan", e)
+            }
         }
     }
 }

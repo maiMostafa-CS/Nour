@@ -57,26 +57,28 @@ class MyApplication : Application() {
 
         fun stopAdhan() {
             Log.d(TAG, "🛑 stopAdhan called")
-
-            val messenger = flutterMessenger
-            if (messenger == null) {
-                Log.e(TAG, "❌ Flutter messenger is null - saving flag instead")
-                instance?.let { app ->
-                    app.getSharedPreferences("adhan_control", MODE_PRIVATE)
-                        .edit()
-                        .putBoolean("stop_adhan_requested", true)
-                        .apply()
+            try {
+                val alarmService = com.gdelataillade.alarm.alarm.AlarmService.instance
+                if (alarmService != null) {
+                    val ringingIds = com.gdelataillade.alarm.alarm.AlarmService.ringingAlarmIds.toList()
+                    for (id in ringingIds) {
+                        Log.d(TAG, "🛑 Native stopping ringing alarm id=$id")
+                        alarmService.handleStopAlarmCommand(id)
+                    }
                 }
-                return
+            } catch (e: Exception) {
+                Log.e(TAG, "⚠️ Error in native AlarmService stop: $e")
             }
 
-            try {
-                MethodChannel(messenger, ADHAN_CHANNEL)
-                    .invokeMethod("stopAdhan", null)
-
-                Log.d(TAG, "🚀 stopAdhan sent to Flutter")
-            } catch (e: Exception) {
-                Log.e(TAG, "❌ Failed to send stopAdhan", e)
+            val messenger = flutterMessenger
+            if (messenger != null) {
+                try {
+                    MethodChannel(messenger, ADHAN_CHANNEL)
+                        .invokeMethod("stopAdhan", null)
+                    Log.d(TAG, "🚀 stopAdhan forwarded to Flutter")
+                } catch (e: Exception) {
+                    Log.e(TAG, "❌ Failed to send stopAdhan to Flutter", e)
+                }
             }
         }
     }

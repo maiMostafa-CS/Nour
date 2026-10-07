@@ -66,27 +66,10 @@ class OrphanAlarmCleaner {
     );
   }
 
-  /// Defensive cleanup of known ranges
+  /// Defensive cleanup of known ranges - disabled to prevent wiping active prayer alarms
   Future<void> _sweepKnownRanges() async {
-    // ⚠️ Adjust these numbers for your project
-    const adhanBase = 124570;
-    const iqamaBase = 324570;
-    const countdownBase = 424570;
-    const sweepRange = 200;
-
-    final bases = [adhanBase, iqamaBase, countdownBase];
-
-    debugPrint('🧹 [Cleaner] sweeping ranges: $bases × $sweepRange');
-
-    final allIds = <int>[];
-    for (final base in bases) {
-      for (int i = 0; i < sweepRange; i++) {
-        allIds.add(base + i);
-      }
-    }
-
-    await _cancelIds(allIds);
-    debugPrint('🧹 [Cleaner] swept ${allIds.length} IDs');
+    // Intentionally no-op: arbitrary ID ranges overlap with active scheduled prayers.
+    debugPrint('🧹 [Cleaner] sweeping arbitrary ranges is disabled to protect scheduled alarms');
   }
 
   /// Reset the swept flag (for manual use/testing)

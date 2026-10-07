@@ -3,14 +3,15 @@ import '../config/prayer_scheduler_config.dart';
 class PrayerSchedulerIds {
   PrayerSchedulerIds._();
 
-  static final DateTime _epoch = DateTime(2020, 1, 1);
+  static final DateTime _epoch = DateTime.utc(2020, 1, 1);
 
-  /// Day number since a fixed date
+  /// Day number since a fixed date calculated in UTC to prevent DST drift
   static int _dayNumber(DateTime date) {
-    final normalizedDate = DateTime(
-      date.year,
-      date.month,
-      date.day,
+    final local = date.toLocal();
+    final normalizedDate = DateTime.utc(
+      local.year,
+      local.month,
+      local.day,
     );
 
     return normalizedDate.difference(_epoch).inDays;

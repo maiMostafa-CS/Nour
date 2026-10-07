@@ -12,6 +12,7 @@ import 'app.dart';
 import 'core/services/alarm_cleanup/orphan_alarm_cleaner.dart';
 import 'core/services/prayer_scheduler_split/prayer_scheduler/adhan_scheduler_service.dart';
 import 'core/services/prayer_scheduler_split/prayer_scheduler/notifications/countdown_notification_service.dart';
+import 'core/services/prayer_scheduler_split/prayer_scheduler/utils/prayer_alarm_logger.dart';
 import 'core/services/unlock_card.dart';
 import 'features/khatma/data/datasources/khatma_local_data_source.dart';
 import 'features/khatma/domain/entities/khatma_progress.dart';
@@ -28,6 +29,7 @@ Future<void> main() async {
   GoogleFonts.config.allowRuntimeFetching = false;
   tz.initializeTimeZones();
   await configureDependencies();
+  await PrayerAlarmLogger.initTimezone();
 
   if (Platform.isAndroid) {
     await _initializeAndroid();
@@ -161,6 +163,17 @@ Future<void> _stopAdhanForCall() async {
         if (isRinging) {
           await Alarm.stop(alarm.id);
           stopped++;
+          final prayerName = alarm.notificationSettings.title
+              .replaceAll('حان الآن وقت ', '')
+              .trim();
+          PrayerAlarmLogger.log(
+            type: 'ADHAN',
+            stage: 'STOP ADHAN',
+            prayerName: prayerName.isNotEmpty ? prayerName : 'Adhan',
+            alarmId: alarm.id,
+            scheduledTime: alarm.dateTime,
+            status: 'STOPPED_CALL_INTERRUPTION',
+          );
           debugPrint('🔇 Stopped ringing adhan alarm id=${alarm.id}');
         }
       }

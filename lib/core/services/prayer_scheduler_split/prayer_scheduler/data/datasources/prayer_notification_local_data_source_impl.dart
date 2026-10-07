@@ -666,7 +666,9 @@ class PrayerNotificationLocalDataSourceImpl
     final now = DateTime.now();
 
     final adhanSettings =
-    await _adhanSettingsRepository.getSettings();
+        await _adhanSettingsRepository.getSettings();
+    final iqamaSettings =
+        await _iqamaSettingsRepository.getSettings();
 
     final schedule = await _buildSchedule(
       latitude: latitude,
@@ -676,57 +678,49 @@ class PrayerNotificationLocalDataSourceImpl
 
     for (final day in schedule) {
       for (final moment in day.toMoments()) {
-        if (!adhanSettings.isEnabled(moment.index)) {
-          prayerSchedulerLog(
-            '⏭️ Skip disabled Adhan check | '
-                'prayer=${moment.name} | '
-                'index=${moment.index}',
-          );
+        final adhanEnabled = adhanSettings.isEnabled(moment.index);
+
+        // 1. Verify future Adhan if enabled
+        if (adhanEnabled && moment.time.isAfter(now)) {
+          final id = PrayerSchedulerIds.adhan(moment.time, moment.index);
+          final alarm = await Alarm.getAlarm(id);
           await Future.delayed(Duration.zero);
-          continue;
-        }
 
-        if (!moment.time.isAfter(now)) {
-          await Future.delayed(Duration.zero);
-          continue;
-        }
-
-        final id = PrayerSchedulerIds.adhan(moment.time, moment.index);
-
-        final alarm = await Alarm.getAlarm(id);
-
-        await Future.delayed(Duration.zero);
-
-        if (alarm == null) {
-          prayerSchedulerLog(
-            '❌ Missing future Adhan alarm | '
-                'id=$id | prayer=${moment.name} | time=${moment.time}',
-          );
-          return false;
-        }
-
-        if (!alarm.dateTime.isAfter(now)) {
-          prayerSchedulerLog(
-            '❌ Adhan alarm is not future | '
-                'id=$id | alarmTime=${alarm.dateTime}',
-          );
-          await Future.delayed(Duration.zero);
-          return false;
-        }
-
-        // Check corresponding Iqama alarm if its time is in the future
-        final iqamaSettings = await _iqamaSettingsRepository.getSettings();
-        final iqamaMinutes = iqamaSettings.getMinutes(moment.index);
-        final iqamaTime = moment.time.add(Duration(minutes: iqamaMinutes));
-        if (iqamaTime.isAfter(now)) {
-          final iqamaId = PrayerSchedulerIds.iqama(moment.time, moment.index);
-          final iqamaAlarm = await Alarm.getAlarm(iqamaId);
-          if (iqamaAlarm == null) {
+          if (alarm == null) {
             prayerSchedulerLog(
-              '❌ Missing future Iqama alarm | '
-                  'id=$iqamaId | prayer=${moment.name} | time=$iqamaTime',
+              '❌ Missing future Adhan alarm | '
+              'id=$id | prayer=${moment.name} | time=${moment.time}',
             );
             return false;
+          }
+
+          if (!alarm.dateTime.isAfter(now)) {
+            prayerSchedulerLog(
+              '❌ Adhan alarm is not future | '
+              'id=$id | alarmTime=${alarm.dateTime}',
+            );
+            await Future.delayed(Duration.zero);
+            return false;
+          }
+        }
+
+        // 2. Verify future Iqama independently (even if adhan time has passed)
+        if (moment.index != 1) { // Skip Sunrise as it has no Iqama
+          final iqamaMinutes = iqamaSettings.getMinutes(moment.index);
+          final iqamaTime = moment.time.add(Duration(minutes: iqamaMinutes));
+
+          if (iqamaTime.isAfter(now)) {
+            final iqamaId = PrayerSchedulerIds.iqama(moment.time, moment.index);
+            final iqamaAlarm = await Alarm.getAlarm(iqamaId);
+            await Future.delayed(Duration.zero);
+
+            if (iqamaAlarm == null) {
+              prayerSchedulerLog(
+                '❌ Missing future Iqama alarm | '
+                'id=$iqamaId | prayer=${moment.name} | time=$iqamaTime',
+              );
+              return false;
+            }
           }
         }
       }
@@ -883,19 +877,6 @@ class PrayerNotificationLocalDataSourceImpl
       prayerSchedulerLog('⚠️ Safety net cancel error: $e');
     }
 
-    // ==========================================================
-    // 🧹 NEW: SWEEP ORPHAN ALARMS
-    //
-    // Clears orphan alarms from known ranges
-    // (those not registered in Alarm.getAlarms() or AlarmIdTracker)
-    // ==========================================================
-
-    try {
-      final swept = await _sweepOrphanAlarms();
-      prayerSchedulerLog('🧹 [Sweep] Cancelled $swept orphan alarms');
-    } catch (e) {
-      prayerSchedulerLog('⚠️ Sweep orphan error: $e');
-    }
 
     // ==========================================================
     // GET SCHEDULED LOCATION
@@ -1040,53 +1021,7 @@ class PrayerNotificationLocalDataSourceImpl
     );
   }
 
-// ============================================================
-// 🧹 SWEEP ORPHAN ALARMS
-// ============================================================
 
-  /// Clears orphan alarms from the known ranges
-  ///
-  /// Orphan alarms are those that:
-  /// - are not present in `Alarm.getAlarms()`
-  /// - are not registered in `AlarmIdTracker`
-  /// - but are still registered in the Android system
-  ///
-  /// Solution: iterate over all IDs in the known ranges
-  /// and try to cancel each one.
-  Future<int> _sweepOrphanAlarms() async {
-    // ⚠️ Adjust these numbers for your project
-    const adhanBase = 124570;
-    const iqamaBase = 324570;
-    const countdownBase = 424570;
-    const sweepRange = 200;
-
-    final bases = [adhanBase, iqamaBase, countdownBase];
-
-    var cancelled = 0;
-
-    for (final base in bases) {
-      for (int i = 0; i < sweepRange; i++) {
-        final id = base + i;
-
-        // 1️⃣ Cancel from the alarm plugin
-        try {
-          await Alarm.stop(id);
-          cancelled++;
-        } catch (_) {
-          // Expected — alarm does not exist
-        }
-
-        // 2️⃣ Cancel from android_alarm_manager_plus
-        try {
-          await AndroidAlarmManager.cancel(id);
-        } catch (_) {
-          // Expected
-        }
-      }
-    }
-
-    return cancelled;
-  }
   Future<(double, double)?> getScheduledLocation() async {
     final prefs = await SharedPreferences.getInstance();
     final lat = prefs.getDouble(prayerScheduledLatitudePrefsKey);

@@ -22,6 +22,7 @@ import 'background/prayer_background_callbacks.dart';
 import 'config/prayer_scheduler_config.dart';
 import 'data/datasources/prayer_notification_local_data_source_impl.dart';
 import 'notifications/countdown_notification_service.dart';
+import 'utils/prayer_alarm_logger.dart';
 /// Number of days always kept scheduled ahead (rolling window).
 const int kPrayerNotificationWindowDays = 4;
 const int kPrayerMaintenanceAlarmId = 909001;
@@ -288,7 +289,35 @@ class AdhanSchedulerService {
 
     Alarm.ringing.listen((alarmSet) async {
       for (final alarm in alarmSet.alarms) {
-        if (alarm.payload == 'reminder_before_adhan') {
+        if (alarm.payload == 'adhan') {
+          final prayerName = alarm.notificationSettings.title
+              .replaceAll('حان الآن وقت ', '')
+              .trim();
+          PrayerAlarmLogger.log(
+            type: 'ADHAN',
+            stage: 'ALARM CALLBACK',
+            prayerName: prayerName.isNotEmpty ? prayerName : 'Adhan',
+            alarmId: alarm.id,
+            scheduledTime: alarm.dateTime,
+            status: 'CALLBACK_TRIGGERED',
+          );
+          PrayerAlarmLogger.log(
+            type: 'ADHAN',
+            stage: 'PLAY ADHAN',
+            prayerName: prayerName.isNotEmpty ? prayerName : 'Adhan',
+            alarmId: alarm.id,
+            scheduledTime: alarm.dateTime,
+            status: 'AUDIO_PLAYING',
+          );
+          PrayerAlarmLogger.log(
+            type: 'ADHAN',
+            stage: 'NOTIFICATION SHOWN',
+            prayerName: prayerName.isNotEmpty ? prayerName : 'Adhan',
+            alarmId: alarm.id,
+            scheduledTime: alarm.dateTime,
+            status: 'NOTIFICATION_DISPLAYED',
+          );
+        } else if (alarm.payload == 'reminder_before_adhan') {
           Future.delayed(const Duration(seconds: 15), () async {
             try {
               await Alarm.stop(alarm.id);
@@ -300,11 +329,46 @@ class AdhanSchedulerService {
             }
           });
         } else if (alarm.payload == 'iqama') {
+          final prayerName = alarm.notificationSettings.body
+              .replaceAll('إقامة صلاة ', '')
+              .trim();
+          PrayerAlarmLogger.log(
+            type: 'IQAMA',
+            stage: 'ALARM CALLBACK',
+            prayerName: prayerName.isNotEmpty ? prayerName : 'Iqama',
+            alarmId: alarm.id,
+            scheduledTime: alarm.dateTime,
+            status: 'CALLBACK_TRIGGERED',
+          );
+          PrayerAlarmLogger.log(
+            type: 'IQAMA',
+            stage: 'PLAY IQAMA',
+            prayerName: prayerName.isNotEmpty ? prayerName : 'Iqama',
+            alarmId: alarm.id,
+            scheduledTime: alarm.dateTime,
+            status: 'AUDIO_PLAYING',
+          );
+          PrayerAlarmLogger.log(
+            type: 'IQAMA',
+            stage: 'NOTIFICATION SHOWN',
+            prayerName: prayerName.isNotEmpty ? prayerName : 'Iqama',
+            alarmId: alarm.id,
+            scheduledTime: alarm.dateTime,
+            status: 'NOTIFICATION_DISPLAYED',
+          );
           Future.delayed(const Duration(seconds: 60), () async {
             try {
               final isRinging = await Alarm.isRinging(alarm.id);
               if (isRinging) {
                 await Alarm.stop(alarm.id);
+                PrayerAlarmLogger.log(
+                  type: 'IQAMA',
+                  stage: 'STOP IQAMA',
+                  prayerName: prayerName.isNotEmpty ? prayerName : 'Iqama',
+                  alarmId: alarm.id,
+                  scheduledTime: alarm.dateTime,
+                  status: 'AUTO_STOPPED_AFTER_TIMEOUT',
+                );
                 prayerSchedulerLog('🛑 Iqama auto-stopped after ringing | id=${alarm.id}');
               }
             } catch (e) {

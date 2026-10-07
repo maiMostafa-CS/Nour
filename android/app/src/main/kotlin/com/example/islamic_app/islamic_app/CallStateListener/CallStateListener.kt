@@ -79,31 +79,30 @@ object CallStateListener {
     }
 
     private fun stopAdhan() {
-        val messenger = MyApplication.flutterMessenger
-
-        if (messenger == null) {
-            Log.e(TAG, "❌ Flutter messenger is null - saving flag instead")
-
-            // ✅ احفظ flag في FlutterSharedPreferences
-            appContext?.getSharedPreferences(
-                PREFS_NAME,
-                Context.MODE_PRIVATE
-            )
-                ?.edit()
-                ?.putBoolean(KEY_STOP_ADHAN, true)
-                ?.putLong("flutter.stop_adhan_time", System.currentTimeMillis())
-                ?.apply()
-
-            return
+        try {
+            // 1. Direct native stop: stop ONLY the alarm currently playing audio
+            val alarmService = com.gdelataillade.alarm.alarm.AlarmService.instance
+            if (alarmService != null) {
+                val ringingIds = com.gdelataillade.alarm.alarm.AlarmService.ringingAlarmIds.toList()
+                for (id in ringingIds) {
+                    Log.d(TAG, "🛑 Native stopping currently ringing alarm id=$id")
+                    alarmService.handleStopAlarmCommand(id)
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "⚠️ Direct native AlarmService stop exception: $e")
         }
 
-        try {
-            MethodChannel(messenger, ADHAN_CHANNEL)
-                .invokeMethod("stopAdhan", null)
-
-            Log.d(TAG, "🚀 stopAdhan sent to background engine")
-        } catch (e: Exception) {
-            Log.e(TAG, "❌ Failed to send stopAdhan", e)
+        // 2. Also notify Flutter if an engine is connected (safely)
+        val messenger = MyApplication.flutterMessenger
+        if (messenger != null) {
+            try {
+                MethodChannel(messenger, ADHAN_CHANNEL)
+                    .invokeMethod("stopAdhan", null)
+                Log.d(TAG, "🚀 stopAdhan forwarded to Flutter")
+            } catch (e: Exception) {
+                Log.e(TAG, "❌ Failed to forward stopAdhan to Flutter", e)
+            }
         }
     }
 }

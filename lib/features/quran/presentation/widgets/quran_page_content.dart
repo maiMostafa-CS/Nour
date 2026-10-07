@@ -18,6 +18,7 @@ class QuranPageContent extends StatefulWidget {
   final int pageNumber;
   final PageController? controller;
 
+
   final void Function({
     required int pageNumber,
     required String surahName,

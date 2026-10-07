@@ -2,6 +2,7 @@ import 'package:alarm/alarm.dart';
 
 import '../config/prayer_scheduler_config.dart';
 import '../notifications/countdown_notification_service.dart';
+import '../utils/prayer_alarm_logger.dart';
 import '../utils/prayer_scheduler_ids.dart';
 
 class AdhanScheduler {
@@ -16,6 +17,15 @@ class AdhanScheduler {
     final id = PrayerSchedulerIds.adhan(
       moment.time,
       moment.index,
+    );
+
+    PrayerAlarmLogger.log(
+      type: 'ADHAN',
+      stage: 'SCHEDULE',
+      prayerName: moment.name,
+      alarmId: id,
+      scheduledTime: moment.time,
+      status: enabled ? 'INITIATING_SCHEDULE' : 'DISABLED',
     );
 
     if (!enabled) {
@@ -96,6 +106,15 @@ class AdhanScheduler {
         alarmSettings: alarmSettings,
       );
 
+      PrayerAlarmLogger.log(
+        type: 'ADHAN',
+        stage: 'ALARM CREATED',
+        prayerName: moment.name,
+        alarmId: id,
+        scheduledTime: moment.time,
+        status: 'SUCCESS',
+      );
+
       prayerSchedulerLog(
         '✅ ADHAN Alarm.set SUCCESS | '
             'id=$id | '
@@ -106,6 +125,17 @@ class AdhanScheduler {
 
       return true;
     } catch (e, stackTrace) {
+      PrayerAlarmLogger.log(
+        type: 'ADHAN',
+        stage: 'ALARM CREATED',
+        prayerName: moment.name,
+        alarmId: id,
+        scheduledTime: moment.time,
+        status: 'FAILED',
+        error: e,
+        stackTrace: stackTrace,
+      );
+
       prayerSchedulerLog(
         '❌ ADHAN Alarm.set FAILED | '
             'id=$id | '
@@ -123,12 +153,22 @@ class AdhanScheduler {
       return false;
     }
   }
+
   static Future<void> cancel({
     required DateTime time,
     required int prayerIndex,
+    String prayerName = 'Unknown',
   }) async {
     final id = PrayerSchedulerIds.adhan(time, prayerIndex);
     await Alarm.stop(id);
+    PrayerAlarmLogger.log(
+      type: 'ADHAN',
+      stage: 'STOP ADHAN',
+      prayerName: prayerName,
+      alarmId: id,
+      scheduledTime: time,
+      status: 'CANCELLED',
+    );
     prayerSchedulerLog('🔇 ADHAN CANCELLED | id=$id');
   }
 
