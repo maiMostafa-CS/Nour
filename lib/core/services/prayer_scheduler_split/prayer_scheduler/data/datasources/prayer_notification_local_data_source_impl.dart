@@ -713,11 +713,27 @@ class PrayerNotificationLocalDataSourceImpl
           await Future.delayed(Duration.zero);
           return false;
         }
+
+        // Check corresponding Iqama alarm if its time is in the future
+        final iqamaSettings = await _iqamaSettingsRepository.getSettings();
+        final iqamaMinutes = iqamaSettings.getMinutes(moment.index);
+        final iqamaTime = moment.time.add(Duration(minutes: iqamaMinutes));
+        if (iqamaTime.isAfter(now)) {
+          final iqamaId = PrayerSchedulerIds.iqama(moment.time, moment.index);
+          final iqamaAlarm = await Alarm.getAlarm(iqamaId);
+          if (iqamaAlarm == null) {
+            prayerSchedulerLog(
+              '❌ Missing future Iqama alarm | '
+                  'id=$iqamaId | prayer=${moment.name} | time=$iqamaTime',
+            );
+            return false;
+          }
+        }
       }
     }
 
     prayerSchedulerLog(
-      '✅ All ENABLED future Adhan alarms are scheduled',
+      '✅ All ENABLED future Adhan and Iqama alarms are scheduled',
     );
 
     return true;

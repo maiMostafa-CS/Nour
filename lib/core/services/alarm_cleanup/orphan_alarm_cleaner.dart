@@ -14,8 +14,17 @@ class OrphanAlarmCleaner {
 
   OrphanAlarmCleaner(this._tracker, this._prefs);
 
-  /// Clean orphan alarms
+  /// Clean orphan alarms — ONE-TIME migration only.
+  ///
+  /// ⚠️ This must NOT run on every launch: the tracked IDs and the swept
+  /// ranges contain the *currently valid* Adhan/Iqama alarms, so running it
+  /// each startup silently cancelled every scheduled prayer alarm.
   Future<void> cleanOrphans() async {
+    if (_prefs.getBool(_sweptKey) ?? false) {
+      debugPrint('🧹 [Cleaner] already swept once → SKIP');
+      return;
+    }
+
     debugPrint('🧹 [Cleaner] START');
 
     final savedIds = _tracker.getAll();
@@ -28,8 +37,10 @@ class OrphanAlarmCleaner {
       debugPrint('🧹 [Cleaner] cleared ${savedIds.length} IDs');
     }
 
-    // 2️⃣ Always perform a defensive sweep
+    // 2️⃣ Defensive sweep (one time)
     await _sweepKnownRanges();
+
+    await _prefs.setBool(_sweptKey, true);
 
     debugPrint('🧹 [Cleaner] DONE');
   }

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:islamic_app/features/quran/presentation/widgets/quran_page_content.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../core/services/quran_bookmark_service.dart';
 import '../../../../injection_container.dart';

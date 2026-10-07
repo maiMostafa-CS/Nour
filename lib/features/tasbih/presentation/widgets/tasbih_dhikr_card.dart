@@ -14,8 +14,8 @@ class TasbihDhikrCard extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Colors.tealAccent.shade700.withOpacity(0.15),
-            Colors.teal.shade900.withOpacity(0.1),
+            Colors.tealAccent.shade700.withValues(alpha: 0.15),
+            Colors.teal.shade900.withValues(alpha: 0.1),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -54,7 +54,7 @@ class TasbihDhikrCard extends StatelessWidget {
                       textAlign: TextAlign.right,
                       textDirection: TextDirection.rtl,
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.75),
+                        color: Colors.white.withValues(alpha: 0.75),
                         fontSize: 13,
                         height: 1.5,
                       ),

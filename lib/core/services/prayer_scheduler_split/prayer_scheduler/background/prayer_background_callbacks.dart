@@ -7,6 +7,7 @@ import '../../../../../features/adhan_sound/data/datasources/adhan_local_data_so
 import '../../../../../features/iqama_setting/data/datasources/iqama_settings_local_data_source.dart';
 import '../../../../../features/iqama_setting/data/repositories/iqama_settings_repository_impl.dart';
 import '../../../../../../../features/prayer_times/data/datasources/prayer_local_data_source.dart';
+import '../adhan_scheduler_service.dart';
 import '../config/prayer_scheduler_config.dart';
 import '../data/datasources/prayer_notification_local_data_source_impl.dart';
 import '../notifications/countdown_notification_service.dart';
@@ -53,6 +54,9 @@ Future<void> prayerScheduleMaintenanceCallback() async {
     final longitude = prefs.getDouble(prayerLastLongitudePrefsKey);
 
     if (latitude == null || longitude == null) return;
+
+    // Background isolate: alarm plugin is not initialized here yet.
+    await AdhanSchedulerService.ensureAlarmInitialized();
 
     final adhanLocalDataSource = AdhanLocalDataSourceImpl(
       prefs: prefs,

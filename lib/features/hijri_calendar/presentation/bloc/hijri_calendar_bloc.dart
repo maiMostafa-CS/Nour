@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../domain/entities/hijri_date_entity.dart';
 import '../../domain/usecases/get_hijri_date.dart';
 import '../../domain/usecases/get_hijri_month.dart';
 

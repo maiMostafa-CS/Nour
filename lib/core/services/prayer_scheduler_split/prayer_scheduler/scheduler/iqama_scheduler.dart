@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:alarm/alarm.dart';
 
 import '../config/prayer_scheduler_config.dart';
@@ -9,11 +7,10 @@ import '../utils/prayer_scheduler_ids.dart';
 class IqamaScheduler {
   const IqamaScheduler._();
 
-  static Future<void> schedule({
+  static Future<bool> schedule({
     required int dayIndex,
     required dynamic moment,
     required int iqamaMinutes,
-    Duration autoStopAfter = const Duration(seconds: 30),
   }) async {
     final id = PrayerSchedulerIds.iqama(
       moment.time,
@@ -36,7 +33,7 @@ class IqamaScheduler {
       prayerSchedulerLog(
         '⏭️ IQAMA SKIPPED | prayer=${moment.name}',
       );
-      return;
+      return false;
     }
 
     final alarmSettings = AlarmSettings(
@@ -45,7 +42,7 @@ class IqamaScheduler {
 
       assetAudioPath: iqamaAsset,
 
-      // مهم
+      // Important: play audio once without looping
       loopAudio: false,
 
       vibrate: false,
@@ -81,62 +78,27 @@ class IqamaScheduler {
     );
 
     prayerSchedulerLog(
-      '✅ IQAMA Alarm.set SUCCESS | id=$id',
+      '✅ IQAMA Alarm.set SUCCESS | id=$id | time=$iqamaTime',
     );
 
-    // ==========================================================
-    // AUTO STOP
-    // ==========================================================
-
-    unawaited(
-      _autoStop(
-        id: id,
-        duration: autoStopAfter,
-        prayerName: moment.name,
-      ),
-    );
+    return true;
   }
 
-  static Future<void> _autoStop({
-    required int id,
-    required Duration duration,
-    required String prayerName,
+  static Future<void> cancel({
+    required DateTime time,
+    required int prayerIndex,
   }) async {
-    try {
-      await Future.delayed(duration);
+    final id = PrayerSchedulerIds.iqama(time, prayerIndex);
+    await Alarm.stop(id);
+    prayerSchedulerLog('🔇 IQAMA CANCELLED | id=$id');
+  }
 
-      prayerSchedulerLog(
-        '⏱️ IQAMA AUTO STOP TRIGGERED | '
-            'id=$id | '
-            'prayer=$prayerName',
-      );
-
-      final alarm = await Alarm.getAlarm(id);
-
-      if (alarm == null) {
-        prayerSchedulerLog(
-          'ℹ️ IQAMA ALREADY STOPPED | id=$id',
-        );
-        return;
+  static Future<void> cancelAllIqamas() async {
+    final alarms = await Alarm.getAlarms();
+    for (final a in alarms) {
+      if (a.payload == 'iqama') {
+        await Alarm.stop(a.id);
       }
-
-      await Alarm.stop(id);
-
-      prayerSchedulerLog(
-        '🛑 IQAMA STOPPED | '
-            'id=$id | '
-            'prayer=$prayerName',
-      );
-    } catch (e, stackTrace) {
-      prayerSchedulerLog(
-        '❌ IQAMA AUTO STOP FAILED | '
-            'id=$id | '
-            'error=$e',
-      );
-
-      prayerSchedulerLog(
-        'STACKTRACE: $stackTrace',
-      );
     }
   }
 }

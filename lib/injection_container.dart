@@ -1,9 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-
-import 'core/router/app_router.dart';
 import 'core/services/alarm_cleanup/alarm_id_tracker.dart';
 import 'core/services/alarm_cleanup/orphan_alarm_cleaner.dart';
 import 'core/services/ayah_audio_service.dart';
@@ -11,11 +8,8 @@ import 'core/services/prayer_scheduler_split/prayer_scheduler/adhan_scheduler_se
 import 'core/services/prayer_scheduler_split/prayer_scheduler/data/datasources/prayer_notification_local_data_source.dart';
 import 'core/services/prayer_scheduler_split/prayer_scheduler/data/datasources/prayer_notification_local_data_source_impl.dart';
 import 'core/services/prayer_scheduler_split/prayer_scheduler/services/adhan_asset_provider.dart';
-import 'core/services/unlock_card.dart';
-// import 'features/adhan_settings/data/ datasources/adhan_settings_local_data_source.dart';
 import 'features/adhan_settings/data/datasources/adhan_settings_local_data_source.dart';
 import 'features/adhan_settings/data/repositories/adhan_settings_repository_impl.dart';
-// import 'features/adhan_settings/domain/repositories/ adhan_settings_repository.dart';
 import 'features/adhan_settings/domain/repositories/adhan_settings_repository.dart';
 import 'features/adhan_settings/domain/usecases/get_adhan_settings.dart';
 import 'features/adhan_settings/domain/usecases/update_adhan_setting.dart';
@@ -103,7 +97,6 @@ import 'features/quran/domain/usecases/search_surahs.dart';
 import 'features/quran/presentation/bloc/quran_bloc.dart';
 import 'features/tasbih/presentation/bloc/tasbih_bloc.dart';
 import 'features/tasbih/presentation/widgets/custom_dhikr_storage.dart';
-
 
 final sl = GetIt.instance;
 
@@ -216,12 +209,17 @@ Future<void> configureDependencies() async {
       iqamaSettingsRepository: sl<IqamaSettingsRepository>(),
       adhanLocalDataSource: sl<AdhanLocalDataSource>(),
       adhanAssetProvider: sl<AdhanAssetProvider>(),
+      alarmIdTracker: sl<AlarmIdTracker>(),
     ),
+  );
+
+  sl.registerLazySingleton<PrayerNotificationLocalDataSource>(
+    () => sl<PrayerNotificationLocalDataSourceImpl>(),
   );
 
   sl.registerLazySingleton<PrayerNotificationRepository>(
     () => PrayerNotificationRepositoryImpl(
-      localDataSource: sl(),
+      localDataSource: sl<PrayerNotificationLocalDataSource>(),
     ),
   );
 
@@ -335,41 +333,41 @@ Future<void> configureDependencies() async {
   );
 
   sl.registerLazySingleton<AdhanAssetProvider>(
-        () => AdhanAssetProvider(
-          localDataSource: sl<AdhanLocalDataSource>(),
-        ),
+    () => AdhanAssetProvider(
+      localDataSource: sl<AdhanLocalDataSource>(),
+    ),
   );
   sl.registerLazySingleton<AdhanRepository>(
-        () => AdhanRepositoryImpl(
+    () => AdhanRepositoryImpl(
       localDataSource: sl<AdhanLocalDataSource>(),
     ),
   );
 
   sl.registerLazySingleton<GetAdhans>(
-        () => GetAdhans(
+    () => GetAdhans(
       sl<AdhanRepository>(),
     ),
   );
 
   sl.registerLazySingleton<GetSelectedAdhan>(
-        () => GetSelectedAdhan(
+    () => GetSelectedAdhan(
       sl<AdhanRepository>(),
     ),
   );
 
   sl.registerLazySingleton<SaveSelectedAdhan>(
-        () => SaveSelectedAdhan(
+    () => SaveSelectedAdhan(
       sl<AdhanRepository>(),
     ),
   );
   sl.registerLazySingleton<GetAdhansForPrayer>(
-        () => GetAdhansForPrayer(
+    () => GetAdhansForPrayer(
       sl<AdhanRepository>(),
     ),
   );
 
   sl.registerFactoryParam<AdhanBloc, String, void>(
-        (prayerName, _) => AdhanBloc(
+    (prayerName, _) => AdhanBloc(
       prayerName: prayerName,
       getAdhansForPrayer: sl<GetAdhansForPrayer>(),
       getSelectedAdhan: sl<GetSelectedAdhan>(),
@@ -495,32 +493,32 @@ Future<void> configureDependencies() async {
   );
 // Repository
   sl.registerLazySingleton<QuranAudioRepository>(
-        () => QuranAudioRepositoryImpl(
+    () => QuranAudioRepositoryImpl(
       remoteDataSource: sl<QuranAudioRemoteDataSource>(),
     ),
   );
 
 // UseCases
   sl.registerLazySingleton<GetQuranReciters>(
-        () => GetQuranReciters(
+    () => GetQuranReciters(
       sl<QuranAudioRepository>(),
     ),
   );
 
   sl.registerLazySingleton<GetAyahAudioUrl>(
-        () => GetAyahAudioUrl(
+    () => GetAyahAudioUrl(
       sl<QuranAudioRepository>(),
     ),
   );
 
 // Audio Service
   sl.registerLazySingleton<AyahAudioService>(
-        () => AyahAudioService(),
+    () => AyahAudioService(),
   );
 
 // Quran BLoC
   sl.registerFactory<QuranIndexBloc>(
-        () => QuranIndexBloc(
+    () => QuranIndexBloc(
       getSurahs: sl<GetSurahs>(),
       searchSurahs: sl<SearchSurahs>(),
       getQuranReciters: sl<GetQuranReciters>(),
@@ -558,29 +556,29 @@ Future<void> configureDependencies() async {
 // ============================================================
 
   sl.registerLazySingleton<http.Client>(
-        () => http.Client(),
+    () => http.Client(),
   );
 
   sl.registerLazySingleton<QuranpediaRemoteDataSource>(
-        () => QuranpediaRemoteDataSourceImpl(
+    () => QuranpediaRemoteDataSourceImpl(
       client: sl<http.Client>(),
     ),
   );
 
   sl.registerLazySingleton<TafsirBooksRepository>(
-        () => TafsirBooksRepositoryImpl(
+    () => TafsirBooksRepositoryImpl(
       remoteDataSource: sl<QuranpediaRemoteDataSource>(),
     ),
   );
 
   sl.registerLazySingleton<GetTafsirBooks>(
-        () => GetTafsirBooks(
+    () => GetTafsirBooks(
       sl<TafsirBooksRepository>(),
     ),
   );
 
   sl.registerLazySingleton<GetAyahTafsir>(
-        () => GetAyahTafsir(
+    () => GetAyahTafsir(
       sl<TafsirBooksRepository>(),
     ),
   );
@@ -589,41 +587,41 @@ Future<void> configureDependencies() async {
 // ============================================================
 
   sl.registerLazySingleton<KhatmaLocalDataSource>(
-        () => KhatmaLocalDataSourceImpl(
+    () => KhatmaLocalDataSourceImpl(
       sl<SharedPreferences>(),
     ),
   );
   sl.registerLazySingleton<KhatmaRepository>(
-        () => KhatmaRepositoryImpl(
+    () => KhatmaRepositoryImpl(
       localDataSource: sl<KhatmaLocalDataSource>(),
     ),
   );
 
   sl.registerLazySingleton<GetKhatmaProgress>(
-        () => GetKhatmaProgress(
+    () => GetKhatmaProgress(
       sl<KhatmaRepository>(),
     ),
   );
 
   sl.registerLazySingleton<MarkCurrentAyahAsRead>(
-        () => MarkCurrentAyahAsRead(
+    () => MarkCurrentAyahAsRead(
       sl<KhatmaRepository>(),
     ),
   );
 
   sl.registerLazySingleton<ResetKhatma>(
-        () => ResetKhatma(
+    () => ResetKhatma(
       sl<KhatmaRepository>(),
     ),
   );
 
   sl.registerLazySingleton<GetCurrentKhatmaAyah>(
-        () => GetCurrentKhatmaAyah(
+    () => GetCurrentKhatmaAyah(
       sl<KhatmaRepository>(),
     ),
   );
   sl.registerLazySingleton<GetKhatmaWeeklyReport>(
-        () => GetKhatmaWeeklyReport(sl()),
+    () => GetKhatmaWeeklyReport(sl()),
   );
   // sl.registerFactory(() => UnlockCardCubit());
 
@@ -636,7 +634,7 @@ Future<void> configureDependencies() async {
   // -------------------------
 
   sl.registerLazySingleton<AzkarLocalDataSource>(
-        () => AzkarLocalDataSource(),
+    () => AzkarLocalDataSource(),
   );
 
   // -------------------------
@@ -644,7 +642,7 @@ Future<void> configureDependencies() async {
   // -------------------------
 
   sl.registerLazySingleton<AzkarRepository>(
-        () => AzkarRepositoryImpl(
+    () => AzkarRepositoryImpl(
       sl<AzkarLocalDataSource>(),
     ),
   );
@@ -654,19 +652,19 @@ Future<void> configureDependencies() async {
   // -------------------------
 
   sl.registerLazySingleton<GetAzkarCategories>(
-        () => GetAzkarCategories(
+    () => GetAzkarCategories(
       sl<AzkarRepository>(),
     ),
   );
 
   sl.registerLazySingleton<GetAzkarChapters>(
-        () => GetAzkarChapters(
+    () => GetAzkarChapters(
       sl<AzkarRepository>(),
     ),
   );
 
   sl.registerLazySingleton<GetAzkarItems>(
-        () => GetAzkarItems(
+    () => GetAzkarItems(
       sl<AzkarRepository>(),
     ),
   );
@@ -676,20 +674,19 @@ Future<void> configureDependencies() async {
   // -------------------------
 
   sl.registerFactory<AzkarBloc>(
-        () => AzkarBloc(
+    () => AzkarBloc(
       getAzkarCategories: sl(),
       getAzkarChapters: sl(),
       getAzkarItems: sl(),
     ),
   );
 
-
   sl.registerLazySingleton<AlarmIdTracker>(
-        () => AlarmIdTracker(prefs),
+    () => AlarmIdTracker(prefs),
   );
 
   sl.registerLazySingleton<OrphanAlarmCleaner>(
-        () => OrphanAlarmCleaner(
+    () => OrphanAlarmCleaner(
       sl<AlarmIdTracker>(),
       prefs,
     ),
@@ -697,6 +694,4 @@ Future<void> configureDependencies() async {
 
   sl.registerFactory<TasbihBloc>(() => TasbihBloc());
   sl.registerLazySingleton(() => CustomDhikrStorage());
-
-
 }

@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 
-import '../../constants/tasbih_data.dart';
 
 class AddDhikrDialog extends StatefulWidget {
   const AddDhikrDialog({super.key});

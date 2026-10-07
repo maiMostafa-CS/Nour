@@ -18,7 +18,6 @@ import '../../features/hijri_calendar/presentation/bloc/hijri_calendar_event.dar
 import '../../features/hijri_calendar/presentation/pages/hijri_calendar_page.dart';
 
 import '../../features/home/presentation/bloc/home_event.dart';
-import '../../features/home/presentation/pages/home_page.dart';
 import '../../features/home/presentation/widget/mainPage.dart';
 import '../../features/iqama_setting/presentation/bloc/iqama_settings_bloc.dart';
 import '../../features/home/presentation/bloc/bloc.dart';
@@ -42,24 +41,22 @@ class AppRouter {
   static const splashScreen = '/splashScreen';
   static const qibla = '/qibla';
   static const hijriCalendar = '/hijriCalendar';
-static const locationPage = '/locationPage';
-static const adhan= "/adhan";
-  static const adhanSetting= "/adhanSetting";
-static const iqamaSettings= "/iqamaSettings";
-  static const prayerSettingsPage= "/prayerSettingsPage";
-  static const quranHomePage= "/quranHomePage";
-  static const tasbih= "/tasbih";
-
+  static const locationPage = '/locationPage';
+  static const adhan = "/adhan";
+  static const adhanSetting = "/adhanSetting";
+  static const iqamaSettings = "/iqamaSettings";
+  static const prayerSettingsPage = "/prayerSettingsPage";
+  static const quranHomePage = "/quranHomePage";
+  static const tasbih = "/tasbih";
 
   static Route<dynamic> onGenerateRoute(
-      RouteSettings settings,
-      ) {
+    RouteSettings settings,
+  ) {
     switch (settings.name) {
       case quran:
         return MaterialPageRoute(
           builder: (_) => const QuranIndexPage(),
         );
-
 
       case tasbih:
         return MaterialPageRoute(
@@ -75,7 +72,7 @@ static const iqamaSettings= "/iqamaSettings";
         return MaterialPageRoute(
           builder: (_) => const QiblaPage(),
         );
-      case  prayerSettingsPage :
+      case prayerSettingsPage:
         return MaterialPageRoute(
           builder: (_) => const PrayerSettingsPage(),
         );
@@ -90,12 +87,12 @@ static const iqamaSettings= "/iqamaSettings";
           ),
         );
 
-      case locationPage :
+      case locationPage:
         return MaterialPageRoute(
           builder: (_) => BlocProvider(
             create: (_) => getIt<LocationBloc>()
               ..add(
-                const LoadLocations() ,
+                const LoadLocations(),
               ),
             child: const LocationPage(),
           ),
@@ -140,8 +137,8 @@ static const iqamaSettings= "/iqamaSettings";
       case adhanSetting:
         return MaterialPageRoute(
           builder: (_) => BlocProvider<AdhanSettingsBloc>(
-            create: (_) => sl<AdhanSettingsBloc>()
-              ..add(const LoadAdhanSettings()),
+            create: (_) =>
+                sl<AdhanSettingsBloc>()..add(const LoadAdhanSettings()),
             child: const AdhanSettingsPage(),
           ),
         );
@@ -156,7 +153,6 @@ static const iqamaSettings= "/iqamaSettings";
           ),
         );
 
-
       case home:
       default:
         return MaterialPageRoute(
@@ -166,8 +162,7 @@ static const iqamaSettings= "/iqamaSettings";
                 create: (_) => getIt<LocationBloc>(),
               ),
               BlocProvider<HomeBloc>(
-                create: (_) => getIt<HomeBloc>()
-                  ..add(const LoadHome()),
+                create: (_) => getIt<HomeBloc>()..add(const LoadHome()),
               ),
             ],
             child: const MainPage(),

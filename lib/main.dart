@@ -150,19 +150,19 @@ void backgroundMain() async {
   }
 }
 
-/// يُوقف الأذان فقط عند الاتصال.
-/// الإقامة لا تتأثر بالاتصال وتُشغَّل في وقتها عادي.
 Future<void> _stopAdhanForCall() async {
   try {
     final alarms = await Alarm.getAlarms();
     var stopped = 0;
 
     for (final alarm in alarms) {
-      // توقف الأذان فقط — الإقامة تُشغَّل حتى لو فيه اتصال
       if (alarm.payload == 'adhan') {
-        await Alarm.stop(alarm.id);
-        stopped++;
-        debugPrint('🔇 Stopped adhan alarm id=${alarm.id}');
+        final isRinging = await Alarm.isRinging(alarm.id);
+        if (isRinging) {
+          await Alarm.stop(alarm.id);
+          stopped++;
+          debugPrint('🔇 Stopped ringing adhan alarm id=${alarm.id}');
+        }
       }
     }
 
@@ -172,7 +172,6 @@ Future<void> _stopAdhanForCall() async {
     debugPrint('$stackTrace');
   }
 }
-
 
 void _setupAdhanStopHandler() {
   const adhanChannel = MethodChannel('com.example.islamic_app/adhan');
@@ -188,17 +187,15 @@ void _setupAdhanStopHandler() {
 // Android initialization
 // ================================================================
 
-
-
 Future<void> _initializeAndroid() async {
   try {
 // ------------------------------------------------------------
-// Alarm initialization is intentionally NOT done here.
-//
-// AdhanSchedulerService owns Alarm.init().
-// This prevents duplicate Alarm.init() calls.
+// Alarm.init() is guarded (runs once per isolate) inside
+// AdhanSchedulerService.ensureAlarmInitialized(). It must run
+// BEFORE runApp, otherwise HomeBloc can call Alarm.set before init.
 // ------------------------------------------------------------
 
+    await AdhanSchedulerService.ensureAlarmInitialized();
     await _cleanOrphanAlarms();
   } catch (e, stackTrace) {
     debugPrint(
@@ -259,8 +256,6 @@ Future<void> _initializeKhatmaUnlock() async {
   }
 
   try {
-
-
     await _syncKhatmaUnlockAyah();
 
     // ==========================================================
@@ -291,8 +286,7 @@ Future<void> _processPendingKhatmaRead() async {
   }
 
   try {
-    final hasPending =
-    await KhatmaUnlockSyncService.hasPendingRead();
+    final hasPending = await KhatmaUnlockSyncService.hasPendingRead();
 
     debugPrint(
       '🔍 KHATMA: hasPendingRead = $hasPending',
@@ -385,7 +379,7 @@ Future<void> _backgroundSetup() async {
 
     debugPrint(
       '✅ ADHAN SCHEDULER INITIALIZED '
-          '| ${stopwatch.elapsedMilliseconds}ms',
+      '| ${stopwatch.elapsedMilliseconds}ms',
     );
 
     stopwatch
@@ -400,7 +394,7 @@ Future<void> _backgroundSetup() async {
 
     debugPrint(
       '✅ EXACT ALARM PERMISSION CHECKED '
-          '| ${stopwatch.elapsedMilliseconds}ms',
+      '| ${stopwatch.elapsedMilliseconds}ms',
     );
 
     stopwatch
@@ -415,7 +409,7 @@ Future<void> _backgroundSetup() async {
 
     debugPrint(
       '✅ BATTERY OPTIMIZATION CHECKED '
-          '| ${stopwatch.elapsedMilliseconds}ms',
+      '| ${stopwatch.elapsedMilliseconds}ms',
     );
 
     debugPrint(
@@ -518,10 +512,10 @@ Future<void> _syncKhatmaUnlockAyah() async {
 
     debugPrint(
       '✅ KHATMA UNLOCK: synced '
-          'global=${ayah.globalNumber} '
-          'surah=${ayah.surahName} '
-          'ayah=${ayah.ayahNumber} '
-          'page=${ayah.pageNumber}',
+      'global=${ayah.globalNumber} '
+      'surah=${ayah.surahName} '
+      'ayah=${ayah.ayahNumber} '
+      'page=${ayah.pageNumber}',
     );
   } catch (e, stackTrace) {
     debugPrint(
@@ -552,8 +546,8 @@ Future<void> _onNativeKhatmaRead() async {
     KhatmaController.update(progress);
     debugPrint(
       '✅ KHATMA: '
-          'currentAyah=${progress.currentAyah}, '
-          'readAyahs=${progress.readAyahs}',
+      'currentAyah=${progress.currentAyah}, '
+      'readAyahs=${progress.readAyahs}',
     );
 
 // ------------------------------------------------------------
@@ -566,9 +560,9 @@ Future<void> _onNativeKhatmaRead() async {
 
     debugPrint(
       '📊 KHATMA WEEKLY: '
-          'total=${report.totalAyahs}, '
-          'currentWeek=${report.currentWeekAyahs}, '
-          'week=${report.weekNumber}',
+      'total=${report.totalAyahs}, '
+      'currentWeek=${report.currentWeekAyahs}, '
+      'week=${report.weekNumber}',
     );
 
 // ------------------------------------------------------------
@@ -604,11 +598,12 @@ Future<void> _onNativeKhatmaRead() async {
     );
 
     debugPrint('$stackTrace');
-  }finally {
+  } finally {
     await KhatmaUnlockSyncService.clearPendingRead();
     debugPrint('🧹 KHATMA: pending_read cleared');
   }
 }
+
 Future<void> _processPendingAdhanStop() async {
   try {
     final prefs = await SharedPreferences.getInstance();

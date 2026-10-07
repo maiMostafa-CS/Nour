@@ -1,5 +1,4 @@
 import '../entities/quran_tafsir.dart';
-import '../repositories/quran_repository.dart';
 import '../repositories/tafsir_books_repository.dart';
 
 class GetAyahTafsir {

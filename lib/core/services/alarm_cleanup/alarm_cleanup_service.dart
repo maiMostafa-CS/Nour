@@ -8,7 +8,6 @@
 ///
 /// ⚠️ Call `cleanOrphans()` in `main()` immediately before `runApp`,
 ///    and before any `forceReschedule`.
-library alarm_cleanup_service;
 
 export 'alarm_id_tracker.dart';
 export 'orphan_alarm_cleaner.dart';

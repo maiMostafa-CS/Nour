@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../azkar/presentation/pages/azkar_page.dart';
 import '../../../home/presentation/pages/home_page.dart';

@@ -84,7 +84,7 @@ class _EditTargetDialogState extends State<EditTargetDialog> {
                   side: BorderSide(
                     color: isSelected
                         ? Colors.tealAccent
-                        : Colors.white.withOpacity(0.15),
+                        : Colors.white.withValues(alpha: 0.15),
                   ),
                   onSelected: (_) {
                     setState(() {
@@ -110,7 +110,7 @@ class _EditTargetDialogState extends State<EditTargetDialog> {
                   onPressed: () => setState(() => _ctrl.clear()),
                 ),
                 filled: true,
-                fillColor: Colors.white.withOpacity(0.05),
+                fillColor: Colors.white.withValues(alpha: 0.05),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,

@@ -11,8 +11,7 @@ import '../bloc/bloc_event.dart';
 import '../bloc/bloc_state.dart';
 import '../widgets/Build_loaded.dart';
 import '../widgets/build_error.dart';
-import '../widgets/qibla_compass.dart';
-import '../widgets/qibla_info_card.dart';
+
 
 class QiblaPage extends StatefulWidget {
   const QiblaPage({super.key});

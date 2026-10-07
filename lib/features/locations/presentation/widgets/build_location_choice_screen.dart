@@ -1,12 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:islamic_app/features/locations/presentation/widgets/build_manual_location_card.dart';
 
-import '../bloc/bloc.dart';
 import '../bloc/blocState.dart';
-import '../pages/countrySelectionScreen.dart';
 import 'currentLocationCard.dart';
 
 class BuildLocationChoiceScreen extends StatefulWidget {

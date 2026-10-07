@@ -38,8 +38,26 @@ class AdhanSchedulerService {
   factory AdhanSchedulerService() => instance;
 
   bool _ringingListenerRegistered = false;
+
+  static bool _alarmInitialized = false;
+  static Future<void>? _alarmInitFuture;
+
+  /// Initializes the `alarm` plugin exactly once per isolate.
+  /// Must be awaited before any Alarm.set / Alarm.getAlarm call.
+  static Future<void> ensureAlarmInitialized() {
+    if (_alarmInitialized) return Future.value();
+    return _alarmInitFuture ??= () async {
+      try {
+        await Alarm.init();
+        _alarmInitialized = true;
+        prayerSchedulerLog('✅ Alarm.init() completed');
+      } catch (e) {
+        _alarmInitFuture = null;
+        prayerSchedulerLog('⚠️ Alarm.init(): $e');
+      }
+    }();
+  }
   PrayerNotificationLocalDataSourceImpl? _notificationDataSource;
-  bool _autoRenewRunning = false;
   AdhanAssetProvider? _adhanAssetProvider;
 
   AdhanAssetProvider get adhanAssetProvider =>
@@ -63,6 +81,16 @@ class AdhanSchedulerService {
       ) async {
     prayerSchedulerLog(
       '🔔 Compatibility: showNextPrayerCountdown()',
+    );
+
+    final prefs = await SharedPreferences.getInstance();
+    final lat = prefs.getDouble(prayerLastLatitudePrefsKey) ?? 30.0444;
+    final lng = prefs.getDouble(prayerLastLongitudePrefsKey) ?? 31.2357;
+    final tomorrow = DateTime.now().add(const Duration(days: 1));
+    final tomorrowTimes = PrayerLocalDataSourceImpl().calculate(
+      latitude: lat,
+      longitude: lng,
+      date: tomorrow,
     );
 
     final entries = <Map<String, String>>[
@@ -90,9 +118,31 @@ class AdhanSchedulerService {
         'name': 'العشاء',
         'time': prayerTimes.isha.toIso8601String(),
       },
+      {
+        'name': 'الفجر',
+        'time': tomorrowTimes.fajr.toIso8601String(),
+      },
+      {
+        'name': 'الشروق',
+        'time': tomorrowTimes.sunrise.toIso8601String(),
+      },
+      {
+        'name': 'الظهر',
+        'time': tomorrowTimes.dhuhr.toIso8601String(),
+      },
+      {
+        'name': 'العصر',
+        'time': tomorrowTimes.asr.toIso8601String(),
+      },
+      {
+        'name': 'المغرب',
+        'time': tomorrowTimes.maghrib.toIso8601String(),
+      },
+      {
+        'name': 'العشاء',
+        'time': tomorrowTimes.isha.toIso8601String(),
+      },
     ];
-
-    final prefs = await SharedPreferences.getInstance();
 
     await prefs.setString(
       prayerNotificationWindowPrefsKey,
@@ -113,6 +163,8 @@ class AdhanSchedulerService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setDouble(prayerLastLatitudePrefsKey, latitude);
     await prefs.setDouble(prayerLastLongitudePrefsKey, longitude);
+
+    await ensureAlarmInitialized();
 
     await _dataSource.ensureWindowScheduled(
       latitude: latitude,
@@ -165,6 +217,8 @@ class AdhanSchedulerService {
 
         return;
       }
+
+      await ensureAlarmInitialized();
 
       // 1️⃣ Cancel the entire old schedule
       await _dataSource.cancelAll();
@@ -245,6 +299,20 @@ class AdhanSchedulerService {
               );
             }
           });
+        } else if (alarm.payload == 'iqama') {
+          Future.delayed(const Duration(seconds: 60), () async {
+            try {
+              final isRinging = await Alarm.isRinging(alarm.id);
+              if (isRinging) {
+                await Alarm.stop(alarm.id);
+                prayerSchedulerLog('🛑 Iqama auto-stopped after ringing | id=${alarm.id}');
+              }
+            } catch (e) {
+              prayerSchedulerLog(
+                '⚠️ Iqama auto-stop failed | id=${alarm.id} | $e',
+              );
+            }
+          });
         }
       }
     });
@@ -279,17 +347,7 @@ class AdhanSchedulerService {
     // 2️⃣ Alarm
     // ============================================================
 
-    try {
-      await Alarm.init();
-
-      prayerSchedulerLog(
-        '✅ Alarm.init() completed',
-      );
-    } catch (e) {
-      prayerSchedulerLog(
-        '⚠️ Alarm.init(): $e',
-      );
-    }
+    await ensureAlarmInitialized();
 
     // ============================================================
     // 3️⃣ Android Alarm Manager

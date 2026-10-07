@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/services/prayer_scheduler_split/prayer_scheduler/data/datasources/prayer_notification_local_data_source_impl.dart';
-import '../../domain/entities/adhan_settings_entity.dart';
 import '../../domain/usecases/get_adhan_settings.dart';
 import '../../domain/usecases/update_adhan_setting.dart';
 import 'adhan_settings_event.dart';
@@ -50,7 +49,7 @@ class AdhanSettingsBloc
         settings: settings,
         clearError: true,
       ));
-    } catch (e, stackTrace) {
+    } catch (e) {
       debugPrint('❌ [AdhanSettingsBloc] LOAD ERROR: $e');
       emit(state.copyWith(
         status: AdhanSettingsStatus.error,
@@ -117,7 +116,7 @@ class AdhanSettingsBloc
     required bool enabled,
   }) async {
     try {
-      final updatedSettings = await updateAdhanSetting(
+      await updateAdhanSetting(
         currentSettings: previous,
         prayerIndex: index,
         enabled: enabled,

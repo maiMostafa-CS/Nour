@@ -67,7 +67,9 @@ class AdhanScheduler {
 
 
         // ======================================================
-        androidFullScreenIntent: true,
+        // false → Adhan plays + shows a notification (with stop
+        // button) WITHOUT opening the app / activity.
+        androidFullScreenIntent: false,
 
         androidStopAlarmOnTermination: false,
         allowAlarmOverlap: true,
