@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -32,10 +33,13 @@ class QuranPageContent extends StatefulWidget {
     required int verseNumber,
   })? onAyahTap;
 
+  final double fontSizeScale;
+
   const QuranPageContent({
     super.key,
     required this.pageNumber,
     this.controller,
+    this.fontSizeScale = 0.8,
     this.onPageInfoLoaded,
     this.onAyahTap,
   });
@@ -46,11 +50,9 @@ class QuranPageContent extends StatefulWidget {
 
 class _QuranPageContentState extends State<QuranPageContent>
     with SingleTickerProviderStateMixin {
-  late final PageController _controller;
-
   int _currentPage = 1;
-  String _currentSurahName = '';
-  int? _currentJuz;
+
+  final Map<String, TapGestureRecognizer> _recognizers = {};
 
   // ============================================================
   // Selected ayah
@@ -77,10 +79,6 @@ class _QuranPageContentState extends State<QuranPageContent>
     super.initState();
 
     _currentPage = widget.pageNumber;
-
-    _controller = PageController(
-      initialPage: widget.pageNumber - 1,
-    );
 
     // ==========================================================
     // Flash animation
@@ -118,11 +116,57 @@ class _QuranPageContentState extends State<QuranPageContent>
   }
 
   @override
+  void didUpdateWidget(covariant QuranPageContent oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.pageNumber != widget.pageNumber) {
+      for (final r in _recognizers.values) {
+        r.dispose();
+      }
+      _recognizers.clear();
+      _currentPage = widget.pageNumber;
+      _reportPageInfo(widget.pageNumber);
+    }
+  }
+
+  @override
   void dispose() {
+    for (final r in _recognizers.values) {
+      r.dispose();
+    }
+    _recognizers.clear();
     _flashController?.removeListener(_onFlashTick);
     _flashController?.dispose();
-    _controller.dispose();
     super.dispose();
+  }
+
+  TapGestureRecognizer _getRecognizer(int surah, int verse) {
+    final key = '$surah:$verse';
+    return _recognizers.putIfAbsent(key, () {
+      return TapGestureRecognizer()
+        ..onTap = () {
+          debugPrint(
+            '📖 AYAH TAP → surah=$surah, ayah=$verse',
+          );
+
+          if (!mounted) return;
+
+          setState(() {
+            _selectedSurahNumber = surah;
+            _selectedVerseNumber = verse;
+          });
+
+          debugPrint(
+            '📌 SELECTED → surah=$_selectedSurahNumber, ayah=$_selectedVerseNumber',
+          );
+
+          _triggerAyahFlash();
+
+          widget.onAyahTap?.call(
+            surahNumber: surah,
+            verseNumber: verse,
+          );
+        };
+    });
   }
 
   void _triggerAyahFlash() {
@@ -146,81 +190,140 @@ class _QuranPageContentState extends State<QuranPageContent>
 
   @override
   Widget build(BuildContext context) {
-    final double offsetY = _currentPage <= 2 ? -50 : -8.0;
-
     return NoInternetListener(
       onRetry: () => _lastRetryAction?.call(),
-      child: Transform.translate(
-        offset: Offset(0, offsetY),
-        child: Stack(
-          children: [
-            // ====================================================
-            // Mushaf
-            // ====================================================
+      child: Stack(
+        children: [
+          // ====================================================
+          // Mushaf Content with Vertical Scroll
+          // ====================================================
+          Positioned.fill(
+            child: _buildQuranText(context),
+          ),
 
-            PageviewQuran(
-              pageBackgroundColor: const Color(0xFFFCF5D7),
-              controller: _controller,
-              physics: const NeverScrollableScrollPhysics(),
-              sp: .855,
-              h: 1,
-
-              verseBackgroundColor: _verseBackgroundColor,
-
-              onTap: (surahNumber, verseNumber) {
-                debugPrint(
-                  '📖 AYAH TAP → '
-                  'surah=$surahNumber, '
-                  'ayah=$verseNumber',
-                );
-
-                if (!mounted) return;
-
-                setState(() {
-                  _selectedSurahNumber = surahNumber;
-                  _selectedVerseNumber = verseNumber;
-                });
-
-                debugPrint(
-                  '📌 SELECTED → '
-                  'surah=$_selectedSurahNumber, '
-                  'ayah=$_selectedVerseNumber',
-                );
-
-                _triggerAyahFlash();
-
-                widget.onAyahTap?.call(
-                  surahNumber: surahNumber,
-                  verseNumber: verseNumber,
-                );
-              },
-
-              // ==================================================
-              // Change page
-              // ==================================================
-
-              onPageChanged: (pageNumber) {
-                _reportPageInfo(pageNumber);
-
-                if (!mounted) return;
-
-                setState(() {
-                  _selectedSurahNumber = null;
-                  _selectedVerseNumber = null;
-                });
-
-                _flashController?.reset();
-              },
+          if (_selectedSurahNumber != null && _selectedVerseNumber != null)
+            Positioned(
+              left: 12.w,
+              right: 12.w,
+              bottom: 18.h,
+              child: _buildAyahActions(),
             ),
+        ],
+      ),
+    );
+  }
 
-            if (_selectedSurahNumber != null && _selectedVerseNumber != null)
-              Positioned(
-                left: 12.w,
-                right: 12.w,
-                bottom: 18.h,
-                child: _buildAyahActions(),
+  Widget _buildQuranText(BuildContext context) {
+    if (_currentPage < 1 || _currentPage > 604) {
+      return const SizedBox.shrink();
+    }
+
+    final ranges = getPageData(_currentPage);
+    final pageFont = "QCF_P${_currentPage.toString().padLeft(3, '0')}";
+    final baseFontSize =
+        getFontSize(_currentPage, context) * widget.fontSizeScale;
+    final isFirstTwoPages = _currentPage <= 2;
+
+    final verseSpans = <InlineSpan>[];
+
+    for (final r in ranges) {
+      final surah = int.parse(r['surah'].toString());
+      final start = int.parse(r['start'].toString());
+      final end = int.parse(r['end'].toString());
+
+      for (int v = start; v <= end; v++) {
+        // 1. Header if first verse of surah
+        if (v == start && v == 1) {
+          verseSpans.add(
+            WidgetSpan(
+              child: HeaderWidget(
+                suraNumber: surah,
+                theme: const QcfThemeData(),
               ),
-          ],
+            ),
+          );
+
+          // 2. Basmala (except Al-Fatiha page 1 and At-Tawbah page 187)
+          if (_currentPage != 1 && _currentPage != 187) {
+            verseSpans.add(
+              TextSpan(
+                text: " ﱁ   ﱂﱃﱄ\n",
+                style: TextStyle(
+                  fontFamily: "QCF_P001",
+                  package: 'qcf_quran',
+                  fontSize: 20 * widget.fontSizeScale,
+                  color: const Color(0xFF000000),
+                ),
+              ),
+            );
+          }
+        }
+
+        // 3. Highlight background color
+        final verseBgColor = _verseBackgroundColor(surah, v);
+
+        // 4. Verse number symbol
+        final verseNumberSpan = TextSpan(
+          text: getVerseNumberQCF(surah, v),
+          style: TextStyle(
+            fontFamily: pageFont,
+            package: 'qcf_quran',
+            color: const Color(0xFF8B5A2B),
+            height: 1.0,
+            backgroundColor: verseBgColor,
+          ),
+        );
+
+        // 5. Verse text
+        final rawVerseText = getVerseQCF(surah, v, verseEndSymbol: false);
+        final isFirstVerseOnPage = (v == ranges[0]['start']);
+        final verseText = (isFirstVerseOnPage && rawVerseText.length > 1)
+            ? "${rawVerseText.substring(0, 1)}\u200A${rawVerseText.substring(1)}"
+            : rawVerseText;
+
+        verseSpans.add(
+          TextSpan(
+            text: verseText,
+            recognizer: _getRecognizer(surah, v),
+            style: verseBgColor != null
+                ? TextStyle(backgroundColor: verseBgColor)
+                : null,
+            children: [verseNumberSpan],
+          ),
+        );
+      }
+    }
+
+    return Scrollbar(
+      thumbVisibility: false,
+      child: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(
+          parent: AlwaysScrollableScrollPhysics(),
+        ),
+        padding: EdgeInsets.only(
+          top: isFirstTwoPages ? 40.h : 10.h,
+          bottom: 120.h, // Bottom padding guarantees bottom ayahs are never cut off
+          left: 12.w,
+          right: 12.w,
+        ),
+        child: Container(
+          width: double.infinity,
+          color: const Color(0xFFFCF5D7),
+          child: Text.rich(
+            TextSpan(children: verseSpans),
+            locale: const Locale("ar"),
+            textAlign: TextAlign.center,
+            textDirection: TextDirection.rtl,
+            style: TextStyle(
+              fontFamily: pageFont,
+              package: 'qcf_quran',
+              fontSize: baseFontSize,
+              color: const Color(0xFF000000),
+              height: isFirstTwoPages ? 2.3 : 2.0,
+              letterSpacing: 0,
+              wordSpacing: 0,
+            ),
+          ),
         ),
       ),
     );
@@ -397,8 +500,6 @@ class _QuranPageContentState extends State<QuranPageContent>
     if (mounted) {
       setState(() {
         _currentPage = pageNumber;
-        _currentSurahName = surahName;
-        _currentJuz = juz;
       });
     }
 

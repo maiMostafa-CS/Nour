@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:islamic_app/features/quran/presentation/widgets/quran_page_content.dart';
 
 import '../../../../core/services/quran_bookmark_service.dart';
+import '../../../../core/services/quran_font_size_service.dart';
 import '../../../../injection_container.dart';
 import '../bloc/quran_bloc.dart';
 import '../bloc/quran_event.dart';
@@ -30,6 +31,7 @@ class MushafPageState extends State<MushafPage> {
 
   int _currentJuz = 1;
   int _currentHizb = 1;
+  double _fontSizeScale = QuranFontSizeService.defaultScale;
 
   Future<void> _toggleBookmark() async {
     final int? savedPage =
@@ -86,6 +88,23 @@ class MushafPageState extends State<MushafPage> {
     _controller = PageController(
       initialPage: widget.startPage - 1,
     );
+
+    _loadSavedFontSize();
+  }
+
+  Future<void> _loadSavedFontSize() async {
+    final scale = await QuranFontSizeService.getFontSizeScale();
+    if (!mounted) return;
+    setState(() {
+      _fontSizeScale = scale;
+    });
+  }
+
+  void _onFontSizeChanged(double newScale) {
+    setState(() {
+      _fontSizeScale = newScale;
+    });
+    QuranFontSizeService.saveFontSizeScale(newScale);
   }
 
   @override
@@ -159,58 +178,200 @@ class MushafPageState extends State<MushafPage> {
                   final pageNumber = index + 1;
                   return QuranPageContent(
                     pageNumber: pageNumber,
+                    fontSizeScale: _fontSizeScale,
                     onPageInfoLoaded: _updatePageInfo,
-
-
                   );
                 },
               ),
             ),
-    Container(
-    margin: const EdgeInsets.only(right: 10),
-        height: 32,
-        padding: const EdgeInsets.symmetric(horizontal: 10),
-        decoration: BoxDecoration(
-          color: const Color(0xFFF3E5C8),
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'رقم الصفحة $_currentPage',
-              style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF8B5A2B),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // قائمة منسدلة عائمة للتحكم بحجم الخط
+                  _buildFontSizeDropdown(),
+
+                  // بيانات رقم الصفحة والحزب
+                  _buildPageHizbBadge(),
+                ],
               ),
             ),
-
-            Container(
-              height: 16,
-              width: 1,
-              margin: const EdgeInsets.symmetric(horizontal: 8),
-              color: const Color(0xFF8B5A2B).withOpacity(0.3),
-            ),
-
-            Text(
-              'الحزب $_currentHizb',
-              style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF8B5A2B),
-              ),
-            ),
-          ],
-        ),
-      ),
 
           ],
         ),
       ),
     ),
 
-      );
+    );
+  }
+
+  Widget _buildFontSizeDropdown() {
+    final currentScale = QuranFontSizeService.closestScale(_fontSizeScale);
+    return Theme(
+      data: Theme.of(context).copyWith(
+        popupMenuTheme: PopupMenuThemeData(
+          color: const Color(0xFFFCF5D7),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: BorderSide(
+              color: const Color(0xFF8B5A2B).withValues(alpha: 0.25),
+              width: 0.8,
+            ),
+          ),
+          elevation: 6,
+        ),
+      ),
+      child: PopupMenuButton<double>(
+        initialValue: currentScale,
+        tooltip: 'حجم الخط',
+        onSelected: _onFontSizeChanged,
+        position: PopupMenuPosition.over,
+        itemBuilder: (context) => [
+          _buildFontSizeMenuItem(0.75, 'صغير جداً (75%)', currentScale),
+          _buildFontSizeMenuItem(0.855, 'صغير (85% - عادي)', currentScale),
+          _buildFontSizeMenuItem(0.95, 'متوسط (95%)', currentScale),
+          _buildFontSizeMenuItem(1.05, 'كبير (105%)', currentScale),
+          _buildFontSizeMenuItem(1.20, 'كبير جداً (120%)', currentScale),
+          _buildFontSizeMenuItem(1.35, 'ضخم (135%)', currentScale),
+        ],
+        child: Container(
+          height: 34,
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF3E5C8),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: const Color(0xFF8B5A2B).withValues(alpha: 0.25),
+              width: 0.8,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.04),
+                blurRadius: 4,
+                offset: const Offset(0, 1),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.format_size,
+                size: 16,
+                color: Color(0xFF8B5A2B),
+              ),
+              const SizedBox(width: 4),
+              Text(
+                _getScaleLabel(currentScale),
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF8B5A2B),
+                ),
+              ),
+              const SizedBox(width: 2),
+              const Icon(
+                Icons.keyboard_arrow_up,
+                size: 18,
+                color: Color(0xFF8B5A2B),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  PopupMenuItem<double> _buildFontSizeMenuItem(
+    double value,
+    String label,
+    double currentScale,
+  ) {
+    final isSelected = (value - currentScale).abs() < 0.01;
+    return PopupMenuItem<double>(
+      value: value,
+      height: 40,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+              color: isSelected
+                  ? const Color(0xFF8B5A2B)
+                  : const Color(0xFF5D4037),
+            ),
+          ),
+          if (isSelected)
+            const Icon(
+              Icons.check_circle_rounded,
+              size: 18,
+              color: Color(0xFF8B5A2B),
+            ),
+        ],
+      ),
+    );
+  }
+
+  String _getScaleLabel(double scale) {
+    if (scale <= 0.76) return 'صغير جداً';
+    if (scale <= 0.86) return 'خط عادي';
+    if (scale <= 0.96) return 'متوسط';
+    if (scale <= 1.06) return 'كبير';
+    if (scale <= 1.21) return 'كبير جداً';
+    return 'ضخم';
+  }
+
+  Widget _buildPageHizbBadge() {
+    return Container(
+      height: 34,
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF3E5C8),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: const Color(0xFF8B5A2B).withValues(alpha: 0.25),
+          width: 0.8,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 4,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            'رقم الصفحة $_currentPage',
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF8B5A2B),
+            ),
+          ),
+          Container(
+            height: 16,
+            width: 1,
+            margin: const EdgeInsets.symmetric(horizontal: 8),
+            color: const Color(0xFF8B5A2B).withValues(alpha: 0.3),
+          ),
+          Text(
+            'الحزب $_currentHizb',
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF8B5A2B),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
