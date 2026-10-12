@@ -72,9 +72,37 @@ object PrayerCardOverlay {
         // Ayah Text
         // ============================================================
 
-        cardView
-            .findViewById<TextView>(R.id.title)
-            .text = title
+        val titleView = cardView.findViewById<TextView>(R.id.title)
+        titleView.text = title
+
+        // تعديل حجم الخط للآيات الطويلة جداً لراحة القراءة
+        if (title.length > 280) {
+            titleView.textSize = 19f
+        } else if (title.length > 140) {
+            titleView.textSize = 20f
+        } else {
+            titleView.textSize = 22f
+        }
+
+        // ============================================================
+        // حساب أقصى ارتفاع للآية لمنع اختفاء الأزرار نهائياً
+        // ============================================================
+
+        val displayMetrics = app.resources.displayMetrics
+        val screenHeight = displayMetrics.heightPixels
+        val density = displayMetrics.density
+
+        val fixedElementsPx = (230 * density).toInt()
+        val screenMarginsPx = (80 * density).toInt()
+        val availableForAyah = screenHeight - fixedElementsPx - screenMarginsPx
+
+        val minAyahHeightPx = (100 * density).toInt()
+        val maxAyahLimitPx = (screenHeight * 0.45).toInt()
+        val calculatedMaxHeight = availableForAyah.coerceIn(minAyahHeightPx, maxAyahLimitPx)
+
+        cardView.findViewById<MaxHeightScrollView>(R.id.ayahScrollView)?.apply {
+            maxHeight = calculatedMaxHeight
+        }
 
         // ============================================================
         // Surah / Ayah
