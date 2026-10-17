@@ -52,7 +52,7 @@
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
-            android:resource="ic_mosque_notification" />
+            android:resource="@drawable/ic_mosque_notification" />
 
         <!-- Main Flutter Activity -->
         <!-- Main Flutter Activity -->

@@ -43,10 +43,11 @@ class LocationRepositoryImpl implements LocationRepository {
     final locations = await localDataSource.getLocations();
 
     try {
+      final query = city.trim().toLowerCase();
       return locations.firstWhere(
-            (location) =>
-        location.city.toLowerCase() ==
-            city.toLowerCase(),
+        (location) =>
+            location.city.toLowerCase() == query ||
+            location.cityEn.toLowerCase() == query,
       );
     } catch (_) {
       return null;

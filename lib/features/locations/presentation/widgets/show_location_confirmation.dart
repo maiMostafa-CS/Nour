@@ -66,7 +66,7 @@ class LocationConfirmationBottomSheet
             SizedBox(height: 16.h),
 
             Text(
-              location.city,
+              location.getLocalizedCity(context.locale.languageCode),
               style: TextStyle(
                 fontSize: 24.sp,
                 fontWeight: FontWeight.bold,
@@ -76,7 +76,7 @@ class LocationConfirmationBottomSheet
             SizedBox(height: 6.h),
 
             Text(
-              location.country,
+              location.getLocalizedCountry(context.locale.languageCode),
               style: TextStyle(
                 fontSize: 16.sp,
                 color: Colors.grey.shade600,

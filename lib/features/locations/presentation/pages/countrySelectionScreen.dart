@@ -1,8 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../domain/entity/location_entity.dart';
 import '../widgets/build_cities_screen.dart';
 
 class CountrySelectionScreen extends StatefulWidget {
@@ -46,10 +46,16 @@ class CountrySelectionScreenState extends State<CountrySelectionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final langCode = context.locale.languageCode;
     final countries = <String, String>{};
 
     for (final location in widget.locations) {
-      countries[location.countryCode] = location.country;
+      final String name = location is LocationEntity
+          ? location.getLocalizedCountry(langCode)
+          : (langCode == 'en' && (location.countryEn?.isNotEmpty ?? false)
+              ? location.countryEn
+              : location.country);
+      countries[location.countryCode] = name;
     }
 
     final filteredCountries = countries.entries.where((entry) {
@@ -57,9 +63,9 @@ class CountrySelectionScreenState extends State<CountrySelectionScreen> {
         return true;
       }
 
-      return entry.value.toLowerCase().contains(
-            _searchQuery.trim().toLowerCase(),
-          );
+      final query = _searchQuery.trim().toLowerCase();
+      return entry.value.toLowerCase().contains(query) ||
+          entry.key.toLowerCase().contains(query);
     }).toList();
 
     filteredCountries.sort(

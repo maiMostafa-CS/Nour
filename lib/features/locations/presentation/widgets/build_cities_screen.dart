@@ -2,6 +2,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../domain/entity/location_entity.dart';
+
 class BuildCitiesScreen extends StatefulWidget {
   final List<dynamic> locations;
   final String countryCode;
@@ -36,14 +38,18 @@ class _BuildCitiesScreenState
       location.countryCode == widget.countryCode,
     )
         .toList();
-
-    cities.sort(
-          (a, b) => a.city.compareTo(b.city),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final langCode = context.locale.languageCode;
+
+    cities.sort((a, b) {
+      final aName = a is LocationEntity ? a.getLocalizedCity(langCode) : a.city;
+      final bName = b is LocationEntity ? b.getLocalizedCity(langCode) : b.city;
+      return aName.compareTo(bName);
+    });
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -77,6 +83,9 @@ class _BuildCitiesScreenState
             index,
             ) {
           final city = cities[index];
+          final String cityName = city is LocationEntity
+              ? city.getLocalizedCity(langCode)
+              : city.city;
 
           return Card(
             elevation: 1,
@@ -108,7 +117,7 @@ class _BuildCitiesScreenState
               ),
 
               title: Text(
-                city.city,
+                cityName,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(

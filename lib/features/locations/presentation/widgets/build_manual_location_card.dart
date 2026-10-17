@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:islamic_app/features/locations/presentation/widgets/savelocation.dart';
 import 'package:islamic_app/features/locations/presentation/widgets/show_location_confirmation.dart';
 
+import '../../domain/entity/location_entity.dart';
 import '../bloc/bloc.dart';
 import '../bloc/blocEvent.dart';
 import '../pages/countrySelectionScreen.dart';
@@ -64,12 +65,17 @@ class _BuildManualLocationCardState
                         () async {
                       Navigator.pop(context);
 
+                      final lang = context.locale.languageCode;
                       await saveLocation(
                         context,
                         latitude: location.latitude,
                         longitude: location.longitude,
-                        city: location.city,
-                        country: location.country,
+                        city: location is LocationEntity
+                            ? location.getLocalizedCity(lang)
+                            : location.city,
+                        country: location is LocationEntity
+                            ? location.getLocalizedCountry(lang)
+                            : location.country,
                         timezone: location.timezone,
                         isCurrentLocation: false,
                       );
