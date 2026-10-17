@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -28,7 +29,7 @@ class BuildError extends StatelessWidget {
             SizedBox(height: 20.h),
 
             Text(
-              state.errorMessage ?? 'حدث خطأ',
+              state.errorMessage ?? 'error'.tr(),
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 16.sp,
@@ -56,7 +57,7 @@ class BuildError extends StatelessWidget {
                 ),
               ),
               child: Text(
-                'إعادة المحاولة',
+                'retry'.tr(),
                 style: TextStyle(
                   fontSize: 14.sp,
                 ),

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -37,8 +38,8 @@ class _BuildMainGridState extends State<BuildMainGrid> {
                   );
                 },
                 image: 'assets/images/quran.png',
-                title: 'القرآن الكريم',
-                subtitle: 'آخر قراءة',
+                title: 'holy_quran'.tr(),
+                subtitle: 'last_read'.tr(),
               ),
             ),
             SizedBox(width: 10.w),
@@ -52,8 +53,8 @@ class _BuildMainGridState extends State<BuildMainGrid> {
                   );
                 },
                 image: 'assets/images/mosque_design_no_frame.png',
-                title: 'المسبحه  ',
-                subtitle: 'الاكترونيه',
+                title: 'electronic_tasbih'.tr(),
+                subtitle: '',
               ),
             ),
           ],
@@ -71,7 +72,7 @@ class _BuildMainGridState extends State<BuildMainGrid> {
                     AppRouter.hijriCalendar,
                   );
                 },
-                title: 'التقويم الهجري',
+                title: 'hijri_calendar'.tr(),
                 subtitle: getCurrentHijriDate(),
                 icon: Icons.calendar_month_outlined,
                 iconColor: const Color(0xFF333333),
@@ -88,7 +89,7 @@ class _BuildMainGridState extends State<BuildMainGrid> {
                     AppRouter.qibla,
                   );
                 },
-                title: 'اتجاه القبلة',
+                title: 'qibla_direction'.tr(),
                 subtitle: '',
                 icon: Icons.explore_outlined,
                 iconColor: const Color(0xFF176B5B),

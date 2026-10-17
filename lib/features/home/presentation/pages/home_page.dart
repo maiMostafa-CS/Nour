@@ -1,12 +1,15 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart' as widgets;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../../../../core/services/unlock_card.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../locations/presentation/bloc/bloc.dart';
+import '../../../locations/presentation/bloc/blocEvent.dart';
 import '../../../locations/presentation/bloc/blocState.dart';
+import '../../../locations/presentation/widgets/current_location_dialog.dart';
+import '../../../locations/presentation/widgets/current_location_helper.dart';
 import '../../../prayer_times/presentation/widgets/prayer_times_widget.dart';
 import '../bloc/bloc.dart';
 import '../bloc/home_event.dart';
@@ -23,8 +26,39 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
 
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      debugPrint('📱 App resumed → checking location change...');
+      context.read<HomeBloc>().add(const CheckLocationIfChanged());
+    }
+  }
+
+  Future<void> _requestLocationUpdate(BuildContext context) async {
+    final shouldUpdate = await showCurrentLocationDialog(context);
+    if (!shouldUpdate || !context.mounted) return;
+
+    final hasPermission =
+        await CurrentLocationHelper.checkAndRequestPermission(context);
+    if (!hasPermission || !context.mounted) return;
+
+    context.read<LocationBloc>().add(
+      const GetCurrentLocation(),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,28 +66,157 @@ class _HomePageState extends State<HomePage> {
       listener: (context, locationState) {
         final location = locationState.currentLocation;
 
-        if (locationState.status == LocationStatus.success &&
+        if (locationState.status == LocationStatus.loading) {
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  SizedBox(
+                    width: 16.w,
+                    height: 16.h,
+                    child: const CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
+                  ),
+                  SizedBox(width: 10.w),
+                  Text(
+                    'locating_gps'.tr(),
+                    style: TextStyle(fontSize: 13.sp),
+                  ),
+                ],
+              ),
+              backgroundColor: AppColors.deepGreen,
+              duration: const Duration(seconds: 2),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.r),
+              ),
+            ),
+          );
+        } else if (locationState.status == LocationStatus.success &&
             location != null) {
           context.read<HomeBloc>().add(
             HomeLocationChanged(location),
           );
+
+          final cityName = location.city.trim().isNotEmpty
+              ? location.city.trim()
+              : 'current_location'.tr();
+
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  Icon(
+                    Icons.check_circle_rounded,
+                    color: Colors.white,
+                    size: 20.sp,
+                  ),
+                  SizedBox(width: 10.w),
+                  Expanded(
+                    child: Text(
+                      'location_updated_success'.tr(args: [cityName]),
+                      style: TextStyle(
+                        fontSize: 13.sp,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              backgroundColor: AppColors.emeraldGreen,
+              duration: const Duration(seconds: 3),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.r),
+              ),
+            ),
+          );
+        } else if (locationState.status == LocationStatus.failure) {
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  Icon(
+                    Icons.error_outline_rounded,
+                    color: Colors.white,
+                    size: 20.sp,
+                  ),
+                  SizedBox(width: 10.w),
+                  Expanded(
+                    child: Text(
+                      locationState.errorMessage ?? 'location_update_failed'.tr(),
+                      style: TextStyle(fontSize: 13.sp),
+                    ),
+                  ),
+                ],
+              ),
+              backgroundColor: Colors.red.shade700,
+              duration: const Duration(seconds: 3),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.r),
+              ),
+            ),
+          );
         }
       },
-      child: BlocBuilder<HomeBloc, HomeState>(
-        builder: (context, state) {
-          return Directionality(
-            textDirection: widgets.TextDirection.rtl,
-            child: Scaffold(
+      child: BlocListener<HomeBloc, HomeState>(
+        listenWhen: (previous, current) =>
+            current.autoUpdateMessage != null &&
+            current.autoUpdateMessage != previous.autoUpdateMessage,
+        listener: (context, homeState) {
+          if (homeState.autoUpdateMessage != null) {
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Row(
+                  children: [
+                    Icon(
+                      Icons.auto_awesome,
+                      color: Colors.white,
+                      size: 20.sp,
+                    ),
+                    SizedBox(width: 10.w),
+                    Expanded(
+                      child: Text(
+                        homeState.autoUpdateMessage!,
+                        style: TextStyle(
+                          fontSize: 13.sp,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                backgroundColor: AppColors.deepGreen,
+                duration: const Duration(seconds: 4),
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.r),
+                ),
+              ),
+            );
+            context.read<HomeBloc>().add(const ClearAutoUpdateMessage());
+          }
+        },
+        child: BlocBuilder<HomeBloc, HomeState>(
+          builder: (context, state) {
+            return Scaffold(
               extendBodyBehindAppBar: false,
               backgroundColor: AppColors.creamBg,
-              appBar: _buildAppBar(),
+              appBar: _buildAppBar(context),
               body: SafeArea(
                 top: false,
                 child: _buildBody(context, state),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }
@@ -61,12 +224,57 @@ class _HomePageState extends State<HomePage> {
   // ═══════════════════════════════════════════════════════════
   // AppBar
   // ═══════════════════════════════════════════════════════════
-  PreferredSizeWidget _buildAppBar() {
+  PreferredSizeWidget _buildAppBar(BuildContext context) {
     return AppBar(
       automaticallyImplyLeading: false,
       centerTitle: true,
       elevation: 0,
       backgroundColor: Colors.transparent,
+      actions: [
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 8.w),
+          child: InkWell(
+            onTap: () {
+              if (context.locale.languageCode == 'ar') {
+                context.setLocale(const Locale('en'));
+              } else {
+                context.setLocale(const Locale('ar'));
+              }
+            },
+            borderRadius: BorderRadius.circular(16.r),
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.18),
+                borderRadius: BorderRadius.circular(16.r),
+                border: Border.all(
+                  color: AppColors.softGold.withOpacity(0.6),
+                  width: 1,
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.language_rounded,
+                    color: AppColors.softGold,
+                    size: 16.sp,
+                  ),
+                  SizedBox(width: 4.w),
+                  Text(
+                    context.locale.languageCode == 'ar' ? 'EN' : 'عربي',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
       flexibleSpace: Container(
         decoration: BoxDecoration(
           gradient: const LinearGradient(
@@ -100,7 +308,7 @@ class _HomePageState extends State<HomePage> {
           ),
           SizedBox(width: 8.w),
           Text(
-            getCurrentHijriDate(),
+            getCurrentHijriDate(context),
             style: TextStyle(
               fontSize: 15.sp,
               fontWeight: FontWeight.bold,
@@ -160,7 +368,7 @@ class _HomePageState extends State<HomePage> {
     if (prayerTimes == null) {
       return Center(
         child: Text(
-          'جاري التحميل...',
+          'loading'.tr(),
           style: TextStyle(
             fontSize: 14.sp,
             color: AppColors.mediumText,
@@ -195,7 +403,7 @@ class _HomePageState extends State<HomePage> {
 
                 SizedBox(height: 22.h),
 
-                _buildSectionTitle('مواقيت الصلاة'),
+                _buildSectionTitle('prayer_times'.tr()),
                 SizedBox(height: 12.h),
                 PrayerTimesWidget(
                   prayerTimes: prayerTimes,
@@ -220,76 +428,138 @@ class _HomePageState extends State<HomePage> {
   // Top Bar (city + location button)
   // ═══════════════════════════════════════════════════════════
   Widget _buildTopBar(BuildContext context, HomeState state) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(
-          color: AppColors.gold.withOpacity(0.20),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.deepGreen.withOpacity(0.06),
-            blurRadius: 12.r,
-            offset: Offset(0, 4.h),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 34.w,
-            height: 34.h,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: LinearGradient(
-                colors: [
-                  AppColors.emeraldGreen.withOpacity(0.15),
-                  AppColors.emeraldGreen.withOpacity(0.05),
+    return BlocBuilder<LocationBloc, LocationState>(
+      builder: (context, locationState) {
+        final isLocating = locationState.status == LocationStatus.loading;
+        final isUpdating = isLocating || state.loading;
+
+        return Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: isUpdating
+                ? null
+                : () => _requestLocationUpdate(context),
+            borderRadius: BorderRadius.circular(16.r),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16.r),
+                border: Border.all(
+                  color: isUpdating
+                      ? AppColors.emeraldGreen.withOpacity(0.5)
+                      : AppColors.gold.withOpacity(0.20),
+                  width: isUpdating ? 1.5 : 1,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: isUpdating
+                        ? AppColors.emeraldGreen.withOpacity(0.12)
+                        : AppColors.deepGreen.withOpacity(0.06),
+                    blurRadius: 12.r,
+                    offset: Offset(0, 4.h),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 34.w,
+                    height: 34.h,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                        colors: [
+                          AppColors.emeraldGreen.withOpacity(0.15),
+                          AppColors.emeraldGreen.withOpacity(0.05),
+                        ],
+                      ),
+                    ),
+                    child: isUpdating
+                        ? Center(
+                            child: SizedBox(
+                              width: 16.w,
+                              height: 16.h,
+                              child: const CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: AppColors.emeraldGreen,
+                              ),
+                            ),
+                          )
+                        : const CurrentLocationButton(),
+                  ),
+
+                  SizedBox(width: 8.w),
+
+                  // City name & status
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          isUpdating ? 'updating_location'.tr() : 'current_location'.tr(),
+                          style: TextStyle(
+                            fontSize: 10.sp,
+                            color: isUpdating
+                                ? AppColors.emeraldGreen
+                                : AppColors.lightText,
+                            fontWeight: isUpdating
+                                ? FontWeight.w700
+                                : FontWeight.w500,
+                          ),
+                        ),
+                        SizedBox(height: 2.h),
+                        AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 250),
+                          child: Text(
+                            isUpdating
+                                ? 'locating_position'.tr()
+                                : (state.cityName.trim().isEmpty
+                                    ? 'not_specified'.tr()
+                                    : state.cityName),
+                            key: ValueKey<String>(
+                              isUpdating ? 'loading' : state.cityName,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.w700,
+                              color: isUpdating
+                                  ? AppColors.emeraldGreen
+                                  : AppColors.darkText,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // Refresh indicator / icon on the side
+                  Container(
+                    padding: EdgeInsets.all(6.r),
+                    decoration: BoxDecoration(
+                      color: isUpdating
+                          ? AppColors.emeraldGreen.withOpacity(0.08)
+                          : Colors.grey.shade50,
+                      borderRadius: BorderRadius.circular(8.r),
+                    ),
+                    child: Icon(
+                      Icons.refresh_rounded,
+                      size: 16.sp,
+                      color: isUpdating
+                          ? AppColors.emeraldGreen
+                          : AppColors.mediumText.withOpacity(0.6),
+                    ),
+                  ),
                 ],
               ),
             ),
-            child:
-            const CurrentLocationButton(),
           ),
-
-          SizedBox(width: 8.w),
-
-          // City name
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'الموقع الحالي',
-                  style: TextStyle(
-                    fontSize: 10.sp,
-                    color: AppColors.lightText,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                SizedBox(height: 2.h),
-                Text(
-                  state.cityName.trim().isEmpty
-                      ? 'غير محدد'
-                      : state.cityName,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.darkText,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-        ],
-      ),
+        );
+      },
     );
   }
 

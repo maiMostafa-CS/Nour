@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -21,7 +22,7 @@ class PrayerSettingsPage extends StatelessWidget {
         elevation: 0,
         centerTitle: true,
         title: Text(
-          'إعدادات ',
+          'settings'.tr(),
           style: TextStyle(
             fontSize: 20.sp,
             fontWeight: FontWeight.bold,
@@ -35,12 +36,12 @@ class PrayerSettingsPage extends StatelessWidget {
             horizontal: 16.w,
             vertical: 12.h,
           ),
-          child: Column(
+          child: ListView(
             children: [
               SettingsCard(
                 icon: Icons.notifications_active_outlined,
-                title: 'إعدادات الأذان',
-                subtitle: 'تشغيل أو إيقاف الأذان لكل صلاة',
+                title: 'adhan_settings'.tr(),
+                subtitle: 'adhan_settings_subtitle'.tr(),
                 onTap: () {
                   Navigator.pushNamed(
                     context,
@@ -51,8 +52,8 @@ class PrayerSettingsPage extends StatelessWidget {
               SizedBox(height: 14.h),
               SettingsCard(
                 icon: Icons.mosque_outlined,
-                title: 'وقت الإقامة',
-                subtitle: 'تحديد عدد الدقائق بعد كل صلاة',
+                title: 'iqama_time'.tr(),
+                subtitle: 'iqama_time_subtitle'.tr(),
                 onTap: () {
                   Navigator.pushNamed(
                     context,
@@ -63,8 +64,8 @@ class PrayerSettingsPage extends StatelessWidget {
               SizedBox(height: 14.h),
               SettingsCard(
                 icon: Icons.record_voice_over_outlined,
-                title: 'صوت المؤذن',
-                subtitle: 'اختيار المؤذن المفضل لديك',
+                title: 'muezzin_voice'.tr(),
+                subtitle: 'muezzin_voice_subtitle'.tr(),
                 onTap: () async {
                   Navigator.push(
                     context,
@@ -79,8 +80,8 @@ class PrayerSettingsPage extends StatelessWidget {
                 builder: (context, state) {
                   return SettingsCard(
                     icon: Icons.location_on_outlined,
-                    title: 'الموقع',
-                    subtitle: state.cityName,
+                    title: 'location'.tr(),
+                    subtitle: state.cityName.isEmpty ? 'not_specified'.tr() : state.cityName,
                     onTap: () {
                       Navigator.pushNamed(
                         context,
@@ -90,15 +91,25 @@ class PrayerSettingsPage extends StatelessWidget {
                   );
                 },
               ),
-
               SizedBox(height: 14.h),
-
               SettingsCard(
-                icon: Icons.record_voice_over_outlined,
-                title: 'تفعيل الخاتمه ',
-                subtitle: 'آية عند فتح الهاتف',
-                trailing: UnlockAyahSwitch(),
-
+                icon: Icons.language_rounded,
+                title: 'language'.tr(),
+                subtitle: context.locale.languageCode == 'ar' ? 'العربية' : 'English',
+                onTap: () {
+                  if (context.locale.languageCode == 'ar') {
+                    context.setLocale(const Locale('en'));
+                  } else {
+                    context.setLocale(const Locale('ar'));
+                  }
+                },
+              ),
+              SizedBox(height: 14.h),
+              SettingsCard(
+                icon: Icons.lock_clock_outlined,
+                title: 'enable_khatma'.tr(),
+                subtitle: 'ayah_on_unlock'.tr(),
+                trailing: const UnlockAyahSwitch(),
               ),
             ],
           ),

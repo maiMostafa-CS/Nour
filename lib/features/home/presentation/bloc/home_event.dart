@@ -15,12 +15,22 @@ class LoadHome extends HomeEvent {
 
 class HomeLocationChanged extends HomeEvent {
   final CurrentLocationEntity location;
+  final bool isAutoDetected;
 
-  const HomeLocationChanged(this.location);
+  const HomeLocationChanged(this.location, {this.isAutoDetected = false});
 
   @override
-  List<Object?> get props => [location];
+  List<Object?> get props => [location, isAutoDetected];
 }
+
 class RefreshLocation extends HomeEvent {
   const RefreshLocation();
+}
+
+class CheckLocationIfChanged extends HomeEvent {
+  const CheckLocationIfChanged();
+}
+
+class ClearAutoUpdateMessage extends HomeEvent {
+  const ClearAutoUpdateMessage();
 }

@@ -11,6 +11,7 @@ class HomeState extends Equatable {
   final String timezone;
   final PrayerTimesEntity? prayerTimes;
   final String? errorMessage;
+  final String? autoUpdateMessage;
 
   const HomeState({
     this.loading = true,
@@ -21,6 +22,7 @@ class HomeState extends Equatable {
     this.timezone = 'Africa/Cairo',
     this.prayerTimes,
     this.errorMessage,
+    this.autoUpdateMessage,
   });
 
   HomeState copyWith({
@@ -32,7 +34,9 @@ class HomeState extends Equatable {
     String? timezone,
     PrayerTimesEntity? prayerTimes,
     String? errorMessage,
+    String? autoUpdateMessage,
     bool clearError = false,
+    bool clearAutoUpdateMessage = false,
   }) {
     return HomeState(
       loading: loading ?? this.loading,
@@ -43,6 +47,9 @@ class HomeState extends Equatable {
       timezone: timezone ?? this.timezone,
       prayerTimes: prayerTimes ?? this.prayerTimes,
       errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
+      autoUpdateMessage: clearAutoUpdateMessage
+          ? null
+          : (autoUpdateMessage ?? this.autoUpdateMessage),
     );
   }
 
@@ -56,5 +63,6 @@ class HomeState extends Equatable {
         timezone,
         prayerTimes,
         errorMessage,
+        autoUpdateMessage,
       ];
 }

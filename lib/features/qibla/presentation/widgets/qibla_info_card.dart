@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -16,34 +17,34 @@ class QiblaInfoCard extends StatelessWidget {
   String get directionText {
     if (qiblaDirection >= 337.5 ||
         qiblaDirection < 22.5) {
-      return 'شمال';
+      return 'north'.tr();
     }
 
     if (qiblaDirection < 67.5) {
-      return 'شمال شرق';
+      return 'north_east'.tr();
     }
 
     if (qiblaDirection < 112.5) {
-      return 'شرق';
+      return 'east'.tr();
     }
 
     if (qiblaDirection < 157.5) {
-      return 'جنوب شرق';
+      return 'south_east'.tr();
     }
 
     if (qiblaDirection < 202.5) {
-      return 'جنوب';
+      return 'south'.tr();
     }
 
     if (qiblaDirection < 247.5) {
-      return 'جنوب غرب';
+      return 'south_west'.tr();
     }
 
     if (qiblaDirection < 292.5) {
-      return 'غرب';
+      return 'west'.tr();
     }
 
-    return 'شمال غرب';
+    return 'north_west'.tr();
   }
 
   @override
@@ -83,7 +84,7 @@ class QiblaInfoCard extends StatelessWidget {
 
               Expanded(
                 child: Text(
-                  'اتجاه القبلة',
+                  'qibla_direction'.tr(),
                   style: TextStyle(
                     fontSize: 16.sp,
                     fontWeight: FontWeight.bold,

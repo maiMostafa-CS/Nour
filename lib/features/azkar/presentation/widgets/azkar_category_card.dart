@@ -1,6 +1,9 @@
-import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter/material.dart';
+import 'dart:ui' as ui;
+
 
 class AzkarCategoryCard extends StatelessWidget {
   const AzkarCategoryCard({
@@ -20,6 +23,8 @@ class AzkarCategoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isArabic = context.locale.languageCode == 'ar';
+
     return Card(
       margin: EdgeInsets.only(bottom: 12.h),
       color: _cardColor,
@@ -42,12 +47,20 @@ class AzkarCategoryCard extends StatelessWidget {
         ),
         title: Text(
           title,
-          textDirection: TextDirection.rtl,
-          style: GoogleFonts.amiri(
-            fontSize: 20.sp,
-            fontWeight: FontWeight.bold,
-            color: _primaryColor,
-          ),
+          textDirection: isArabic
+              ? ui.TextDirection.rtl
+              : ui.TextDirection.ltr,
+          style: isArabic
+              ? GoogleFonts.amiri(
+                  fontSize: 20.sp,
+                  fontWeight: FontWeight.bold,
+                  color: _primaryColor,
+                )
+              : GoogleFonts.cairo(
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.bold,
+                  color: _primaryColor,
+                ),
         ),
         trailing: Icon(
           Icons.arrow_forward_ios,

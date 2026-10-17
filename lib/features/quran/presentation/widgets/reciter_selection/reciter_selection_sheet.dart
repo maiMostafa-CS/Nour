@@ -81,7 +81,7 @@ class ReciterSelectionSheet extends StatelessWidget {
                     itemCount: reciters.length,
                     separatorBuilder: (_, __) => Divider(
                       height: 1.h,
-                      color: primaryColor.withOpacity(.12),
+                      color: primaryColor.withValues(alpha:.12),
                     ),
                     itemBuilder: (context, index) {
                       final reciter = reciters[index];
@@ -102,7 +102,7 @@ class ReciterSelectionSheet extends StatelessWidget {
                           radius: 20.r,
                           backgroundColor: isSelected
                               ? primaryColor
-                              : primaryColor.withOpacity(.12),
+                              : primaryColor.withValues(alpha:.12),
                           child: Icon(
                             Icons.person,
                             size: 20.sp,

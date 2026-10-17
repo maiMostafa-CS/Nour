@@ -40,7 +40,7 @@ class AyahActions extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       elevation: 10,
-      shadowColor: Colors.black.withOpacity(.25),
+      shadowColor: Colors.black.withValues(alpha: .25),
       borderRadius: BorderRadius.circular(18.r),
       color: Colors.transparent,
       child: Container(
@@ -52,7 +52,7 @@ class AyahActions extends StatelessWidget {
           color: const Color(0xFFFCF5D7),
           borderRadius: BorderRadius.circular(18.r),
           border: Border.all(
-            color: const Color(0xFF8B5A2B).withOpacity(.30),
+            color: const Color(0xFF8B5A2B).withValues(alpha: .30),
             width: 1,
           ),
         ),

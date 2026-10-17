@@ -1,7 +1,6 @@
-import 'package:flutter/cupertino.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
 
 class InfoCard extends StatelessWidget {
   const InfoCard();
@@ -25,7 +24,7 @@ class InfoCard extends StatelessWidget {
           SizedBox(width: 12.w),
           Expanded(
             child: Text(
-              'اختر أوقات الصلاة التي تريد تشغيل الأذان فيها.',
+              'choose_adhan_times_info'.tr(),
               style: TextStyle(
                 fontSize: 14.sp,
                 height: 1.5,

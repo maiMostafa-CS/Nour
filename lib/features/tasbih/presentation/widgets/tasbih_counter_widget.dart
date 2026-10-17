@@ -35,7 +35,7 @@ class TasbihCounterWidget extends StatelessWidget {
           boxShadow: enabled
               ? [
             BoxShadow(
-              color: Colors.tealAccent.withOpacity(0.4),
+              color: Colors.tealAccent.withValues(alpha: 0.4),
               blurRadius: 20,
               spreadRadius: 2,
             ),

@@ -21,7 +21,7 @@ class TasbihDhikrCard extends StatelessWidget {
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.tealAccent.withOpacity(0.3)),
+        border: Border.all(color: Colors.tealAccent.withValues(alpha: 0.3)),
       ),
       child: Column(
         children: [
@@ -41,7 +41,7 @@ class TasbihDhikrCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.05),
+                color: Colors.white.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(

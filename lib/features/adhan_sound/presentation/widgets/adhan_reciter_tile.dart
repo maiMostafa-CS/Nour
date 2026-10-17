@@ -1,5 +1,4 @@
-// lib/features/adhan/presentation/widgets/adhan_reciter_tile.dart
-
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -71,7 +70,7 @@ class AdhanReciterTile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    reciter.name,
+                    reciter.name.tr(),
                     style: TextStyle(
                       fontSize: 17.sp,
                       fontWeight: FontWeight.bold,
@@ -80,7 +79,7 @@ class AdhanReciterTile extends StatelessWidget {
                   ),
                   SizedBox(height: 5.h),
                   Text(
-                    isSelected ? 'المؤذن المختار' : 'اضغط للاختيار',
+                    isSelected ? 'selected_muezzin'.tr() : 'tap_to_select'.tr(),
                     style: TextStyle(
                       fontSize: 12.sp,
                       color: Colors.grey,

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
@@ -102,21 +103,21 @@ class AppRouter {
 
         if (prayerName == null || prayerName.isEmpty) {
           return MaterialPageRoute(
-            builder: (_) => const Scaffold(
+            builder: (_) => Scaffold(
               body: Center(
-                child: Text('لم يتم تحديد الصلاة'),
+                child: Text('prayer_not_specified'.tr()),
               ),
             ),
           );
         }
 
-        final prayerTitle = switch (prayerName) {
-          'fajr' => 'الفجر',
-          'dhuhr' => 'الظهر',
-          'asr' => 'العصر',
-          'maghrib' => 'المغرب',
-          'isha' => 'العشاء',
-          _ => 'الأذان',
+        final prayerTitle = switch (prayerName.toLowerCase()) {
+          'fajr' => 'fajr'.tr(),
+          'dhuhr' => 'dhuhr'.tr(),
+          'asr' => 'asr'.tr(),
+          'maghrib' => 'maghrib'.tr(),
+          'isha' => 'isha'.tr(),
+          _ => 'adhan'.tr(),
         };
 
         return MaterialPageRoute(

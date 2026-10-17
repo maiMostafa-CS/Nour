@@ -32,12 +32,12 @@ class TasbihDhikrSelector extends StatelessWidget {
               decoration: BoxDecoration(
                 color: selected
                     ? Colors.tealAccent.shade700
-                    : Colors.white.withOpacity(0.05),
+                    : Colors.white.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
                   color: selected
                       ? Colors.tealAccent
-                      : Colors.white.withOpacity(0.15),
+                      : Colors.white.withValues(alpha: 0.15),
                 ),
               ),
               child: Column(
@@ -74,8 +74,8 @@ class TasbihDhikrSelector extends StatelessWidget {
                     '${dhikr.targetCount} مرة',
                     style: TextStyle(
                       color: selected
-                          ? Colors.white.withOpacity(0.9)
-                          : Colors.white.withOpacity(0.5),
+                          ? Colors.white.withValues(alpha: 0.9)
+                          : Colors.white.withValues(alpha: 0.5),
                       fontSize: 11,
                     ),
                   ),

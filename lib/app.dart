@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -13,23 +14,27 @@ class IslamicApp extends StatelessWidget {
       designSize: const Size(375, 812),
       minTextAdapt: true,
       splitScreenMode: true,
-    builder: (context, child) {
+      builder: (context, child) {
         return MaterialApp(
-        title: 'Islamic App',
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.light,
-        darkTheme: AppTheme.dark,
-        themeMode: ThemeMode.system,
-        onGenerateRoute: AppRouter.onGenerateRoute,
-        initialRoute: AppRouter.splashScreen,
+          title: 'Islamic App',
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.light,
+          darkTheme: AppTheme.dark,
+          themeMode: ThemeMode.system,
+          localizationsDelegates: context.localizationDelegates,
+          supportedLocales: context.supportedLocales,
+          locale: context.locale,
+          onGenerateRoute: AppRouter.onGenerateRoute,
+          initialRoute: AppRouter.splashScreen,
           onGenerateInitialRoutes: (String initialRouteName) {
-          return [
-            AppRouter.onGenerateRoute(
-              RouteSettings(name: initialRouteName),
-            ),
-          ];
-        },
-      );}
+            return [
+              AppRouter.onGenerateRoute(
+                RouteSettings(name: initialRouteName),
+              ),
+            ];
+          },
+        );
+      },
     );
   }
 }

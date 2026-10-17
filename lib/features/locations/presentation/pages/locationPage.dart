@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -48,7 +49,7 @@ class _LocationPageState extends State<LocationPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'اختر الموقع',
+          'choose_location'.tr(),
           style: TextStyle(
             fontSize: 18.sp,
           ),
@@ -105,7 +106,7 @@ class _LocationPageState extends State<LocationPage> {
               state.locations.isEmpty) {
             return ErrorView(
               message:
-              state.errorMessage ?? 'حدث خطأ ما',
+              state.errorMessage ?? 'error'.tr(),
               onRetry: () {
                 context.read<LocationBloc>().add(
                   const LoadLocations(),
@@ -117,7 +118,7 @@ class _LocationPageState extends State<LocationPage> {
           if (state.locations.isEmpty) {
             return Center(
               child: Text(
-                'لم يتم العثور على مواقع',
+                'no_locations_found'.tr(),
                 style: TextStyle(
                   fontSize: 14.sp,
                 ),

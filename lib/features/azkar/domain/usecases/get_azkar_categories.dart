@@ -5,7 +5,7 @@ class GetAzkarCategories {
 
   GetAzkarCategories(this.repository);
 
-  List<dynamic> call() {
-    return repository.getCategories();
+  List<dynamic> call([String langCode = 'ar']) {
+    return repository.getCategories(langCode);
   }
 }

@@ -7,17 +7,17 @@ class AzkarRepositoryImpl implements AzkarRepository {
   AzkarRepositoryImpl(this.localDataSource);
 
   @override
-  List<dynamic> getCategories() {
-    return localDataSource.getCategories();
+  List<dynamic> getCategories([String langCode = 'ar']) {
+    return localDataSource.getCategories(langCode);
   }
 
   @override
-  List<dynamic> getChaptersByCategory(int categoryId) {
-    return localDataSource.getChaptersByCategory(categoryId);
+  List<dynamic> getChaptersByCategory(int categoryId, [String langCode = 'ar']) {
+    return localDataSource.getChaptersByCategory(categoryId, langCode);
   }
 
   @override
-  List<dynamic> getItemsByChapter(int chapterId) {
-    return localDataSource.getItemsByChapter(chapterId);
+  List<dynamic> getItemsByChapter(int chapterId, [String langCode = 'ar']) {
+    return localDataSource.getItemsByChapter(chapterId, langCode);
   }
 }

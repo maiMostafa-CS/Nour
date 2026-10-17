@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -9,6 +10,7 @@ class PrayerSwitchTile extends StatelessWidget {
   final ValueChanged<bool> onChanged;
 
   const PrayerSwitchTile({
+    super.key,
     required this.name,
     required this.icon,
     required this.enabled,
@@ -54,7 +56,7 @@ class PrayerSwitchTile extends StatelessWidget {
             ),
           ),
           subtitle: Text(
-            enabled ? 'الأذان مفعّل' : 'الأذان متوقف',
+            enabled ? 'adhan_enabled'.tr() : 'adhan_disabled'.tr(),
             style: TextStyle(
               fontSize: 12.sp,
               color: Colors.grey.shade600,

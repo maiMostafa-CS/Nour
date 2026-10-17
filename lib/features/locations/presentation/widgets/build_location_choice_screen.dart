@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -32,7 +33,7 @@ class _BuildLocationChoiceScreenState
           SizedBox(height: 16.h),
 
           Text(
-            'اختر موقعك',
+            'choose_your_location'.tr(),
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 24.sp,
@@ -43,7 +44,7 @@ class _BuildLocationChoiceScreenState
           SizedBox(height: 8.h),
 
           Text(
-            'اختر طريقة تحديد موقع الصلاة',
+            'choose_location_method'.tr(),
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 14.sp,

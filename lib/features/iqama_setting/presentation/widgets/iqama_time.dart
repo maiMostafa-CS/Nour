@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -11,6 +12,7 @@ class IqamaTimeTile extends StatelessWidget {
   final ValueChanged<int> onChanged;
 
   const IqamaTimeTile({
+    super.key,
     required this.name,
     required this.icon,
     required this.minutes,
@@ -65,7 +67,7 @@ class IqamaTimeTile extends StatelessWidget {
                     ),
                     SizedBox(height: 3.h),
                     Text(
-                      'بعد الأذان بـ $minutes دقيقة',
+                      'minutes_after_adhan'.tr(args: ['$minutes']),
                       style: TextStyle(
                         fontSize: 12.sp,
                         color:

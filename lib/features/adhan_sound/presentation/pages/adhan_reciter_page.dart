@@ -1,5 +1,4 @@
-// lib/features/adhan/presentation/pages/adhan_reciter_page.dart
-
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -70,7 +69,7 @@ class _AdhanReciterPageState extends State<AdhanReciterPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'تعذر تشغيل صوت الأذان',
+            'failed_play_adhan'.tr(),
             style: TextStyle(fontSize: 14.sp),
           ),
         ),
@@ -87,7 +86,7 @@ class _AdhanReciterPageState extends State<AdhanReciterPage> {
         foregroundColor: Colors.white,
         centerTitle: true,
         title: Text(
-          'صوت أذان ${widget.prayerTitle}',
+          'adhan_sound_for'.tr(args: [widget.prayerName.tr()]),
           style: TextStyle(
             fontSize: 20.sp,
             fontWeight: FontWeight.bold,
@@ -135,7 +134,7 @@ class _AdhanReciterPageState extends State<AdhanReciterPage> {
             if (state.reciters.isEmpty) {
               return Center(
                 child: Text(
-                  'لا يوجد مؤذنون متاحون',
+                  'no_muezzins_available'.tr(),
                   style: TextStyle(fontSize: 16.sp),
                 ),
               );

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -26,7 +27,7 @@ class BuildLoaded extends StatelessWidget {
         children: [
           SizedBox(height: 10.h),
           Text(
-            'وجّه هاتفك نحو القبلة',
+            'point_phone_qibla'.tr(),
             style: TextStyle(
               fontSize: 22.sp,
               fontWeight: FontWeight.bold,
@@ -35,7 +36,7 @@ class BuildLoaded extends StatelessWidget {
           ),
           SizedBox(height: 8.h),
           Text(
-            'حرّك الهاتف حتى يشير السهم إلى اتجاه الكعبة',
+            'move_phone_qibla'.tr(),
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 14.sp, color: Colors.grey),
           ),
@@ -50,7 +51,7 @@ class BuildLoaded extends StatelessWidget {
 
           if (heading != null)
             Text(
-              'اتجاه الهاتف: ${heading!.toStringAsFixed(0)}°',
+              'phone_heading'.tr(args: [heading!.toStringAsFixed(0)]),
               style: TextStyle(fontSize: 14.sp, color: Colors.grey),
             ),
 
@@ -89,9 +90,7 @@ class BuildLoaded extends StatelessWidget {
 
           Expanded(
             child: Text(
-              'للحصول على قراءة أدق، أبعد '
-                  'الهاتف عن الأجهزة المعدنية '
-                  'وحركه بشكل رقم 8 لمعايرة البوصلة.',
+              'qibla_hint'.tr(),
               style: TextStyle(
                 fontSize: 13.sp,
                 height: 1.5,

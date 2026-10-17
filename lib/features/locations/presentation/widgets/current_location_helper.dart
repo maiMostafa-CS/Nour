@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -31,7 +32,7 @@ class CurrentLocationHelper {
 
         showMessage(
           context,
-          'يلزم السماح بالوصول إلى الموقع.',
+          'location_permission_required'.tr(),
         );
 
         return false;
@@ -81,7 +82,7 @@ class CurrentLocationHelper {
 
           showMessage(
             context,
-            'يرجى تفعيل الموقع ثم المحاولة مرة أخرى.',
+            'enable_location_retry'.tr(),
           );
 
           return false;
@@ -103,7 +104,7 @@ class CurrentLocationHelper {
 
       showMessage(
         context,
-        'تعذر الوصول إلى موقعك.',
+        'location_update_failed'.tr(),
       );
 
       return false;
@@ -123,17 +124,16 @@ class CurrentLocationHelper {
       builder: (dialogContext) {
         return AlertDialog(
           icon: const Icon(Icons.location_off),
-          title: const Text('الموقع غير مفعّل'),
-          content: const Text(
-            'يحتاج التطبيق إلى تفعيل الموقع/GPS '
-            'للحصول على موقعك الحالي.',
+          title: Text('location_disabled_title'.tr()),
+          content: Text(
+            'location_disabled_content'.tr(),
           ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.pop(dialogContext, false);
               },
-              child: const Text('إلغاء'),
+              child: Text('cancel'.tr()),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -141,7 +141,7 @@ class CurrentLocationHelper {
 
                 await Geolocator.openLocationSettings();
               },
-              child: const Text('فتح الإعدادات'),
+              child: Text('open_settings'.tr()),
             ),
           ],
         );
@@ -164,19 +164,18 @@ class CurrentLocationHelper {
       builder: (dialogContext) {
         return AlertDialog(
           icon: const Icon(Icons.location_disabled),
-          title: const Text(
-            'يلزم السماح بالموقع',
+          title: Text(
+            'location_permission_required'.tr(),
           ),
-          content: const Text(
-            'تم رفض إذن الموقع بشكل دائم. '
-            'يرجى تفعيله من إعدادات التطبيق.',
+          content: Text(
+            'permission_denied_forever'.tr(),
           ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.pop(dialogContext);
               },
-              child: const Text('إلغاء'),
+              child: Text('cancel'.tr()),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -184,7 +183,7 @@ class CurrentLocationHelper {
 
                 await Geolocator.openAppSettings();
               },
-              child: const Text('فتح الإعدادات'),
+              child: Text('open_settings'.tr()),
             ),
           ],
         );

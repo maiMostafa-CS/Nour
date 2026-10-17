@@ -1,6 +1,7 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
+import 'dart:ui' as ui;
 import '../bloc/azkar_state.dart';
 
 class AzkarItemsView extends StatefulWidget {
@@ -42,10 +43,10 @@ class _AzkarItemsViewState extends State<AzkarItemsView> {
         .toList();
 
     if (visibleItems.isEmpty) {
-      return const Center(
+      return Center(
         child: Text(
-          'تم الانتهاء من الأذكار',
-          style: TextStyle(
+          'azkar_completed'.tr(),
+          style: const TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -71,14 +72,14 @@ class _AzkarItemsViewState extends State<AzkarItemsView> {
               color: const Color(0xFFFCF5D7),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: const Color(0xFF8B5A2B).withOpacity(0.25),
+                color: const Color(0xFF8B5A2B).withValues(alpha: 0.25),
               ),
             ),
             child: Column(
               children: [
                 Text(
                   item.text,
-                  textDirection: TextDirection.rtl,
+                  textDirection: ui.TextDirection.rtl,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontSize: 20,

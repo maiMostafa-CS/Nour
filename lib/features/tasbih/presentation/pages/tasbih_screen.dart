@@ -1,5 +1,6 @@
 // lib/features/tasbih/view/tasbih_screen.dart
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -38,25 +39,25 @@ class _TasbihView extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
-        title: const Text(
-          'المسبحة الإلكترونية',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        title: Text(
+          'electronic_tasbih'.tr(),
+          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         leading: IconButton(
           icon: const Icon(Icons.delete_outline, color: Colors.white),
-          tooltip: 'تصفير الكل',
+          tooltip: 'reset_all'.tr(),
           onPressed: () => _confirmResetAll(context),
         ),
         actions: [
           IconButton(
             icon: const Icon(Icons.add_circle_outline,
                 color: Colors.tealAccent),
-            tooltip: 'إضافة ذكر',
+            tooltip: 'add_dhikr'.tr(),
             onPressed: () => _showAddDhikrDialog(context),
           ),
           IconButton(
             icon: const Icon(Icons.refresh, color: Colors.white),
-            tooltip: 'تصفير العداد',
+            tooltip: 'reset_counter'.tr(),
             onPressed: () =>
                 context.read<TasbihBloc>().add(const TasbihReset()),
           ),
@@ -180,7 +181,7 @@ class _TasbihView extends StatelessWidget {
                         child: _navButton(
                           context,
                           icon: Icons.arrow_back_ios_new,
-                          label: 'السابق',
+                          label: 'previous'.tr(),
                           onTap: () => context
                               .read<TasbihBloc>()
                               .add(const TasbihPreviousDhikr()),
@@ -191,7 +192,7 @@ class _TasbihView extends StatelessWidget {
                         child: _navButton(
                           context,
                           icon: Icons.arrow_forward_ios,
-                          label: 'التالي',
+                          label: 'next'.tr(),
                           onTap: () => context
                               .read<TasbihBloc>()
                               .add(const TasbihNextDhikr()),
@@ -255,10 +256,10 @@ class _TasbihView extends StatelessWidget {
     );
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
+      SnackBar(
         behavior: SnackBarBehavior.floating,
         backgroundColor: Colors.teal,
-        content: Text('تمت إضافة الذكر بنجاح ✅'),
+        content: Text('dhikr_added_success'.tr()),
       ),
     );
   }
@@ -281,7 +282,7 @@ class _TasbihView extends StatelessWidget {
       SnackBar(
         behavior: SnackBarBehavior.floating,
         backgroundColor: Colors.teal,
-        content: Text('تم تحديث العدد المستهدف إلى $result ✅'),
+        content: Text('target_updated_success'.tr(args: ['$result'])),
       ),
     );
   }
@@ -291,17 +292,17 @@ class _TasbihView extends StatelessWidget {
       context: context,
       builder: (dialogContext) => AlertDialog(
         backgroundColor: const Color(0xFF1E293B),
-        title: const Text('حذف الذكر',
-            style: TextStyle(color: Colors.white)),
+        title: Text('delete'.tr(),
+            style: const TextStyle(color: Colors.white)),
         content: Text(
-          'هل تريد حذف هذا الذكر؟\n\n"$text"',
+          'delete_dhikr_confirm'.tr(args: [text]),
           style: const TextStyle(color: Colors.white70),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
             child:
-            const Text('إلغاء', style: TextStyle(color: Colors.white70)),
+            Text('cancel'.tr(), style: const TextStyle(color: Colors.white70)),
           ),
           TextButton(
             onPressed: () {
@@ -309,7 +310,7 @@ class _TasbihView extends StatelessWidget {
               Navigator.pop(dialogContext);
             },
             child:
-            const Text('حذف', style: TextStyle(color: Colors.redAccent)),
+            Text('delete'.tr(), style: const TextStyle(color: Colors.redAccent)),
           ),
         ],
       ),
@@ -320,19 +321,19 @@ class _TasbihView extends StatelessWidget {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('تصفير الكل'),
-        content: const Text('هل أنت متأكد من تصفير جميع الإحصائيات؟'),
+        title: Text('reset_all'.tr()),
+        content: Text('confirm_reset_all'.tr()),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('إلغاء'),
+            child: Text('cancel'.tr()),
           ),
           TextButton(
             onPressed: () {
               context.read<TasbihBloc>().add(const TasbihResetAll());
               Navigator.pop(dialogContext);
             },
-            child: const Text('نعم'),
+            child: Text('yes'.tr()),
           ),
         ],
       ),

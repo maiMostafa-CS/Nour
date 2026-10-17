@@ -9,6 +9,7 @@ class AyahActionButton extends StatelessWidget {
   final VoidCallback onPressed;
 
   const AyahActionButton({
+    super.key,
     required this.icon,
     required this.tooltip,
     required this.iconColor,

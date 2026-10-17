@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -25,39 +26,38 @@ class CustomBottomNavigation extends StatelessWidget {
     required this.onSelected,
   });
 
-  static const List<_NavItem> _items = [
+  List<_NavItem> _getItems() => [
     _NavItem(
       icon: Icons.home_outlined,
       activeIcon: Icons.home_rounded,
-      label: 'الرئيسية',
+      label: 'home'.tr(),
     ),
     _NavItem(
       icon: Icons.menu_book_outlined,
       activeIcon: Icons.menu_book_rounded,
-      label: 'القرآن',
+      label: 'quran'.tr(),
     ),
     _NavItem(
       icon: Icons.auto_awesome_outlined,
       activeIcon: Icons.auto_awesome,
-      label: 'الأذكار',
+      label: 'azkar'.tr(),
     ),
     _NavItem(
       icon: Icons.settings_outlined,
       activeIcon: Icons.settings_rounded,
-      label: 'الإعدادات',
+      label: 'settings'.tr(),
     ),
   ];
 
   @override
   Widget build(BuildContext context) {
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
-        child: Container(
-          height: 64.h,
-          decoration: BoxDecoration(
-            color: Colors.white,
+    final items = _getItems();
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
+      child: Container(
+        height: 64.h,
+        decoration: BoxDecoration(
+          color: Colors.white,
             borderRadius: BorderRadius.circular(25.r),
             boxShadow: [
               BoxShadow(
@@ -69,8 +69,8 @@ class CustomBottomNavigation extends StatelessWidget {
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: List.generate(_items.length, (index) {
-              final item = _items[index];
+            children: List.generate(items.length, (index) {
+              final item = items[index];
               final selected = selectedIndex == index;
 
               return GestureDetector(
@@ -124,8 +124,7 @@ class CustomBottomNavigation extends StatelessWidget {
             }),
           ),
         ),
-      ),
-    );
+      );
   }
 }
 

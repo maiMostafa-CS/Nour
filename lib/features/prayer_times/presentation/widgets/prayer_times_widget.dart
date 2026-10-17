@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:timezone/timezone.dart' as tz;
@@ -70,32 +71,38 @@ class _PrayerTimesWidgetState extends State<PrayerTimesWidget> {
 
     final prayers = [
       {
-        'name': 'الفجر',
+        'key': 'fajr',
+        'name': 'fajr'.tr(),
         'time': widget.prayerTimes.fajr,
         'icon': Icons.wb_twilight,
       },
       {
-        'name': 'الشروق',
+        'key': 'sunrise',
+        'name': 'sunrise'.tr(),
         'time': widget.prayerTimes.sunrise,
         'icon': Icons.wb_sunny_outlined,
       },
       {
-        'name': 'الظهر',
+        'key': 'dhuhr',
+        'name': 'dhuhr'.tr(),
         'time': widget.prayerTimes.dhuhr,
         'icon': Icons.wb_sunny,
       },
       {
-        'name': 'العصر',
+        'key': 'asr',
+        'name': 'asr'.tr(),
         'time': widget.prayerTimes.asr,
         'icon': Icons.wb_cloudy_outlined,
       },
       {
-        'name': 'المغرب',
+        'key': 'maghrib',
+        'name': 'maghrib'.tr(),
         'time': widget.prayerTimes.maghrib,
         'icon': Icons.nights_stay_outlined,
       },
       {
-        'name': 'العشاء',
+        'key': 'isha',
+        'name': 'isha'.tr(),
         'time': widget.prayerTimes.isha,
         'icon': Icons.nightlight_outlined,
       },

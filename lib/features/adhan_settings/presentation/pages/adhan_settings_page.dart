@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -27,7 +28,7 @@ class AdhanSettingsPage extends StatelessWidget {
           color: Color(0xFF176B5B),
         ),
         title: Text(
-          'أوقات الأذان',
+          'adhan_times'.tr(),
           style: TextStyle(
             fontSize: 20.sp,
             fontWeight: FontWeight.bold,
@@ -55,7 +56,7 @@ class AdhanSettingsPage extends StatelessWidget {
                 isha: true,
               )) {
             return ErrorView(
-              message: state.errorMessage ?? 'حدث خطأ، حاول مرة أخرى',
+              message: state.errorMessage ?? 'error_try_again'.tr(),
               onRetry: () {
                 context.read<AdhanSettingsBloc>().add(
                   const LoadAdhanSettings(),
@@ -77,7 +78,7 @@ class AdhanSettingsPage extends StatelessWidget {
               SizedBox(height: 20.h),
 
               PrayerSwitchTile(
-                name: 'الفجر',
+                name: 'fajr'.tr(),
                 icon: Icons.nightlight_outlined,
                 enabled: settings.fajr,
                 onChanged: (value) {
@@ -90,7 +91,7 @@ class AdhanSettingsPage extends StatelessWidget {
               ),
 
               PrayerSwitchTile(
-                name: 'الشروق',
+                name: 'sunrise'.tr(),
                 icon: Icons.wb_sunny_outlined,
                 enabled: settings.sunrise,
                 onChanged: (value) {
@@ -103,7 +104,7 @@ class AdhanSettingsPage extends StatelessWidget {
               ),
 
               PrayerSwitchTile(
-                name: 'الظهر',
+                name: 'dhuhr'.tr(),
                 icon: Icons.wb_sunny,
                 enabled: settings.dhuhr,
                 onChanged: (value) {
@@ -116,7 +117,7 @@ class AdhanSettingsPage extends StatelessWidget {
               ),
 
               PrayerSwitchTile(
-                name: 'العصر',
+                name: 'asr'.tr(),
                 icon: Icons.wb_twilight_outlined,
                 enabled: settings.asr,
                 onChanged: (value) {
@@ -129,7 +130,7 @@ class AdhanSettingsPage extends StatelessWidget {
               ),
 
               PrayerSwitchTile(
-                name: 'المغرب',
+                name: 'maghrib'.tr(),
                 icon: Icons.wb_twilight,
                 enabled: settings.maghrib,
                 onChanged: (value) {
@@ -142,7 +143,7 @@ class AdhanSettingsPage extends StatelessWidget {
               ),
 
               PrayerSwitchTile(
-                name: 'العشاء',
+                name: 'isha'.tr(),
                 icon: Icons.nights_stay_outlined,
                 enabled: settings.isha,
                 onChanged: (value) {

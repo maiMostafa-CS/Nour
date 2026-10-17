@@ -1,19 +1,26 @@
 import 'package:azkar/azkar.dart';
 
 class AzkarLocalDataSource {
-  List<dynamic> getCategories() {
-    return Azkar.getCategories(AzkarLang.arabic);
+  AzkarLang _toLang(String langCode) {
+    return langCode.toLowerCase() == 'en'
+        ? AzkarLang.english
+        : AzkarLang.arabic;
   }
 
-  List<dynamic> getChaptersByCategory(int categoryId) {
+  List<dynamic> getCategories([String langCode = 'ar']) {
+    return Azkar.getCategories(_toLang(langCode));
+  }
+
+  List<dynamic> getChaptersByCategory(int categoryId, [String langCode = 'ar']) {
     return Azkar.getChaptersByCategory(
-      AzkarLang.arabic,
+      _toLang(langCode),
       categoryId,
     );
   }
-  List<dynamic> getItemsByChapter(int chapterId) {
+
+  List<dynamic> getItemsByChapter(int chapterId, [String langCode = 'ar']) {
     final items = Azkar.getItemsByChapter(
-      AzkarLang.arabic,
+      _toLang(langCode),
       chapterId,
     );
 

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -16,18 +17,14 @@ async {
           color: Theme.of(context).colorScheme.primary,
         ),
         title: Text(
-          'تحديث الموقع الحالي',
+          'update_current_location'.tr(),
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 20.sp,
           ),
         ),
         content: Text(
-          'سيتم تحديث موقعك الحالي.\n\n'
-              'يرجى التأكد من تفعيل الموقع/GPS '
-              'على جهازك.\n\n'
-              'إذا كان الموقع غير مفعّل، يرجى تفعيله '
-              'قبل المتابعة.',
+          'location_dialog_content'.tr(),
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 14.sp,
@@ -39,7 +36,7 @@ async {
               Navigator.pop(dialogContext, false);
             },
             child: Text(
-              'إلغاء',
+              'cancel'.tr(),
               style: TextStyle(
                 fontSize: 14.sp,
               ),
@@ -50,7 +47,7 @@ async {
               Navigator.pop(dialogContext, true);
             },
             child: Text(
-              'تحديث الموقع',
+              'refresh_location'.tr(),
               style: TextStyle(
                 fontSize: 14.sp,
               ),

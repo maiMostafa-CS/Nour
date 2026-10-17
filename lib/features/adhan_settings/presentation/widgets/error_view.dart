@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -6,6 +6,7 @@ class ErrorView extends StatelessWidget {
   final String? message;
 
   const ErrorView({
+    super.key,
     this.message,
   });
 
@@ -24,7 +25,7 @@ class ErrorView extends StatelessWidget {
             ),
             SizedBox(height: 12.h),
             Text(
-              'حدث خطأ أثناء تحميل إعدادات الأذان',
+              'adhan_settings_load_error'.tr(),
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 16.sp,

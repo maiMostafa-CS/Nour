@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -27,7 +28,7 @@ class IqamaSettingsPage extends StatelessWidget {
         elevation: 0,
         centerTitle: true,
         title: Text(
-          'إعدادات الإقامة',
+          'iqama_settings'.tr(),
           style: TextStyle(
             fontSize: 20.sp,
             fontWeight: FontWeight.bold,
@@ -82,7 +83,7 @@ class IqamaSettingsPage extends StatelessWidget {
                         CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'وقت الإقامة',
+                            'iqama_time'.tr(),
                             style: TextStyle(
                               fontSize: 17.sp,
                               fontWeight:
@@ -91,7 +92,7 @@ class IqamaSettingsPage extends StatelessWidget {
                           ),
                           SizedBox(height: 4.h),
                           Text(
-                            'حدد مدة الانتظار بعد الأذان لكل صلاة',
+                            'set_iqama_waiting_time'.tr(),
                             style: TextStyle(
                               fontSize: 12.sp,
                               color:
@@ -106,7 +107,7 @@ class IqamaSettingsPage extends StatelessWidget {
               ),
 
               IqamaTimeTile(
-                name: 'الفجر',
+                name: 'fajr'.tr(),
                 icon: Icons.nightlight_round,
                 minutes: state.settings.fajr,
                 onChanged: (value) {
@@ -119,7 +120,7 @@ class IqamaSettingsPage extends StatelessWidget {
               ),
 
               IqamaTimeTile(
-                name: 'الشروق',
+                name: 'sunrise'.tr(),
                 icon: Icons.wb_sunny_outlined,
                 minutes: state.settings.sunrise,
                 onChanged: (value) {
@@ -132,7 +133,7 @@ class IqamaSettingsPage extends StatelessWidget {
               ),
 
               IqamaTimeTile(
-                name: 'الظهر',
+                name: 'dhuhr'.tr(),
                 icon: Icons.wb_sunny,
                 minutes: state.settings.dhuhr,
                 onChanged: (value) {
@@ -145,7 +146,7 @@ class IqamaSettingsPage extends StatelessWidget {
               ),
 
               IqamaTimeTile(
-                name: 'العصر',
+                name: 'asr'.tr(),
                 icon: Icons.wb_twilight,
                 minutes: state.settings.asr,
                 onChanged: (value) {
@@ -158,7 +159,7 @@ class IqamaSettingsPage extends StatelessWidget {
               ),
 
               IqamaTimeTile(
-                name: 'المغرب',
+                name: 'maghrib'.tr(),
                 icon: Icons.wb_twilight,
                 minutes: state.settings.maghrib,
                 onChanged: (value) {
@@ -171,7 +172,7 @@ class IqamaSettingsPage extends StatelessWidget {
               ),
 
               IqamaTimeTile(
-                name: 'العشاء',
+                name: 'isha'.tr(),
                 icon: Icons.nights_stay_outlined,
                 minutes: state.settings.isha,
                 onChanged: (value) {

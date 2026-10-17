@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -31,7 +32,7 @@ class CurrentLocationCard extends StatelessWidget {
       final openSettings = await _showDialog(
         context: context,
         icon: Icons.wifi_off,
-        title: 'لا يوجد اتصال بالإنترنت',
+        title: 'no_internet_title'.tr(),
         message: 'يحتاج التطبيق إلى الاتصال بالإنترنت '
             'لتحديد موقعك بدقة والحصول على اسم المدينة.\n\n'
             'يرجى تفعيل Wi-Fi أو بيانات الجوال.',
@@ -53,9 +54,8 @@ class CurrentLocationCard extends StatelessWidget {
       final openSettings = await _showDialog(
         context: context,
         icon: Icons.location_off,
-        title: 'الموقع غير مفعّل',
-        message: 'يحتاج التطبيق إلى تفعيل خدمة الموقع (GPS) '
-            'للحصول على موقعك الحالي.',
+        title: 'location_disabled_title'.tr(),
+        message: 'location_disabled_content'.tr(),
       );
 
       if (openSettings == true) {
@@ -76,7 +76,8 @@ class CurrentLocationCard extends StatelessWidget {
     required IconData icon,
     required String title,
     required String message,
-  }) {
+  })
+  {
     return showDialog<bool>(
       context: context,
       barrierDismissible: false,
@@ -129,7 +130,8 @@ class CurrentLocationCard extends StatelessWidget {
     final isLoading = state.status == LocationStatus.loading;
     final primaryColor = Theme.of(context).colorScheme.primary;
 
-    return Card(
+    return
+      Card(
       elevation: 2,
       clipBehavior: Clip.antiAlias,
       child: InkWell(
@@ -157,7 +159,7 @@ class CurrentLocationCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'استخدام الموقع الحالي',
+                      'use_current_location'.tr(),
                       style: TextStyle(
                         fontSize: 17.sp,
                         fontWeight: FontWeight.bold,
@@ -165,7 +167,7 @@ class CurrentLocationCard extends StatelessWidget {
                     ),
                     SizedBox(height: 6.h),
                     Text(
-                      'تحديد موقعك تلقائيًا باستخدام GPS',
+                      'determine_location_gps'.tr(),
                       style: TextStyle(
                         fontSize: 13.sp,
                         color: Colors.grey.shade600,

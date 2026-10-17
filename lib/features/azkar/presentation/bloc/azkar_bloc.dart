@@ -12,6 +12,7 @@ class AzkarBloc extends Bloc<AzkarEvent, AzkarState> {
   final GetAzkarChapters getAzkarChapters;
   final GetAzkarItems getAzkarItems;
 
+  String _currentLangCode = 'ar';
   int? _currentCategoryId;
   int? _currentChapterId;
 
@@ -34,16 +35,20 @@ class AzkarBloc extends Bloc<AzkarEvent, AzkarState> {
     try {
       emit(const AzkarLoading());
 
+      if (event.langCode != null) {
+        _currentLangCode = event.langCode!;
+      }
+
       _currentCategoryId = null;
       _currentChapterId = null;
 
-      final allCategories = getAzkarCategories();
+      final allCategories = getAzkarCategories(_currentLangCode);
 
       final categoriesWithAzkar = allCategories.where((category) {
-        final chapters = getAzkarChapters(category.id);
+        final chapters = getAzkarChapters(category.id, _currentLangCode);
 
         return chapters.any((chapter) {
-          final items = getAzkarItems(chapter.id);
+          final items = getAzkarItems(chapter.id, _currentLangCode);
           return items.isNotEmpty;
         });
       }).toList();
@@ -61,6 +66,7 @@ class AzkarBloc extends Bloc<AzkarEvent, AzkarState> {
       emit(AzkarError(e.toString()));
     }
   }
+
   void _onLoadChapters(
       LoadAzkarChapters event,
       Emitter<AzkarState> emit,
@@ -68,13 +74,17 @@ class AzkarBloc extends Bloc<AzkarEvent, AzkarState> {
     try {
       emit(const AzkarLoading());
 
+      if (event.langCode != null) {
+        _currentLangCode = event.langCode!;
+      }
+
       _currentCategoryId = event.categoryId;
       _currentChapterId = null;
 
-      final allChapters = getAzkarChapters(event.categoryId);
+      final allChapters = getAzkarChapters(event.categoryId, _currentLangCode);
 
       final chaptersWithAzkar = allChapters.where((chapter) {
-        final items = getAzkarItems(chapter.id);
+        final items = getAzkarItems(chapter.id, _currentLangCode);
         return items.isNotEmpty;
       }).toList();
 
@@ -94,6 +104,7 @@ class AzkarBloc extends Bloc<AzkarEvent, AzkarState> {
       emit(AzkarError(e.toString()));
     }
   }
+
   void _onLoadItems(
       LoadAzkarItems event,
       Emitter<AzkarState> emit,
@@ -101,9 +112,13 @@ class AzkarBloc extends Bloc<AzkarEvent, AzkarState> {
     try {
       emit(const AzkarLoading());
 
+      if (event.langCode != null) {
+        _currentLangCode = event.langCode!;
+      }
+
       _currentChapterId = event.chapterId;
 
-      final items = getAzkarItems(event.chapterId);
+      final items = getAzkarItems(event.chapterId, _currentLangCode);
 
       debugPrint(
         '📿 CHAPTER ${event.chapterId} → ITEMS: ${items.length}',
@@ -145,10 +160,10 @@ class AzkarBloc extends Bloc<AzkarEvent, AzkarState> {
       _currentChapterId = null;
 
       final allChapters =
-      getAzkarChapters(_currentCategoryId!);
+      getAzkarChapters(_currentCategoryId!, _currentLangCode);
 
       final chaptersWithAzkar = allChapters.where((chapter) {
-        final items = getAzkarItems(chapter.id);
+        final items = getAzkarItems(chapter.id, _currentLangCode);
         return items.isNotEmpty;
       }).toList();
 
@@ -171,7 +186,7 @@ class AzkarBloc extends Bloc<AzkarEvent, AzkarState> {
       emit(const AzkarLoading());
       _currentCategoryId = null;
       _currentChapterId = null;
-      emit(AzkarCategoriesLoaded(getAzkarCategories()));
+      emit(AzkarCategoriesLoaded(getAzkarCategories(_currentLangCode)));
     } catch (e) {
       emit(AzkarError(e.toString()));
     }

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -104,6 +105,7 @@ class _AzkarViewState extends State<AzkarView> {
       builder: (context, state) {
         final currentChapterId =
         state is AzkarItemsLoaded ? state.chapterId : null;
+        final isArabic = context.locale.languageCode == 'ar';
 
         return PopScope(
           canPop: false,
@@ -118,12 +120,18 @@ class _AzkarViewState extends State<AzkarView> {
               elevation: 0,
               centerTitle: true,
               title: Text(
-                'الأذكار',
-                style: GoogleFonts.amiri(
-                  fontSize: 28.sp,
-                  fontWeight: FontWeight.bold,
-                  color: _accentColor,
-                ),
+                'azkar'.tr(),
+                style: isArabic
+                    ? GoogleFonts.amiri(
+                        fontSize: 28.sp,
+                        fontWeight: FontWeight.bold,
+                        color: _accentColor,
+                      )
+                    : GoogleFonts.cairo(
+                        fontSize: 24.sp,
+                        fontWeight: FontWeight.bold,
+                        color: _accentColor,
+                      ),
               ),
               leading: IconButton(
                 icon: Icon(
@@ -138,7 +146,7 @@ class _AzkarViewState extends State<AzkarView> {
                     _history(state.chapterId).isNotEmpty)
                   IconButton(
                     icon: Icon(Icons.undo, color: Colors.white, size: 24.r),
-                    tooltip: 'تراجع',
+                    tooltip: 'undo'.tr(),
                     onPressed: () => _undo(state.chapterId),
                   ),
               ],
@@ -210,33 +218,45 @@ class _AzkarViewState extends State<AzkarView> {
           .toList();
 
       if (visibleItems.isEmpty) {
+        final isArabic = context.locale.languageCode == 'ar';
         return Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.check_circle_outline,
-                size: 80.r,
-                color: _primaryColor,
-              ),
-              SizedBox(height: 16.h),
-              Text(
-                'تم الانتهاء من الأذكار',
-                style: GoogleFonts.amiri(
-                  fontSize: 24.sp,
-                  fontWeight: FontWeight.bold,
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 24.w),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.check_circle_outline,
+                  size: 80.r,
                   color: _primaryColor,
                 ),
-              ),
-              SizedBox(height: 8.h),
-              Text(
-                'تقبل الله منا ومنكم صالح الأعمال',
-                style: GoogleFonts.cairo(
-                  fontSize: 16.sp,
-                  color: Colors.grey[600],
+                SizedBox(height: 16.h),
+                Text(
+                  'azkar_completed'.tr(),
+                  textAlign: TextAlign.center,
+                  style: isArabic
+                      ? GoogleFonts.amiri(
+                          fontSize: 24.sp,
+                          fontWeight: FontWeight.bold,
+                          color: _primaryColor,
+                        )
+                      : GoogleFonts.cairo(
+                          fontSize: 20.sp,
+                          fontWeight: FontWeight.bold,
+                          color: _primaryColor,
+                        ),
                 ),
-              ),
-            ],
+                SizedBox(height: 8.h),
+                Text(
+                  'azkar_completed_desc'.tr(),
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.cairo(
+                    fontSize: 16.sp,
+                    color: Colors.grey[600],
+                  ),
+                ),
+              ],
+            ),
           ),
         );
       }

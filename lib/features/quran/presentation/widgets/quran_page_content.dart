@@ -1,13 +1,11 @@
 import 'dart:async';
 import 'dart:io';
-
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:islamic_app/features/quran/presentation/widgets/reciter_selection/reciter_selection_sheet.dart';
 import 'package:qcf_quran/qcf_quran.dart';
-
 import '../../../../core/data/quran/quran_helpers.dart';
 import '../bloc/quran_bloc.dart';
 import '../bloc/quran_event.dart';
@@ -717,7 +715,7 @@ class _QuranPageContentState extends State<QuranPageContent>
                                   horizontal: 12.w,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.65),
+                                  color: Colors.white.withValues(alpha: 0.65),
                                   borderRadius: BorderRadius.circular(14.r),
                                   border: Border.all(
                                     color: Colors.black12,
@@ -763,7 +761,7 @@ class _QuranPageContentState extends State<QuranPageContent>
                                 Container(
                                   padding: EdgeInsets.all(12.w),
                                   decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.45),
+                                    color: Colors.white.withValues(alpha: 0.45),
                                     borderRadius: BorderRadius.circular(12.r),
                                   ),
                                   child: Row(
@@ -824,7 +822,7 @@ class _QuranPageContentState extends State<QuranPageContent>
                                               padding: EdgeInsets.all(16.w),
                                               decoration: BoxDecoration(
                                                 color: Colors.white
-                                                    .withOpacity(0.55),
+                                                    .withValues(alpha: 0.55),
                                                 borderRadius:
                                                     BorderRadius.circular(
                                                   16.r,

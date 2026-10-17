@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_compass/flutter_compass.dart';
@@ -63,7 +64,7 @@ class _QiblaPageState extends State<QiblaPage> {
           elevation: 0,
           centerTitle: true,
           title: Text(
-            'اتجاه القبلة',
+            'qibla_direction'.tr(),
             style: TextStyle(
               color: const Color(0xFF176B5B),
               fontWeight: FontWeight.bold,

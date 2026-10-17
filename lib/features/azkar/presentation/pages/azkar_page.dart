@@ -1,6 +1,6 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../injection_container.dart';
 import '../bloc/azkar_bloc.dart';
@@ -12,16 +12,13 @@ class AzkarPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ScreenUtilInit(
-      designSize: const Size(375, 812),
-      minTextAdapt: true,
-      splitScreenMode: true,
-      builder: (context, child) {
-        return BlocProvider(
-          create: (_) => sl<AzkarBloc>()..add(const LoadAzkarCategories()),
-          child: const AzkarView(),
-        );
-      },
+    final langCode = context.locale.languageCode;
+
+    return BlocProvider(
+      key: ValueKey(langCode),
+      create: (_) => sl<AzkarBloc>()
+        ..add(LoadAzkarCategories(langCode: langCode)),
+      child: const AzkarView(),
     );
   }
 }

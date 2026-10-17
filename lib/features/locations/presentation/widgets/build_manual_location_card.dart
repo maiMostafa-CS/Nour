@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -105,7 +106,7 @@ class _BuildManualLocationCardState
                   CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'اختر الموقع يدويًا',
+                      'choose_location_manually'.tr(),
                       style: TextStyle(
                         fontSize: 17.sp,
                         fontWeight: FontWeight.bold,
@@ -115,7 +116,7 @@ class _BuildManualLocationCardState
                     SizedBox(height: 6.h),
 
                     Text(
-                      'اختر الدولة والمدينة يدويًا',
+                      'choose_country_city_manually'.tr(),
                       style: TextStyle(
                         fontSize: 13.sp,
                         color: Colors.grey,

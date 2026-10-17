@@ -1,6 +1,8 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'dart:ui' as ui;
 
 class AzkarZikrCard extends StatelessWidget {
   const AzkarZikrCard({
@@ -24,6 +26,8 @@ class AzkarZikrCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isArabic = context.locale.languageCode == 'ar';
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -58,14 +62,23 @@ class AzkarZikrCard extends StatelessWidget {
                 children: [
                   Text(
                     text,
-                    textDirection: TextDirection.rtl,
+                    textDirection: isArabic
+                        ? ui.TextDirection.rtl
+                        : ui.TextDirection.ltr,
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.amiri(
-                      fontSize: 22.sp,
-                      height: 2.2,
-                      color: const Color(0xFF2C2C2C),
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: isArabic
+                        ? GoogleFonts.amiri(
+                            fontSize: 22.sp,
+                            height: 2.2,
+                            color: const Color(0xFF2C2C2C),
+                            fontWeight: FontWeight.w600,
+                          )
+                        : GoogleFonts.cairo(
+                            fontSize: 16.sp,
+                            height: 1.8,
+                            color: const Color(0xFF2C2C2C),
+                            fontWeight: FontWeight.w600,
+                          ),
                   ),
                   SizedBox(height: 20.h),
                   Row(
@@ -122,7 +135,7 @@ class AzkarZikrCard extends StatelessWidget {
                         ),
                         SizedBox(width: 16.w),
                         Text(
-                          'المتبقي',
+                          'remaining'.tr(),
                           style: GoogleFonts.cairo(
                             fontSize: 14.sp,
                             color: Colors.grey[600],
@@ -140,11 +153,11 @@ class AzkarZikrCard extends StatelessWidget {
                         color: _primaryColor.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(20.r),
                         border: Border.all(
-                          color: _primaryColor.withOpacity(0.3),
+                          color: _primaryColor.withValues(alpha: 0.3),
                         ),
                       ),
                       child: Text(
-                        'اضغط للقراءة',
+                        'tap_to_read'.tr(),
                         style: GoogleFonts.cairo(
                           color: _primaryColor,
                           fontWeight: FontWeight.bold,

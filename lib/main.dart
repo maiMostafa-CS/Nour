@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:alarm/alarm.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -26,6 +27,7 @@ import 'injection_container.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await EasyLocalization.ensureInitialized();
   GoogleFonts.config.allowRuntimeFetching = false;
   tz.initializeTimeZones();
   await configureDependencies();
@@ -42,7 +44,15 @@ Future<void> main() async {
 
   WidgetsBinding.instance.addObserver(_AppLifecycleObserver());
 
-  runApp(const IslamicApp());
+  runApp(
+    EasyLocalization(
+      supportedLocales: const [Locale('ar'), Locale('en')],
+      path: 'assets/translations',
+      fallbackLocale: const Locale('ar'),
+      startLocale: const Locale('ar'),
+      child: const IslamicApp(),
+    ),
+  );
 
   WidgetsBinding.instance.addPostFrameCallback((_) {
     _runPostFrameSetup();

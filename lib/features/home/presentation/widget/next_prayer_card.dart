@@ -1,6 +1,7 @@
 // lib/features/prayer_times/presentation/widgets/next_prayer_card.dart
 
 import 'dart:async';
+import 'package:easy_localization/easy_localization.dart' hide TextDirection;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:timezone/timezone.dart' as tz;
@@ -101,6 +102,25 @@ class _NextPrayerCardState extends State<NextPrayerCard>
     }
   }
 
+  String _localizePrayerName(String prayerName) {
+    switch (prayerName) {
+      case 'الفجر':
+        return 'fajr'.tr();
+      case 'الشروق':
+        return 'sunrise'.tr();
+      case 'الظهر':
+        return 'dhuhr'.tr();
+      case 'العصر':
+        return 'asr'.tr();
+      case 'المغرب':
+        return 'maghrib'.tr();
+      case 'العشاء':
+        return 'isha'.tr();
+      default:
+        return prayerName;
+    }
+  }
+
   // ✨ Decorative side line for the ayah
   Widget _ornamentLine() {
     return Container(
@@ -110,7 +130,7 @@ class _NextPrayerCardState extends State<NextPrayerCard>
         gradient: LinearGradient(
           colors: [
             Colors.transparent,
-            AppColors.softGold.withOpacity(0.6),
+            AppColors.softGold.withValues(alpha: 0.6),
             Colors.transparent,
           ],
         ),
@@ -177,7 +197,7 @@ class _NextPrayerCardState extends State<NextPrayerCard>
     final seconds = totalSeconds % 60;
 
     final remainingTime =
-        '${hours.toString().padLeft(2, '0')}:'
+        '-${hours.toString().padLeft(2, '0')}:'
         '${minutes.toString().padLeft(2, '0')}:'
         '${seconds.toString().padLeft(2, '0')}';
 
@@ -203,13 +223,13 @@ class _NextPrayerCardState extends State<NextPrayerCard>
           ),
           boxShadow: [
             BoxShadow(
-              color: AppColors.deepGreen.withOpacity(.35),
+              color: AppColors.deepGreen.withValues(alpha: .35),
               blurRadius: 22.r,
               spreadRadius: 2.r,
               offset: Offset(0, 10.h),
             ),
             BoxShadow(
-              color: Colors.black.withOpacity(.12),
+              color: Colors.black.withValues(alpha: .12),
               blurRadius: 6.r,
               offset: Offset(0, 2.h),
             ),
@@ -299,7 +319,7 @@ class _NextPrayerCardState extends State<NextPrayerCard>
                       ),
                       SizedBox(width: 8.w),
                       Text(
-                        'صلاة $nextPrayerName',
+                        'prayer_prefix'.tr(args: [_localizePrayerName(nextPrayerName)]),
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 22.sp,
@@ -331,6 +351,7 @@ class _NextPrayerCardState extends State<NextPrayerCard>
                   // ═══════════════════════════════════════
                   Text(
                     remainingTime,
+                    textDirection: TextDirection.ltr,
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 36.sp,
@@ -338,7 +359,7 @@ class _NextPrayerCardState extends State<NextPrayerCard>
                       letterSpacing: 2.w,
                       shadows: [
                         Shadow(
-                          color: AppColors.softGold.withOpacity(0.4),
+                          color: AppColors.softGold.withValues(alpha: 0.4),
                           blurRadius: 12,
                         ),
                       ],
@@ -348,7 +369,7 @@ class _NextPrayerCardState extends State<NextPrayerCard>
                   SizedBox(height: 4.h),
 
                   Text(
-                    'متبقي على وقت الأذان',
+                    'time_until_adhan'.tr(),
                     style: TextStyle(
                       color: Colors.white70,
                       fontSize: 12.sp,
@@ -382,7 +403,7 @@ class _NextPrayerCardState extends State<NextPrayerCard>
                           ),
                           SizedBox(width: 4.w),
                           Text(
-                            'المؤذن: $nextMuezzin',
+                            'muezzin_colon'.tr(args: [nextMuezzin]),
                             style: TextStyle(
                               color: AppColors.softGold,
                               fontSize: 11.sp,
@@ -425,7 +446,7 @@ class _NextPrayerCardState extends State<NextPrayerCard>
                             ),
                             SizedBox(width: 4.w),
                             Text(
-                              'الآن: $nowInLocation',
+                              'now_colon'.tr(args: [nowInLocation]),
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 11.sp,
@@ -446,7 +467,7 @@ class _NextPrayerCardState extends State<NextPrayerCard>
                         Row(
                           children: [
                             Text(
-                              'الأذان: $nextPrayerFormatted',
+                              'adhan_colon'.tr(args: [nextPrayerFormatted]),
                               style: TextStyle(
                                 color: AppColors.softGold,
                                 fontSize: 11.sp,

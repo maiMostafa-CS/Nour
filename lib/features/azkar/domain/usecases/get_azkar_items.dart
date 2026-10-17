@@ -5,7 +5,7 @@ class GetAzkarItems {
 
   GetAzkarItems(this.repository);
 
-  List<dynamic> call(int chapterId) {
-    return repository.getItemsByChapter(chapterId);
+  List<dynamic> call(int chapterId, [String langCode = 'ar']) {
+    return repository.getItemsByChapter(chapterId, langCode);
   }
 }

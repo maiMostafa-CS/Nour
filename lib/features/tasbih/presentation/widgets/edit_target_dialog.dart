@@ -80,7 +80,7 @@ class _EditTargetDialogState extends State<EditTargetDialog> {
                   ),
                   selected: isSelected,
                   selectedColor: Colors.tealAccent.shade700,
-                  backgroundColor: Colors.white.withOpacity(0.05),
+                  backgroundColor: Colors.white.withValues(alpha: 0.05),
                   side: BorderSide(
                     color: isSelected
                         ? Colors.tealAccent
