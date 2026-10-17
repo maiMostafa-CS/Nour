@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:timezone/timezone.dart' as tz;
@@ -14,9 +15,10 @@ class PrayerTimesCard extends StatelessWidget {
     required this.timezoneName,
   });
 
-  String _formatTime(DateTime time) {
+  String _formatTime(DateTime time, BuildContext context) {
     final location = tz.getLocation(timezoneName);
     final localTime = tz.TZDateTime.from(time, location);
+    final isArabic = context.locale.languageCode == 'ar';
 
     final hour = localTime.hour == 0
         ? 12
@@ -25,12 +27,15 @@ class PrayerTimesCard extends StatelessWidget {
             : localTime.hour;
 
     final minute = localTime.minute.toString().padLeft(2, '0');
-    final period = localTime.hour >= 12 ? 'م' : 'ص';
+    final period = localTime.hour >= 12
+        ? (isArabic ? 'م' : 'PM')
+        : (isArabic ? 'ص' : 'AM');
 
     return '$hour:$minute $period';
   }
 
   Widget _buildPrayer(
+    BuildContext context,
     String name,
     DateTime time,
     IconData icon,
@@ -52,7 +57,7 @@ class PrayerTimesCard extends StatelessWidget {
             ),
           ),
           Text(
-            _formatTime(time),
+            _formatTime(time, context),
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 15.sp,
@@ -72,7 +77,7 @@ class PrayerTimesCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(20.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha:0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 12.r,
             offset: Offset(0, 4.h),
           ),
@@ -82,19 +87,19 @@ class PrayerTimesCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'مواقيت الصلاة',
+            'prayer_times'.tr(),
             style: TextStyle(
               fontSize: 19.sp,
               fontWeight: FontWeight.bold,
             ),
           ),
           SizedBox(height: 10.h),
-          _buildPrayer('الفجر', prayerTimes.fajr, Icons.wb_twilight),
-          _buildPrayer('الشروق', prayerTimes.sunrise, Icons.wb_sunny_outlined),
-          _buildPrayer('الظهر', prayerTimes.dhuhr, Icons.wb_sunny),
-          _buildPrayer('العصر', prayerTimes.asr, Icons.sunny_snowing),
-          _buildPrayer('المغرب', prayerTimes.maghrib, Icons.wb_twilight),
-          _buildPrayer('العشاء', prayerTimes.isha, Icons.nightlight_round),
+          _buildPrayer(context, 'fajr'.tr(), prayerTimes.fajr, Icons.wb_twilight),
+          _buildPrayer(context, 'sunrise'.tr(), prayerTimes.sunrise, Icons.wb_sunny_outlined),
+          _buildPrayer(context, 'dhuhr'.tr(), prayerTimes.dhuhr, Icons.wb_sunny),
+          _buildPrayer(context, 'asr'.tr(), prayerTimes.asr, Icons.sunny_snowing),
+          _buildPrayer(context, 'maghrib'.tr(), prayerTimes.maghrib, Icons.wb_twilight),
+          _buildPrayer(context, 'isha'.tr(), prayerTimes.isha, Icons.nightlight_round),
         ],
       ),
     );

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -59,7 +60,7 @@ class _BuildCitiesScreenState
       body: cities.isEmpty
           ? Center(
         child: Text(
-          'لم يتم العثور على مدن',
+          'no_cities_found'.tr(),
           style: TextStyle(
             fontSize: 14.sp,
           ),

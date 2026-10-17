@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -20,12 +21,14 @@ class HijriCalendarHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final hijriSuffix = 'hijri_suffix'.tr();
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         IconButton(
           onPressed: onNext,
-          tooltip: 'الشهر التالي',
+          tooltip: 'next_month'.tr(),
           icon: Icon(
             Icons.chevron_left_rounded,
             size: 28.sp,
@@ -67,7 +70,7 @@ class HijriCalendarHeader extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10.r),
                   ),
                   child: Text(
-                    '$year هـ',
+                    '$year $hijriSuffix',
                     style: TextStyle(
                       fontSize: 13.sp,
                       color: const Color(0xFF176B5B),
@@ -82,7 +85,7 @@ class HijriCalendarHeader extends StatelessWidget {
 
         IconButton(
           onPressed: onPrevious,
-          tooltip: 'الشهر السابق',
+          tooltip: 'previous_month'.tr(),
           icon: Icon(
             Icons.chevron_right_rounded,
             size: 28.sp,

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -87,7 +88,7 @@ class CountrySelectionScreenState extends State<CountrySelectionScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'اختر الدولة',
+          'select_country'.tr(),
           style: TextStyle(
             fontSize: 18.sp,
           ),
@@ -118,7 +119,7 @@ class CountrySelectionScreenState extends State<CountrySelectionScreen> {
                 fontSize: 15.sp,
               ),
               decoration: InputDecoration(
-                hintText: 'ابحث عن دولة...',
+                hintText: 'search_country'.tr(),
                 hintStyle: TextStyle(
                   fontSize: 15.sp,
                 ),
@@ -160,7 +161,7 @@ class CountrySelectionScreenState extends State<CountrySelectionScreen> {
             child: Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                '${filteredCountries.length} دولة',
+                'countries_count'.tr(args: [filteredCountries.length.toString()]),
                 style: TextStyle(
                   color: Colors.grey.shade600,
                   fontSize: 13.sp,
@@ -177,7 +178,7 @@ class CountrySelectionScreenState extends State<CountrySelectionScreen> {
             child: filteredCountries.isEmpty
                 ? Center(
                     child: Text(
-                      'لم يتم العثور على دول',
+                      'no_countries_found'.tr(),
                       style: TextStyle(
                         fontSize: 14.sp,
                       ),

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -40,7 +41,7 @@ class ErrorView extends StatelessWidget {
             ElevatedButton(
               onPressed: onRetry,
               child: Text(
-                'إعادة المحاولة',
+                'retry'.tr(),
                 style: TextStyle(
                   fontSize: 14.sp,
                 ),

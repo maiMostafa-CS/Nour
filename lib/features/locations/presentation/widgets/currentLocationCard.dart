@@ -33,9 +33,7 @@ class CurrentLocationCard extends StatelessWidget {
         context: context,
         icon: Icons.wifi_off,
         title: 'no_internet_title'.tr(),
-        message: 'يحتاج التطبيق إلى الاتصال بالإنترنت '
-            'لتحديد موقعك بدقة والحصول على اسم المدينة.\n\n'
-            'يرجى تفعيل Wi-Fi أو بيانات الجوال.',
+        message: 'no_internet_content'.tr(),
       );
 
       if (openSettings == true) {
@@ -88,12 +86,12 @@ class CurrentLocationCard extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('لاحقاً'),
+            child: Text('later'.tr()),
           ),
           ElevatedButton.icon(
             onPressed: () => Navigator.pop(ctx, true),
             icon: const Icon(Icons.settings, size: 18),
-            label: const Text('فتح الإعدادات'),
+            label: Text('open_settings'.tr()),
           ),
         ],
       ),

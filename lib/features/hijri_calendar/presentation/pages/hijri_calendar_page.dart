@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -70,7 +71,7 @@ class _HijriCalendarPageState extends State<HijriCalendarPage> {
         elevation: 0,
         centerTitle: true,
         title: Text(
-          'التقويم الهجري',
+          'hijri_calendar'.tr(),
           style: TextStyle(
             fontSize: 18.sp,
             fontWeight: FontWeight.bold,
@@ -95,7 +96,7 @@ class _HijriCalendarPageState extends State<HijriCalendarPage> {
                       color: const Color(0xFF176B5B),
                     ),
                     label: Text(
-                      'اليوم',
+                      'today'.tr(),
                       style: TextStyle(
                         fontSize: 13.sp,
                         fontWeight: FontWeight.bold,
@@ -109,7 +110,7 @@ class _HijriCalendarPageState extends State<HijriCalendarPage> {
                       size: 22.sp,
                       color: const Color(0xFF176B5B),
                     ),
-                    tooltip: 'اختيار شهر وسنة',
+                    tooltip: 'choose_month_and_year'.tr(),
                     onPressed: () => _openMonthYearPicker(
                       context,
                       state.year,
@@ -150,9 +151,8 @@ class _HijriCalendarPageState extends State<HijriCalendarPage> {
             return const SizedBox();
           }
 
-          final monthName = state.dates.isNotEmpty
-              ? state.dates.first.monthName
-              : '';
+          final monthName = 'hijri_month_${state.month}'.tr();
+          final hijriSuffix = 'hijri_suffix'.tr();
 
           return SingleChildScrollView(
             padding: EdgeInsets.fromLTRB(
@@ -225,8 +225,8 @@ class _HijriCalendarPageState extends State<HijriCalendarPage> {
                     alignment: Alignment.centerRight,
                     child: Text(
                       '${state.selectedDate!.day} '
-                          '${state.selectedDate!.monthName} '
-                          '${state.selectedDate!.year} هـ',
+                          '${'hijri_month_${state.selectedDate!.month}'.tr()} '
+                          '${state.selectedDate!.year} $hijriSuffix',
                       style: TextStyle(
                         fontSize: 18.sp,
                         fontWeight: FontWeight.bold,

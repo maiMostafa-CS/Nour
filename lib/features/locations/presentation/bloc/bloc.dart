@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../domain/usecase/get_all_locations.dart';
@@ -137,7 +138,7 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
         emit(
           state.copyWith(
             status: LocationStatus.failure,
-            errorMessage: 'City not found',
+            errorMessage: 'city_not_found'.tr(),
           ),
         );
 

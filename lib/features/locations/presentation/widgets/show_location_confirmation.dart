@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -85,12 +86,12 @@ class LocationConfirmationBottomSheet
             SizedBox(height: 20.h),
 
             CoordinateRow(
-              label: 'خط العرض',
+              label: 'latitude'.tr(),
               value: location.latitude.toString(),
             ),
 
             CoordinateRow(
-              label: 'خط الطول',
+              label: 'longitude'.tr(),
               value: location.longitude.toString(),
             ),
 
@@ -102,7 +103,7 @@ class LocationConfirmationBottomSheet
               child: ElevatedButton(
                 onPressed: onConfirm,
                 child: Text(
-                  'استخدام هذا الموقع',
+                  'use_this_location'.tr(),
                   style: TextStyle(
                     fontSize: 16.sp,
                     fontWeight: FontWeight.bold,
@@ -121,7 +122,7 @@ class LocationConfirmationBottomSheet
                   Navigator.pop(context);
                 },
                 child: Text(
-                  'إلغاء',
+                  'cancel'.tr(),
                   style: TextStyle(
                     fontSize: 14.sp,
                   ),

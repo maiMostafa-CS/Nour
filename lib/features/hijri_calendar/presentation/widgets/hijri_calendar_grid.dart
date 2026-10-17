@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -21,7 +22,7 @@ class HijriCalendarGrid extends StatelessWidget {
     if (dates.isEmpty) {
       return Center(
         child: Text(
-          'لا توجد بيانات',
+          'no_data'.tr(),
           style: TextStyle(
             fontSize: 14.sp,
           ),

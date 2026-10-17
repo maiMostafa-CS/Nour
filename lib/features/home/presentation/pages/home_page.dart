@@ -230,6 +230,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       centerTitle: true,
       elevation: 0,
       backgroundColor: Colors.transparent,
+      titleSpacing: 0,
       actions: [
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 8.w),
@@ -298,25 +299,32 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           ],
         ),
       ),
-      title: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            Icons.mosque_rounded,
-            color: AppColors.softGold,
-            size: 20.sp,
+      title: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 4.w),
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.mosque_rounded,
+                color: AppColors.softGold,
+                size: 20.sp,
+              ),
+              SizedBox(width: 6.w),
+              Text(
+                getCurrentHijriDate(context),
+                maxLines: 1,
+                style: TextStyle(
+                  fontSize: 15.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ],
           ),
-          SizedBox(width: 8.w),
-          Text(
-            getCurrentHijriDate(context),
-            style: TextStyle(
-              fontSize: 15.sp,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-              letterSpacing: 0.5,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

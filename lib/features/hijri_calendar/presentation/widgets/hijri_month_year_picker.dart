@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -12,21 +13,6 @@ class HijriMonthYearPickerSheet extends StatefulWidget {
     required this.initialMonth,
     required this.onSelected,
   });
-
-  static const List<String> hijriMonthNames = [
-    'محرم',
-    'صفر',
-    'ربيع الأول',
-    'ربيع الآخر',
-    'جمادى الأولى',
-    'جمادى الآخرة',
-    'رجب',
-    'شعبان',
-    'رمضان',
-    'شوال',
-    'ذو القعدة',
-    'ذو الحجة',
-  ];
 
   static Future<void> show(
     BuildContext context, {
@@ -82,6 +68,8 @@ class _HijriMonthYearPickerSheetState extends State<HijriMonthYearPickerSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final hijriSuffix = 'hijri_suffix'.tr();
+
     return Container(
       padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 30.h),
       decoration: BoxDecoration(
@@ -110,7 +98,7 @@ class _HijriMonthYearPickerSheetState extends State<HijriMonthYearPickerSheet> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'اختيار الشهر والسنة الهجرية',
+                'choose_hijri_month_and_year'.tr(),
                 style: TextStyle(
                   fontSize: 17.sp,
                   fontWeight: FontWeight.bold,
@@ -133,7 +121,7 @@ class _HijriMonthYearPickerSheetState extends State<HijriMonthYearPickerSheet> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'السنة الهجرية ($_selectedYear هـ)',
+                '${'hijri_year'.tr()} ($_selectedYear $hijriSuffix)',
                 style: TextStyle(
                   fontSize: 14.sp,
                   fontWeight: FontWeight.w600,
@@ -177,7 +165,7 @@ class _HijriMonthYearPickerSheetState extends State<HijriMonthYearPickerSheet> {
                   padding: EdgeInsets.only(left: 8.w),
                   child: ChoiceChip(
                     label: Text(
-                      '$year هـ',
+                      '$year $hijriSuffix',
                       style: TextStyle(
                         fontSize: 13.sp,
                         fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
@@ -206,7 +194,7 @@ class _HijriMonthYearPickerSheetState extends State<HijriMonthYearPickerSheet> {
 
           // Months Label
           Text(
-            'أشهر السنة ($_selectedYear هـ)',
+            '${'months_of_year'.tr()} ($_selectedYear $hijriSuffix)',
             style: TextStyle(
               fontSize: 14.sp,
               fontWeight: FontWeight.w600,
@@ -228,7 +216,7 @@ class _HijriMonthYearPickerSheetState extends State<HijriMonthYearPickerSheet> {
             ),
             itemBuilder: (context, i) {
               final monthNumber = i + 1;
-              final monthName = HijriMonthYearPickerSheet.hijriMonthNames[i];
+              final monthName = 'hijri_month_$monthNumber'.tr();
               final isSelected = monthNumber == _selectedMonth;
 
               return InkWell(
