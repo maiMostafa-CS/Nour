@@ -42,3 +42,16 @@ class ChangeHijriLocation extends HijriCalendarEvent {
     longitude,
   ];
 }
+
+class SetHijriMonthAndYear extends HijriCalendarEvent {
+  final int year;
+  final int month;
+
+  const SetHijriMonthAndYear({
+    required this.year,
+    required this.month,
+  });
+
+  @override
+  List<Object?> get props => [year, month];
+}

@@ -9,6 +9,7 @@ import '../bloc/hijri_calendar_state.dart';
 import '../widgets/hijri_calendar_header.dart';
 import '../widgets/hijri_week_days.dart';
 import '../widgets/hijri_calendar_grid.dart';
+import '../widgets/hijri_month_year_picker.dart';
 import '../widgets/prayer_times_card.dart';
 
 class HijriCalendarPage extends StatefulWidget {
@@ -43,6 +44,22 @@ class _HijriCalendarPageState extends State<HijriCalendarPage> {
     });
   }
 
+  void _openMonthYearPicker(BuildContext context, int year, int month) {
+    HijriMonthYearPickerSheet.show(
+      context,
+      currentYear: year,
+      currentMonth: month,
+      onSelected: (selectedYear, selectedMonth) {
+        context.read<HijriCalendarBloc>().add(
+              SetHijriMonthAndYear(
+                year: selectedYear,
+                month: selectedMonth,
+              ),
+            );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -59,6 +76,51 @@ class _HijriCalendarPageState extends State<HijriCalendarPage> {
             fontWeight: FontWeight.bold,
           ),
         ),
+        actions: [
+          BlocBuilder<HijriCalendarBloc, HijriCalendarState>(
+            builder: (context, state) {
+              if (state is! HijriCalendarLoaded) return const SizedBox();
+              return Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextButton.icon(
+                    onPressed: () {
+                      context
+                          .read<HijriCalendarBloc>()
+                          .add(const LoadHijriCalendar());
+                    },
+                    icon: Icon(
+                      Icons.today_rounded,
+                      size: 18.sp,
+                      color: const Color(0xFF176B5B),
+                    ),
+                    label: Text(
+                      'اليوم',
+                      style: TextStyle(
+                        fontSize: 13.sp,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF176B5B),
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(
+                      Icons.calendar_month_rounded,
+                      size: 22.sp,
+                      color: const Color(0xFF176B5B),
+                    ),
+                    tooltip: 'اختيار شهر وسنة',
+                    onPressed: () => _openMonthYearPicker(
+                      context,
+                      state.year,
+                      state.month,
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ],
       ),
 
       body: BlocBuilder<HijriCalendarBloc, HijriCalendarState>(
@@ -112,6 +174,11 @@ class _HijriCalendarPageState extends State<HijriCalendarPage> {
                       HijriCalendarHeader(
                         monthName: monthName,
                         year: state.year,
+                        onTitleTap: () => _openMonthYearPicker(
+                          context,
+                          state.year,
+                          state.month,
+                        ),
                         onPrevious: () {
                           context
                               .read<HijriCalendarBloc>()

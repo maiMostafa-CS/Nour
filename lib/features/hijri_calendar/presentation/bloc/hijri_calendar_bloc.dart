@@ -25,6 +25,7 @@ class HijriCalendarBloc
     on<SelectHijriDate>(_onSelectDate);
     on<NextHijriMonth>(_onNextMonth);
     on<PreviousHijriMonth>(_onPreviousMonth);
+    on<SetHijriMonthAndYear>(_onSetMonthAndYear);
   }
 
   // ============================================================
@@ -374,5 +375,37 @@ class HijriCalendarBloc
       'latitude': latitude,
       'longitude': longitude,
     };
+  }
+
+  Future<void> _onSetMonthAndYear(
+      SetHijriMonthAndYear event,
+      Emitter<HijriCalendarState> emit,
+      ) async {
+    final currentState = state;
+
+    if (currentState is! HijriCalendarLoaded) {
+      return;
+    }
+
+    debugPrint(
+      '📅 SET HIJRI MONTH AND YEAR | '
+          'month=${event.month} | '
+          'year=${event.year}',
+    );
+
+    final dates = getHijriMonth(
+      year: event.year,
+      month: event.month,
+    );
+
+    emit(
+      currentState.copyWith(
+        dates: dates,
+        year: event.year,
+        month: event.month,
+        selectedDate: dates.isNotEmpty ? dates.first : null,
+        prayerTimes: null,
+      ),
+    );
   }
 }

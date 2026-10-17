@@ -61,6 +61,7 @@ class BuildLoaded extends StatelessWidget {
             qiblaDirection: qibla.qiblaDirection,
             latitude: qibla.latitude,
             longitude: qibla.longitude,
+            cityName: qibla.cityName,
           ),
 
           SizedBox(height: 20.h),

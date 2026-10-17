@@ -6,12 +6,14 @@ class QiblaInfoCard extends StatelessWidget {
   final double qiblaDirection;
   final double latitude;
   final double longitude;
+  final String? cityName;
 
   const QiblaInfoCard({
     super.key,
     required this.qiblaDirection,
     required this.latitude,
     required this.longitude,
+    this.cityName,
   });
 
   String get directionText {
@@ -130,8 +132,9 @@ class QiblaInfoCard extends StatelessWidget {
               const Spacer(),
 
               Text(
-                '${latitude.toStringAsFixed(4)}, '
-                    '${longitude.toStringAsFixed(4)}',
+                cityName != null && cityName!.isNotEmpty
+                    ? '$cityName (${latitude.toStringAsFixed(2)}, ${longitude.toStringAsFixed(2)})'
+                    : '${latitude.toStringAsFixed(4)}, ${longitude.toStringAsFixed(4)}',
                 style: TextStyle(
                   fontSize: 12.sp,
                   color: Colors.grey,

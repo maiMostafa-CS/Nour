@@ -149,7 +149,9 @@ Future<void> configureDependencies() async {
   // ============================================================
 
   sl.registerLazySingleton<QiblaLocalDataSource>(
-    () => QiblaLocalDataSourceImpl(),
+    () => QiblaLocalDataSourceImpl(
+      prefs: sl<SharedPreferences>(),
+    ),
   );
 
   sl.registerLazySingleton<QiblaRepository>(
