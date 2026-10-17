@@ -324,7 +324,7 @@ class CountdownNotificationService {
         onlyAlertOnce: true,
         showWhen: true,
         usesChronometer: true,
-        chronometerCountDown: true,
+        chronometerCountDown: false,
         when: nextPrayerTime.millisecondsSinceEpoch,
         visibility: NotificationVisibility.public,
         channelShowBadge: false,
