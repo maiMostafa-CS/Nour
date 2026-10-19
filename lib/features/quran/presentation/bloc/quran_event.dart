@@ -113,3 +113,45 @@ class LoadAyahTafsir extends QuranIndexEvent {
 class ClearAyahTafsir extends QuranIndexEvent {
   const ClearAyahTafsir();
 }
+
+// ============================================================
+// TRANSLATION
+// ============================================================
+
+class LoadTranslationResources extends QuranIndexEvent {
+  final String language;
+
+  const LoadTranslationResources({this.language = 'english'});
+
+  @override
+  List<Object?> get props => [language];
+}
+
+class SelectTranslationResource extends QuranIndexEvent {
+  final int resourceId;
+
+  const SelectTranslationResource(this.resourceId);
+
+  @override
+  List<Object?> get props => [resourceId];
+}
+
+class LoadAyahTranslation extends QuranIndexEvent {
+  final int surahNumber;
+  final int ayahNumber;
+
+  const LoadAyahTranslation({
+    required this.surahNumber,
+    required this.ayahNumber,
+  });
+
+  @override
+  List<Object?> get props => [
+        surahNumber,
+        ayahNumber,
+      ];
+}
+
+class ClearAyahTranslation extends QuranIndexEvent {
+  const ClearAyahTranslation();
+}

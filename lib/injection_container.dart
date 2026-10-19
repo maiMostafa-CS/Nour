@@ -95,6 +95,12 @@ import 'features/quran/domain/usecases/get_surahs.dart';
 import 'features/quran/domain/usecases/get_tafsir_books.dart';
 import 'features/quran/domain/usecases/search_surahs.dart';
 import 'features/quran/presentation/bloc/quran_bloc.dart';
+import 'features/quran/data/datasources/quran_translation_remote_data_source.dart';
+import 'features/quran/data/repositories/quran_translation_repository_impl.dart';
+import 'features/quran/domain/repositories/quran_translation_repository.dart';
+import 'features/quran/domain/usecases/get_ayah_translation.dart';
+import 'features/quran/domain/usecases/get_chapter_translation.dart';
+import 'features/quran/domain/usecases/get_translation_resources.dart';
 import 'features/tasbih/presentation/bloc/tasbih_bloc.dart';
 import 'features/tasbih/presentation/widgets/custom_dhikr_storage.dart';
 
@@ -530,6 +536,10 @@ Future<void> configureDependencies() async {
       getTafsirBooks: sl<GetTafsirBooks>(),
       getAyahTafsir: sl<GetAyahTafsir>(),
 
+      // Translation
+      getTranslationResources: sl<GetTranslationResources>(),
+      getAyahTranslation: sl<GetAyahTranslation>(),
+
       // Audio
       audioService: sl<AyahAudioService>(),
     ),
@@ -582,6 +592,40 @@ Future<void> configureDependencies() async {
   sl.registerLazySingleton<GetAyahTafsir>(
     () => GetAyahTafsir(
       sl<TafsirBooksRepository>(),
+    ),
+  );
+
+// ============================================================
+// Quran Translation
+// ============================================================
+
+  sl.registerLazySingleton<QuranTranslationRemoteDataSource>(
+    () => QuranTranslationRemoteDataSourceImpl(
+      client: sl<http.Client>(),
+    ),
+  );
+
+  sl.registerLazySingleton<QuranTranslationRepository>(
+    () => QuranTranslationRepositoryImpl(
+      remoteDataSource: sl<QuranTranslationRemoteDataSource>(),
+    ),
+  );
+
+  sl.registerLazySingleton<GetTranslationResources>(
+    () => GetTranslationResources(
+      sl<QuranTranslationRepository>(),
+    ),
+  );
+
+  sl.registerLazySingleton<GetAyahTranslation>(
+    () => GetAyahTranslation(
+      sl<QuranTranslationRepository>(),
+    ),
+  );
+
+  sl.registerLazySingleton<GetChapterTranslation>(
+    () => GetChapterTranslation(
+      sl<QuranTranslationRepository>(),
     ),
   );
 // ============================================================

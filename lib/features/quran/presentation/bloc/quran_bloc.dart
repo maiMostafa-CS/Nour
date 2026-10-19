@@ -15,11 +15,13 @@ import '../../domain/entities/quran_reciter.dart';
 
 import '../../domain/usecases/GetAyahTafsir.dart';
 import '../../domain/usecases/get_ayah_audio_url.dart';
-import '../../domain/usecases/get_surahs.dart';
-import '../../domain/usecases/search_surahs.dart';
+import '../../domain/usecases/get_ayah_translation.dart';
 import '../../domain/usecases/get_quran_reciters.dart';
-
+import '../../domain/usecases/get_surahs.dart';
 import '../../domain/usecases/get_tafsir_books.dart';
+import '../../domain/usecases/get_translation_resources.dart';
+import '../../domain/usecases/search_surahs.dart';
+import '../../domain/entities/quran_translation_resource.dart';
 
 class QuranIndexBloc extends Bloc<QuranIndexEvent, QuranIndexState> {
   // ==========================================================
@@ -44,6 +46,13 @@ class QuranIndexBloc extends Bloc<QuranIndexEvent, QuranIndexState> {
 
   final GetTafsirBooks getTafsirBooks;
   final GetAyahTafsir getAyahTafsir;
+
+  // ==========================================================
+  // Translation UseCases
+  // ==========================================================
+
+  final GetTranslationResources getTranslationResources;
+  final GetAyahTranslation getAyahTranslation;
 
   // ==========================================================
   // Audio Service
@@ -92,6 +101,8 @@ class QuranIndexBloc extends Bloc<QuranIndexEvent, QuranIndexState> {
     required this.getAyahAudioUrl,
     required this.getTafsirBooks,
     required this.getAyahTafsir,
+    required this.getTranslationResources,
+    required this.getAyahTranslation,
     required this.audioService,
   }) : super(const QuranIndexInitial()) {
     // Surah
@@ -113,6 +124,12 @@ class QuranIndexBloc extends Bloc<QuranIndexEvent, QuranIndexState> {
     on<SelectTafsirBook>(_onSelectTafsirBook);
     on<LoadAyahTafsir>(_onLoadAyahTafsir);
     on<ClearAyahTafsir>(_onClearAyahTafsir);
+
+    // Translation
+    on<LoadTranslationResources>(_onLoadTranslationResources);
+    on<SelectTranslationResource>(_onSelectTranslationResource);
+    on<LoadAyahTranslation>(_onLoadAyahTranslation);
+    on<ClearAyahTranslation>(_onClearAyahTranslation);
   }
 
   // ==========================================================
@@ -694,6 +711,217 @@ class QuranIndexBloc extends Bloc<QuranIndexEvent, QuranIndexState> {
     final currentState = state as QuranIndexLoaded;
 
     emit(currentState.copyWith(clearAyahTafsir: true));
+  }
+
+  // ==========================================================
+  // LOAD TRANSLATION RESOURCES
+  // ==========================================================
+
+  Future<void> _onLoadTranslationResources(
+    LoadTranslationResources event,
+    Emitter<QuranIndexState> emit,
+  ) async {
+    if (state is! QuranIndexLoaded) return;
+    final startState = state as QuranIndexLoaded;
+
+    try {
+      debugPrint('🌍 Loading translation resources for ${event.language}');
+
+      emit(startState.copyWith(isTranslationLoading: true));
+
+      final resources = await getTranslationResources(
+        language: event.language,
+      );
+
+      debugPrint('🌍 Loaded ${resources.length} translation resources');
+
+      if (state is! QuranIndexLoaded) return;
+      final latest = state as QuranIndexLoaded;
+
+      QuranTranslationResource? selected;
+      for (final r in resources) {
+        if (r.id == latest.selectedTranslationResource?.id) {
+          selected = r;
+          break;
+        }
+      }
+      // Prefer Saheeh International (id 20) as default, otherwise first available
+      selected ??= resources.firstWhere(
+        (r) => r.id == 20,
+        orElse: () => resources.isNotEmpty ? resources.first : const QuranTranslationResource(
+          id: 20,
+          name: 'Saheeh International',
+          authorName: 'Saheeh International',
+          languageName: 'english',
+        ),
+      );
+
+      emit(
+        latest.copyWith(
+          translationResources: resources,
+          selectedTranslationResource: selected,
+          isTranslationLoading: false,
+        ),
+      );
+    } catch (e, st) {
+      debugPrint('❌ Load translation resources error: $e\n$st');
+
+      if (e is NoInternetException) {
+        _emitNoInternet(e.message);
+      }
+
+      if (state is QuranIndexLoaded) {
+        emit((state as QuranIndexLoaded).copyWith(isTranslationLoading: false));
+      }
+    }
+  }
+
+  // ==========================================================
+  // SELECT TRANSLATION RESOURCE
+  // ==========================================================
+
+  Future<void> _onSelectTranslationResource(
+    SelectTranslationResource event,
+    Emitter<QuranIndexState> emit,
+  ) async {
+    if (state is! QuranIndexLoaded) return;
+
+    final currentState = state as QuranIndexLoaded;
+
+    if (currentState.translationResources.isEmpty) {
+      debugPrint('❌ No translation resources available');
+      return;
+    }
+
+    QuranTranslationResource? selectedResource;
+    for (final resource in currentState.translationResources) {
+      if (resource.id == event.resourceId) {
+        selectedResource = resource;
+        break;
+      }
+    }
+
+    if (selectedResource == null) {
+      debugPrint('❌ Translation resource not found: ${event.resourceId}');
+      return;
+    }
+
+    debugPrint('📖 Selected translation resource: ${selectedResource.name}');
+
+    emit(
+      currentState.copyWith(
+        selectedTranslationResource: selectedResource,
+        clearAyahTranslation: true,
+      ),
+    );
+  }
+
+  // ==========================================================
+  // LOAD AYAH TRANSLATION
+  // ==========================================================
+
+  Future<void> _onLoadAyahTranslation(
+    LoadAyahTranslation event,
+    Emitter<QuranIndexState> emit,
+  ) async {
+    if (state is! QuranIndexLoaded) return;
+
+    var currentState = state as QuranIndexLoaded;
+
+    try {
+      var selectedResource = currentState.selectedTranslationResource;
+
+      if (selectedResource == null) {
+        emit(currentState.copyWith(isTranslationLoading: true));
+
+        final resources = await getTranslationResources();
+
+        if (resources.isEmpty) {
+          debugPrint('❌ No translation resources available');
+          if (state is QuranIndexLoaded) {
+            emit((state as QuranIndexLoaded).copyWith(isTranslationLoading: false));
+          }
+          return;
+        }
+
+        selectedResource = resources.firstWhere(
+          (r) => r.id == 20,
+          orElse: () => resources.first,
+        );
+
+        if (state is! QuranIndexLoaded) return;
+        currentState = state as QuranIndexLoaded;
+
+        emit(
+          currentState.copyWith(
+            translationResources: resources,
+            selectedTranslationResource: selectedResource,
+          ),
+        );
+      }
+
+      debugPrint(
+        '🌍 Loading translation ${event.surahNumber}:${event.ayahNumber} '
+        'resource=${selectedResource.id}',
+      );
+
+      if (state is! QuranIndexLoaded) return;
+      currentState = state as QuranIndexLoaded;
+
+      emit(
+        currentState.copyWith(
+          isTranslationLoading: true,
+          clearAyahTranslation: true,
+        ),
+      );
+
+      final translation = await getAyahTranslation(
+        surahNumber: event.surahNumber,
+        ayahNumber: event.ayahNumber,
+        resourceId: selectedResource.id,
+      );
+
+      debugPrint(
+        translation == null
+            ? '⚠️ No translation found for ${event.surahNumber}:${event.ayahNumber}'
+            : '✅ Translation loaded for ${event.surahNumber}:${event.ayahNumber}',
+      );
+
+      if (state is! QuranIndexLoaded) return;
+      final latest = state as QuranIndexLoaded;
+
+      emit(
+        latest.copyWith(
+          ayahTranslation: translation,
+          isTranslationLoading: false,
+        ),
+      );
+    } catch (e, st) {
+      debugPrint('❌ Load ayah translation error: $e\n$st');
+
+      if (e is NoInternetException) {
+        _emitNoInternet(e.message);
+      }
+
+      if (state is QuranIndexLoaded) {
+        emit((state as QuranIndexLoaded).copyWith(isTranslationLoading: false));
+      }
+    }
+  }
+
+  // ==========================================================
+  // CLEAR AYAH TRANSLATION
+  // ==========================================================
+
+  void _onClearAyahTranslation(
+    ClearAyahTranslation event,
+    Emitter<QuranIndexState> emit,
+  ) {
+    if (state is! QuranIndexLoaded) return;
+
+    final currentState = state as QuranIndexLoaded;
+
+    emit(currentState.copyWith(clearAyahTranslation: true));
   }
 
   // ==========================================================

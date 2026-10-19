@@ -18,6 +18,7 @@ class AyahActions extends StatelessWidget {
   final VoidCallback? onResume;
   final VoidCallback? onReciter;
   final VoidCallback? onTafsir;
+  final VoidCallback? onTranslate;
   final VoidCallback? onClose;
 
   const AyahActions({
@@ -33,6 +34,7 @@ class AyahActions extends StatelessWidget {
     this.onResume,
     this.onReciter,
     this.onTafsir,
+    this.onTranslate,
     this.onClose,
   });
 
@@ -45,7 +47,7 @@ class AyahActions extends StatelessWidget {
       color: Colors.transparent,
       child: Container(
         padding: EdgeInsets.symmetric(
-          horizontal: 10.w,
+          horizontal: 8.w,
           vertical: 8.h,
         ),
         decoration: BoxDecoration(
@@ -63,8 +65,8 @@ class AyahActions extends StatelessWidget {
 // ==================================================
 
             Container(
-              width: 40.w,
-              height: 40.w,
+              width: 36.w,
+              height: 36.w,
               decoration: const BoxDecoration(
                 color: Color(0xFF8B5A2B),
                 shape: BoxShape.circle,
@@ -74,13 +76,13 @@ class AyahActions extends StatelessWidget {
                 '$verseNumber',
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 14.sp,
+                  fontSize: 13.sp,
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ),
 
-            SizedBox(width: 10.w),
+            SizedBox(width: 8.w),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
@@ -92,7 +94,7 @@ class AyahActions extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.right,
                     style: TextStyle(
-                      fontSize: 14.sp,
+                      fontSize: 13.sp,
                       fontWeight: FontWeight.bold,
                       color: const Color(0xFF333333),
                     ),
@@ -112,7 +114,7 @@ class AyahActions extends StatelessWidget {
               ),
             ),
 
-            SizedBox(width: 4.w),
+            SizedBox(width: 2.w),
 
 // ==================================================
 // Play / Pause / Resume
@@ -157,6 +159,17 @@ class AyahActions extends StatelessWidget {
               tooltip: 'التفسير',
               iconColor: const Color(0xFF8B5A2B),
               onPressed: onTafsir ?? () {},
+            ),
+
+// ==================================================
+// Translation
+// ==================================================
+
+            AyahActionButton(
+              icon: Icons.g_translate_outlined,
+              tooltip: 'الترجمة',
+              iconColor: const Color(0xFF8B5A2B),
+              onPressed: onTranslate ?? () {},
             ),
 
 // ==================================================

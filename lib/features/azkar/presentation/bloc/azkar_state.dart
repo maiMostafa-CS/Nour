@@ -18,15 +18,15 @@ class AzkarCategoriesLoaded extends AzkarState {
 
 class AzkarChaptersLoaded extends AzkarState {
   final List<dynamic> chapters;
-  final int categoryId;        // ✅ جديد — عشان نعرف رجعنا من أنهي category
+  final int categoryId;
 
   const AzkarChaptersLoaded(this.chapters, this.categoryId);
 }
 
 class AzkarItemsLoaded extends AzkarState {
   final List<dynamic> items;
-  final int chapterId;         // ✅ جديد
-  final int categoryId;        // ✅ جديد
+  final int chapterId;
+  final int categoryId;
 
   const AzkarItemsLoaded(
       this.items, {

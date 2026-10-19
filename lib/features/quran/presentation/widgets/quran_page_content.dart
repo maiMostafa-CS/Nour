@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:islamic_app/features/quran/presentation/widgets/reciter_selection/reciter_selection_sheet.dart';
@@ -12,6 +13,7 @@ import '../bloc/quran_event.dart';
 import '../bloc/quran_state.dart';
 import 'build_ayah_actions.dart';
 import 'no_internet_listener.dart';
+import '../pages/quran_translation_page.dart';
 
 class QuranPageContent extends StatefulWidget {
   final int pageNumber;
@@ -424,6 +426,14 @@ class _QuranPageContentState extends State<QuranPageContent>
 
           onTafsir: () {
             _showTafsir(context);
+          },
+
+          // ======================================================
+          // Translation
+          // ======================================================
+
+          onTranslate: () {
+            _showTranslation(context);
           },
 
           // ======================================================
@@ -844,6 +854,390 @@ class _QuranPageContentState extends State<QuranPageContent>
                                           ),
                               ),
                             ],
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _showTranslation(BuildContext context) async {
+    final surahNumber = _selectedSurahNumber;
+    final verseNumber = _selectedVerseNumber;
+
+    if (surahNumber == null || verseNumber == null) {
+      return;
+    }
+
+    final bloc = context.read<QuranIndexBloc>();
+
+    // Check internet connection before opening the BottomSheet
+    final online = await _hasInternet();
+
+    if (!context.mounted) return;
+
+    if (!online) {
+      showNoInternetDialog(
+        context,
+        onRetry: () => _showTranslation(context),
+      );
+      return;
+    }
+
+    _lastRetryAction = () => bloc.add(
+          LoadAyahTranslation(
+            surahNumber: surahNumber,
+            ayahNumber: verseNumber,
+          ),
+        );
+
+    bloc.add(
+      LoadAyahTranslation(
+        surahNumber: surahNumber,
+        ayahNumber: verseNumber,
+      ),
+    );
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFFFCF5D7),
+      isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(24.r),
+        ),
+      ),
+      builder: (sheetContext) {
+        return BlocProvider.value(
+          value: bloc,
+          child: StatefulBuilder(
+            builder: (context, setSheetState) {
+              return BlocBuilder<QuranIndexBloc, QuranIndexState>(
+                builder: (context, state) {
+                  if (state is! QuranIndexLoaded) {
+                    return SizedBox(
+                      height: 300.h,
+                      child: const Center(
+                        child: CircularProgressIndicator(
+                          color: Color(0xFF8B5A2B),
+                        ),
+                      ),
+                    );
+                  }
+
+                  final resources = state.translationResources;
+                  final selectedResource = state.selectedTranslationResource;
+                  final translation = state.ayahTranslation;
+                  final isLoading = state.isTranslationLoading;
+
+                  return SafeArea(
+                    child: SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.75,
+                      child: Padding(
+                        padding: EdgeInsets.all(20.w),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            // ==================================================
+                            // Header
+                            // ==================================================
+
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'ترجمة ${getSurahNameArabic(surahNumber)}',
+                                        style: TextStyle(
+                                          fontSize: 19.sp,
+                                          fontWeight: FontWeight.bold,
+                                          color: const Color(0xFF2C2C2C),
+                                        ),
+                                      ),
+                                      SizedBox(height: 2.h),
+                                      Text(
+                                        'الآية $verseNumber • English Translation',
+                                        style: TextStyle(
+                                          fontSize: 13.sp,
+                                          color: Colors.black54,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                IconButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  icon: const Icon(Icons.close),
+                                ),
+                              ],
+                            ),
+
+                            SizedBox(height: 16.h),
+
+                            // ==================================================
+                            // Translator selector
+                            // ==================================================
+
+                            Text(
+                              'المترجم / Translation Edition',
+                              style: TextStyle(
+                                fontSize: 13.sp,
+                                fontWeight: FontWeight.bold,
+                                color: const Color(0xFF555555),
+                              ),
+                            ),
+
+                            SizedBox(height: 8.h),
+
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 12.w,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.65),
+                                borderRadius: BorderRadius.circular(14.r),
+                                border: Border.all(
+                                  color: Colors.black12,
+                                ),
+                              ),
+                              child: DropdownButtonHideUnderline(
+                                child: DropdownButton<int>(
+                                  value: selectedResource?.id,
+                                  isExpanded: true,
+                                  borderRadius: BorderRadius.circular(14.r),
+                                  items: resources.map((resource) {
+                                    return DropdownMenuItem<int>(
+                                      value: resource.id,
+                                      child: Text(
+                                        resource.name,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(fontSize: 14.sp),
+                                      ),
+                                    );
+                                  }).toList(),
+                                  onChanged: (resourceId) {
+                                    if (resourceId == null) return;
+
+                                    bloc.add(
+                                      SelectTranslationResource(resourceId),
+                                    );
+
+                                    bloc.add(
+                                      LoadAyahTranslation(
+                                        surahNumber: surahNumber,
+                                        ayahNumber: verseNumber,
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+
+                            SizedBox(height: 16.h),
+
+                            // ==================================================
+                            // Selected Translator Tag
+                            // ==================================================
+
+                            if (selectedResource != null)
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 12.w,
+                                  vertical: 10.h,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.45),
+                                  borderRadius: BorderRadius.circular(12.r),
+                                  border: Border.all(
+                                    color: const Color(0xFF8B5A2B).withValues(alpha: 0.20),
+                                  ),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.language,
+                                      size: 18.sp,
+                                      color: const Color(0xFF8B5A2B),
+                                    ),
+                                    SizedBox(width: 8.w),
+                                    Expanded(
+                                      child: Text(
+                                        selectedResource.authorName.isNotEmpty
+                                            ? selectedResource.authorName
+                                            : selectedResource.name,
+                                        style: TextStyle(
+                                          fontSize: 13.sp,
+                                          fontWeight: FontWeight.w600,
+                                          color: const Color(0xFF444444),
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    if (translation != null && !isLoading)
+                                      InkWell(
+                                        borderRadius: BorderRadius.circular(20.r),
+                                        onTap: () {
+                                          Clipboard.setData(
+                                            ClipboardData(text: translation.text),
+                                          );
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                              content: const Text(
+                                                'تم نسخ الترجمة إلى الحافظة',
+                                                textAlign: TextAlign.right,
+                                              ),
+                                              backgroundColor: const Color(0xFF176B5B),
+                                              duration: const Duration(seconds: 2),
+                                              behavior: SnackBarBehavior.floating,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(10.r),
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                        child: Padding(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: 8.w,
+                                            vertical: 4.h,
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Icon(
+                                                Icons.copy_rounded,
+                                                size: 16.sp,
+                                                color: const Color(0xFF8B5A2B),
+                                              ),
+                                              SizedBox(width: 4.w),
+                                              Text(
+                                                'نسخ',
+                                                style: TextStyle(
+                                                  fontSize: 12.sp,
+                                                  color: const Color(0xFF8B5A2B),
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              ),
+
+                            SizedBox(height: 16.h),
+
+                            // ==================================================
+                            // Translation Text Area
+                            // ==================================================
+
+                            Expanded(
+                              child: isLoading
+                                  ? const Center(
+                                      child: CircularProgressIndicator(
+                                        color: Color(0xFF8B5A2B),
+                                      ),
+                                    )
+                                  : translation == null
+                                      ? Center(
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Icon(
+                                                Icons.info_outline,
+                                                size: 42.sp,
+                                                color: Colors.black38,
+                                              ),
+                                              SizedBox(height: 10.h),
+                                              Text(
+                                                'لا توجد ترجمة متاحة لهذه الآية',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                  fontSize: 15.sp,
+                                                  color: Colors.black54,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        )
+                                      : SingleChildScrollView(
+                                          physics: const BouncingScrollPhysics(),
+                                          child: Container(
+                                            width: double.infinity,
+                                            padding: EdgeInsets.all(18.w),
+                                            decoration: BoxDecoration(
+                                              color: Colors.white.withValues(alpha: 0.65),
+                                              borderRadius: BorderRadius.circular(16.r),
+                                              border: Border.all(
+                                                color: const Color(0xFF8B5A2B).withValues(alpha: 0.15),
+                                              ),
+                                            ),
+                                            child: Directionality(
+                                              textDirection: TextDirection.ltr,
+                                              child: Text(
+                                                translation.text,
+                                                textAlign: TextAlign.left,
+                                                style: TextStyle(
+                                                  fontSize: 16.sp,
+                                                  height: 1.7,
+                                                  color: const Color(0xFF222222),
+                                                  fontFamily: 'Roboto',
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                            ),
+                            SizedBox(height: 12.h),
+                            SizedBox(
+                              width: double.infinity,
+                              child: OutlinedButton.icon(
+                                style: OutlinedButton.styleFrom(
+                                  side: const BorderSide(color: Color(0xFF8B5A2B)),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12.r),
+                                  ),
+                                  padding: EdgeInsets.symmetric(vertical: 10.h),
+                                ),
+                                icon: const Icon(
+                                  Icons.chrome_reader_mode_outlined,
+                                  size: 18,
+                                  color: Color(0xFF8B5A2B),
+                                ),
+                                label: const Text(
+                                  'عرض السورة كاملة مع الترجمة',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF8B5A2B),
+                                  ),
+                                ),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => QuranTranslationPage(
+                                        initialSurahNumber: surahNumber,
+                                        initialAyahNumber: verseNumber,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
                           ],
                         ),
                       ),

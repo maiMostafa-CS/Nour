@@ -3,6 +3,8 @@ import 'package:equatable/equatable.dart';
 import '../../domain/entities/quran_reciter.dart';
 import '../../domain/entities/quran_tafsir.dart';
 import '../../domain/entities/quran_tafsir_book.dart';
+import '../../domain/entities/quran_translation.dart';
+import '../../domain/entities/quran_translation_resource.dart';
 import '../../domain/entities/surah_entity.dart';
 
 /// ============================================================
@@ -68,6 +70,17 @@ class QuranIndexLoaded extends QuranIndexState {
   final bool isTafsirLoading;
 
   // ==========================================================
+  // Translation
+  // ==========================================================
+
+  final List<QuranTranslationResource> translationResources;
+  final QuranTranslationResource? selectedTranslationResource;
+
+  final QuranTranslation? ayahTranslation;
+
+  final bool isTranslationLoading;
+
+  // ==========================================================
   // Constructor
   // ==========================================================
 
@@ -87,6 +100,12 @@ class QuranIndexLoaded extends QuranIndexState {
     this.selectedTafsirBook,
     this.ayahTafsir,
     this.isTafsirLoading = false,
+
+    // Translation
+    this.translationResources = const [],
+    this.selectedTranslationResource,
+    this.ayahTranslation,
+    this.isTranslationLoading = false,
   });
 
   // ==========================================================
@@ -116,6 +135,15 @@ class QuranIndexLoaded extends QuranIndexState {
 
     bool clearSelectedTafsirBook = false,
     bool clearAyahTafsir = false,
+
+    // Translation
+    List<QuranTranslationResource>? translationResources,
+    QuranTranslationResource? selectedTranslationResource,
+    QuranTranslation? ayahTranslation,
+    bool? isTranslationLoading,
+
+    bool clearSelectedTranslationResource = false,
+    bool clearAyahTranslation = false,
   }) {
     return QuranIndexLoaded(
       // ======================================================
@@ -158,6 +186,24 @@ class QuranIndexLoaded extends QuranIndexState {
 
       isTafsirLoading:
       isTafsirLoading ?? this.isTafsirLoading,
+
+      // ======================================================
+      // Translation
+      // ======================================================
+
+      translationResources:
+          translationResources ?? this.translationResources,
+
+      selectedTranslationResource: clearSelectedTranslationResource
+          ? null
+          : selectedTranslationResource ?? this.selectedTranslationResource,
+
+      ayahTranslation: clearAyahTranslation
+          ? null
+          : ayahTranslation ?? this.ayahTranslation,
+
+      isTranslationLoading:
+          isTranslationLoading ?? this.isTranslationLoading,
     );
   }
 
@@ -183,6 +229,12 @@ class QuranIndexLoaded extends QuranIndexState {
     selectedTafsirBook,
     ayahTafsir,
     isTafsirLoading,
+
+    // Translation
+    translationResources,
+    selectedTranslationResource,
+    ayahTranslation,
+    isTranslationLoading,
   ];
 }
 

@@ -6,6 +6,7 @@ import '../bloc/quran_bloc.dart';
 import '../bloc/quran_event.dart';
 import '../bloc/quran_state.dart';
 import 'mushaf_page.dart';
+import '../pages/quran_translation_page.dart';
 
 class QuranIndexView extends StatefulWidget {
   const QuranIndexView({super.key});
@@ -76,7 +77,23 @@ class _QuranIndexViewState extends State<QuranIndexView> {
       appBar: AppBar(
         backgroundColor: backgroundColor,
         elevation: 0,
-
+        actions: [
+          IconButton(
+            icon: const Icon(
+              Icons.g_translate_outlined,
+              color: Color(0xFF8B5A2B),
+            ),
+            tooltip: 'قراءة القرآن بالترجمة الإنجليزية',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const QuranTranslationPage(),
+                ),
+              );
+            },
+          ),
+        ],
         title: const Align(
           alignment: Alignment.centerRight,
           child: Text(
@@ -285,11 +302,40 @@ class _QuranIndexViewState extends State<QuranIndexView> {
                           child: Row(
                             children: [
                               // =====================
+                              // Translation Mode Button
+                              // =====================
+
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.g_translate_outlined,
+                                  size: 20,
+                                  color: Color(0xFF8B5A2B),
+                                ),
+                                tooltip: 'قراءة سورة ${surah.nameArabic} بالترجمة',
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => QuranTranslationPage(
+                                        initialSurahNumber: surah.number,
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+
+                              const SizedBox(
+                                width: 8,
+                              ),
+
+                              // =====================
                               // Page Number
                               // =====================
 
                               SizedBox(
-                                width: 48,
+                                width: 44,
                                 child: Text(
                                   'ص ${surah.pageNumber}',
 
@@ -306,7 +352,7 @@ class _QuranIndexViewState extends State<QuranIndexView> {
                               ),
 
                               const SizedBox(
-                                width: 12,
+                                width: 10,
                               ),
 
                               // =====================

@@ -34,7 +34,7 @@ class AzkarCategoryCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16.r),
         side: BorderSide(color: _accentColor.withOpacity(0.3)),
       ),
-      clipBehavior: Clip.antiAlias, // ✅ عشان الـ splash يبان جوه الحواف
+      clipBehavior: Clip.antiAlias,
       child: ListTile(
         contentPadding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 8.h),
         leading: Container(

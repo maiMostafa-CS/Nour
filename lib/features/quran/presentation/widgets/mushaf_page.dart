@@ -5,9 +5,11 @@ import 'package:islamic_app/features/quran/presentation/widgets/quran_page_conte
 import '../../../../core/services/quran_bookmark_service.dart';
 import '../../../../core/services/quran_font_size_service.dart';
 import '../../../../injection_container.dart';
+import 'package:qcf_quran/qcf_quran.dart';
 import '../bloc/quran_bloc.dart';
 import '../bloc/quran_event.dart';
 import '../pages/quran_search_page.dart';
+import '../pages/quran_translation_page.dart';
 
 class MushafPage extends StatefulWidget {
   final int startPage;
@@ -145,6 +147,20 @@ class MushafPageState extends State<MushafPage> {
         currentJuz: 'الجزء $_currentJuz',
         isPageSaved: _isPageSaved,
         onBookmarkPressed: _toggleBookmark,
+        onTranslationPressed: () {
+          final ranges = getPageData(_currentPage);
+          final surahNumber = ranges.isNotEmpty
+              ? int.tryParse(ranges.first['surah'].toString()) ?? 1
+              : 1;
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => QuranTranslationPage(
+                initialSurahNumber: surahNumber,
+              ),
+            ),
+          );
+        },
         onSearchPressed: () async {
           final int? pageNumber = await Navigator.push<int>(
             context,
@@ -382,6 +398,7 @@ class QuranAppBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback? onBackPressed;
   final VoidCallback? onSearchPressed;
   final VoidCallback? onBookmarkPressed;
+  final VoidCallback? onTranslationPressed;
   final bool isPageSaved;
 
   const QuranAppBar({
@@ -391,6 +408,7 @@ class QuranAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.onBackPressed,
     this.onSearchPressed,
     this.onBookmarkPressed,
+    this.onTranslationPressed,
     this.isPageSaved = false,
 
   }) : super(key: key);
@@ -441,7 +459,19 @@ class QuranAppBar extends StatelessWidget implements PreferredSizeWidget {
                   icon: const Icon(Icons.search, size: 20,
                     color: Color(0xFF8B5A2B),
                   ),
+                  tooltip: 'بحث في القرآن',
                   onPressed: onSearchPressed,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                ),
+                IconButton(
+                  icon: const Icon(
+                    Icons.g_translate_outlined,
+                    size: 20,
+                    color: Color(0xFF8B5A2B),
+                  ),
+                  tooltip: 'قراءة بالترجمة الإنجليزية',
+                  onPressed: onTranslationPressed,
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
                 ),

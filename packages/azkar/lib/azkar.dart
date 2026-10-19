@@ -24,16 +24,21 @@ class Azkar {
   static List<ChapterCategory> getChapters(AzkarLang language) {
     List chapters = _Chapters.data[language.name];
 
-    return chapters.map((e) => ChapterCategory(e['category_id'], e['id'], e['name'])).toList();
+    return chapters
+        .map((e) => ChapterCategory(e['category_id'], e['id'], e['name']))
+        .toList();
   }
 
-  static List<ChapterCategory> getChaptersByCategory(AzkarLang language, int categoryID) {
-    return getChapters(language).where((e) => e.categoryID == categoryID).toList();
+  static List<ChapterCategory> getChaptersByCategory(
+      AzkarLang language, int categoryID) {
+    return getChapters(language)
+        .where((e) => e.categoryID == categoryID)
+        .toList();
   }
 
-  static List<ItemChapter> getItemsByChapter(AzkarLang language, int chapterID) {
-    Iterable<ItemChapter> items =
-        (_Items.data[language.name] as List).map((e) {
+  static List<ItemChapter> getItemsByChapter(
+      AzkarLang language, int chapterID) {
+    List<ItemChapter> items = _Items.data[language.name].map((e) {
       return ItemChapter(e['chapter_id'], e['id'], e['reference'], e['item']);
     });
 
