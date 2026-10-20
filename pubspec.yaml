@@ -63,7 +63,6 @@ flutter:
 
   assets:
     - assets/translations/
-    - assets/aliiqama/
     - assets/quran/
     - assets/images/
     - assets/adhan-mp3/

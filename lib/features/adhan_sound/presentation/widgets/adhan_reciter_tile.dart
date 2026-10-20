@@ -70,7 +70,7 @@ class AdhanReciterTile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    reciter.name.tr(),
+                    reciter.name,
                     style: TextStyle(
                       fontSize: 17.sp,
                       fontWeight: FontWeight.bold,
